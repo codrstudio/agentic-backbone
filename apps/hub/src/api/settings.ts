@@ -1,6 +1,6 @@
 import { queryOptions, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
-import type { LlmConfig, LlmProvider } from "./types";
+import type { LlmConfig, LlmProvider, WebSearchConfig, WebSearchProviderType } from "./types";
 
 export const llmConfigQuery = queryOptions({
   queryKey: ["settings", "llm"],
@@ -25,6 +25,24 @@ export function useUpdateLlmProvider() {
       api.patch<LlmConfig>("/settings/llm", { provider }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["settings", "llm"] });
+    },
+  });
+}
+
+// --- Web Search ---
+
+export const webSearchConfigQuery = queryOptions({
+  queryKey: ["settings", "web-search"],
+  queryFn: () => api.get<WebSearchConfig>("/settings/web-search"),
+});
+
+export function useUpdateWebSearchProvider() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (provider: WebSearchProviderType) =>
+      api.patch<WebSearchConfig>("/settings/web-search", { provider }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["settings", "web-search"] });
     },
   });
 }

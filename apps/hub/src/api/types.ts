@@ -99,6 +99,12 @@ export interface LlmConfig {
   plans: Record<string, Record<string, LlmPlan>>;
 }
 
+// --- Web Search ---
+export type WebSearchProviderType = "duckduckgo" | "brave" | "none";
+export interface WebSearchConfig {
+  provider: WebSearchProviderType;
+}
+
 // --- Heartbeat ---
 export interface UsageData {
   inputTokens: number;

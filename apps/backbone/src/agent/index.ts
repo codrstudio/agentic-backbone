@@ -1,5 +1,6 @@
 import { runAgent as runProxyAgent, type AgentEvent, type UsageData } from "@agentic-backbone/ai-sdk";
 import { loadLlmConfig, resolveModel, resolveEffort, resolveThinking } from "../settings/llm.js";
+import { loadWebSearchConfig } from "../settings/web-search.js";
 import { join } from "node:path";
 
 export type { AgentEvent, UsageData };
@@ -17,6 +18,7 @@ export async function* runAgent(
   const model = resolveModel(role);
   const effort = resolveEffort();
   const thinking = resolveThinking();
+  const webSearch = loadWebSearchConfig();
 
   const apiKey = config.provider === "claude"
     ? process.env.ANTHROPIC_API_KEY!
@@ -35,6 +37,8 @@ export async function* runAgent(
     providerConfig: {
       ...(effort ? { effort } : {}),
       ...(thinking ? { thinking } : {}),
+      webSearch: webSearch.provider,
+      ...(process.env.BRAVE_API_KEY ? { braveApiKey: process.env.BRAVE_API_KEY } : {}),
     },
   });
 }

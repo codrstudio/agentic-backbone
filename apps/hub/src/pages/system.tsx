@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { systemInfoQuery, systemEnvQuery, contextTreeQuery, useRefreshSystem } from "@/api/system";
-import { llmConfigQuery, useUpdateLlmPlan, useUpdateLlmProvider } from "@/api/settings";
+import { llmConfigQuery, useUpdateLlmPlan, useUpdateLlmProvider, webSearchConfigQuery, useUpdateWebSearchProvider } from "@/api/settings";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -10,8 +10,8 @@ import { StatusBadge } from "@/components/shared/status-badge";
 import { PageHeader } from "@/components/shared/page-header";
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { RefreshCw, FolderTree, Server, KeyRound, Zap, ChevronRight, Folder, FolderOpen, FileText } from "lucide-react";
-import type { LlmPlan, LlmProvider } from "@/api/types";
+import { RefreshCw, FolderTree, Server, KeyRound, Zap, Search, ChevronRight, Folder, FolderOpen, FileText } from "lucide-react";
+import type { LlmPlan, LlmProvider, WebSearchProviderType } from "@/api/types";
 import { cn } from "@/lib/utils";
 
 const PROVIDER_LABELS: Record<LlmProvider, string> = {
@@ -19,14 +19,22 @@ const PROVIDER_LABELS: Record<LlmProvider, string> = {
   ai: "Ai (OpenRouter)",
 };
 
+const WEB_SEARCH_OPTIONS: { provider: WebSearchProviderType; label: string; description: string }[] = [
+  { provider: "duckduckgo", label: "DuckDuckGo", description: "Busca gratuita via scraping. Sem API key." },
+  { provider: "brave", label: "Brave Search", description: "API oficial da Brave. Requer BRAVE_API_KEY." },
+  { provider: "none", label: "Desabilitado", description: "Agente não terá acesso a busca web." },
+];
+
 export function SystemPage() {
   const { data: info } = useQuery(systemInfoQuery);
   const { data: env } = useQuery(systemEnvQuery);
   const { data: tree } = useQuery(contextTreeQuery);
   const { data: llmConfig } = useQuery(llmConfigQuery);
+  const { data: webSearchConfig } = useQuery(webSearchConfigQuery);
   const refresh = useRefreshSystem();
   const updatePlan = useUpdateLlmPlan();
   const updateProvider = useUpdateLlmProvider();
+  const updateWebSearch = useUpdateWebSearchProvider();
 
   const activeProvider = llmConfig?.provider ?? "claude";
   const providerPlans = llmConfig?.plans[activeProvider] ?? {};
@@ -88,6 +96,39 @@ export function SystemPage() {
           ) : (
             <p className="text-sm text-muted-foreground">Loading...</p>
           )}
+        </CardContent>
+      </Card>
+
+      {/* Web Search Card */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base flex items-center gap-2">
+            <Search className="h-4 w-4" /> Busca Web
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-3 sm:grid-cols-3">
+            {WEB_SEARCH_OPTIONS.map((opt) => (
+              <button
+                key={opt.provider}
+                type="button"
+                disabled={webSearchConfig?.provider === opt.provider || updateWebSearch.isPending}
+                onClick={() => updateWebSearch.mutate(opt.provider)}
+                className={cn(
+                  "rounded-lg border p-4 text-left transition-colors",
+                  webSearchConfig?.provider === opt.provider
+                    ? "border-primary bg-primary/5 ring-1 ring-primary"
+                    : "border-border hover:border-primary/50 hover:bg-accent"
+                )}
+              >
+                <div className="flex items-center justify-between mb-1">
+                  <span className="font-medium text-sm">{opt.label}</span>
+                  {webSearchConfig?.provider === opt.provider && <Badge variant="default">Ativo</Badge>}
+                </div>
+                <p className="text-xs text-muted-foreground">{opt.description}</p>
+              </button>
+            ))}
+          </div>
         </CardContent>
       </Card>
 

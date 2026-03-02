@@ -1,6 +1,9 @@
 {
   "provider": "ai",
   "active": "economico",
+  "webSearch": {
+    "provider": "duckduckgo"
+  },
   "plans": {
     "claude": {
       "economico": {
@@ -72,6 +75,9 @@
           "memory": {
             "model": "google/gemini-2.0-flash-lite-001"
           }
+        },
+        "thinking": {
+          "type": "adaptive"
         }
       },
       "padrao": {

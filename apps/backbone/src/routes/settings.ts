@@ -2,6 +2,7 @@ import { Hono } from "hono";
 import { requireSysuser } from "./auth-helpers.js";
 import { loadLlmConfig, saveLlmConfig } from "../settings/llm.js";
 import type { LlmProvider } from "../settings/llm.js";
+import { loadWebSearchConfig, saveWebSearchConfig, isValidWebSearchProvider } from "../settings/web-search.js";
 
 export const settingsRoutes = new Hono();
 
@@ -56,5 +57,35 @@ settingsRoutes.patch("/settings/llm", async (c) => {
   }
 
   saveLlmConfig(config);
+  return c.json(config);
+});
+
+// --- GET /settings/web-search ---
+
+settingsRoutes.get("/settings/web-search", (c) => {
+  const denied = requireSysuser(c);
+  if (denied) return denied;
+
+  return c.json(loadWebSearchConfig());
+});
+
+// --- PATCH /settings/web-search ---
+
+settingsRoutes.patch("/settings/web-search", async (c) => {
+  const denied = requireSysuser(c);
+  if (denied) return denied;
+
+  const body = await c.req.json<{ provider?: string }>();
+
+  if (!body.provider) {
+    return c.json({ error: "'provider' is required" }, 400);
+  }
+
+  if (!isValidWebSearchProvider(body.provider)) {
+    return c.json({ error: `invalid provider "${body.provider}". Valid: duckduckgo, brave, none` }, 400);
+  }
+
+  const config = { provider: body.provider };
+  saveWebSearchConfig(config);
   return c.json(config);
 });
