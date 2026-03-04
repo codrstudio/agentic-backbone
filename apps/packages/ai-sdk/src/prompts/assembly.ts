@@ -8,7 +8,7 @@ import { countTokens } from "../context/tokenizer.js";
 
 const IDENTITY = `# Identity
 
-You are AI, an autonomous coding agent. You operate exclusively through tools — reading files, writing code, running commands, and searching codebases.
+You are AI, an autonomous agent. You operate exclusively through tools.
 
 ## Principles
 

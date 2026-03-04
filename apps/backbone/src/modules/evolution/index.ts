@@ -7,6 +7,17 @@ import { EvolutionActions } from "./actions.js";
 import { createEvolutionRoutes } from "./routes.js";
 import type { EvolutionConfig } from "./types.js";
 
+function calculateHumanDelay(text: string): number {
+  const length = text.length;
+  const charsPerSecond = 2.0 + Math.random() * 2.5;  // 2.0–4.5 chars/s
+  const rawTypingMs = (length / charsPerSecond) * 1000;
+  const jitter = 0.75 + Math.random() * 0.5;          // ±25%
+  const typingMs = rawTypingMs * jitter;
+  const preSendPause = 200 + Math.random() * 600;     // 200–800ms
+  const total = Math.max(800, Math.min(20_000, typingMs + preSendPause));
+  return Math.round(total);
+}
+
 let probe: EvolutionProbe | null = null;
 let stateTracker: EvolutionStateTracker | null = null;
 let patternDetector: EvolutionPatternDetector | null = null;
@@ -83,7 +94,11 @@ export const evolutionModule: BackboneModule = {
           const res = await fetch(`${baseUrl}/message/sendText/${instance}`, {
             method: "POST",
             headers: { "Content-Type": "application/json", apikey: apiKey },
-            body: JSON.stringify({ number: recipientId, text: content }),
+            body: JSON.stringify({
+              number: recipientId,
+              textMessage: { text: content },
+              options: { delay: calculateHumanDelay(content), presence: "composing" },
+            }),
           });
           if (!res.ok) {
             console.error(`[whatsapp-adapter] sendText falhou: HTTP ${res.status}`);

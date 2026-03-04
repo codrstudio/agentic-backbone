@@ -9,7 +9,8 @@ export async function braveSearch(
   numResults: number,
   apiKey: string
 ): Promise<WebSearchResult[]> {
-  const url = `https://api.search.brave.com/res/v1/web/search?q=${encodeURIComponent(query)}&count=${numResults}`;
+  const count = numResults ?? 5;
+  const url = `https://api.search.brave.com/res/v1/web/search?q=${encodeURIComponent(query)}&count=${count}`;
   const res = await fetch(url, {
     headers: { "X-Subscription-Token": apiKey },
   });
