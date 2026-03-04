@@ -3,6 +3,7 @@ import { createMemoryAiTools } from "../memory/ai-tools.js";
 import { createCronTools } from "../cron/tools.js";
 import { createAdapterTools } from "../adapters/tools.js";
 import { createMessageTools } from "../channels/tools.js";
+import { createTwilioTools } from "../modules/twilio/tools.js";
 
 type AgentMode = "heartbeat" | "conversation" | "cron" | "memory";
 
@@ -33,6 +34,9 @@ export function composeAgentTools(
     recipientId: opts?.userId,
   });
   if (messageTools) Object.assign(tools, messageTools);
+
+  const twilioTools = createTwilioTools();
+  if (twilioTools) Object.assign(tools, twilioTools);
 
   return Object.keys(tools).length > 0 ? tools : undefined;
 }

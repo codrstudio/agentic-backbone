@@ -1,10 +1,10 @@
 import type { BackboneModule, ModuleContext, ModuleHealth } from "../types.js";
-import { loadTwilioConfig } from "./config.js";
 import { createTwilioRoutes } from "./routes.js";
 import { listActiveCalls, clearCalls } from "./calls.js";
-import type { TwilioConfig } from "./types.js";
+import { findChannelsByAdapter } from "../../channels/lookup.js";
+import { loadCallbackBaseUrl } from "./config.js";
 
-let config: TwilioConfig | null = null;
+let started = false;
 
 export const twilioModule: BackboneModule = {
   name: "twilio",
@@ -12,11 +12,22 @@ export const twilioModule: BackboneModule = {
   routes: undefined,
 
   async start(ctx: ModuleContext): Promise<void> {
-    config = loadTwilioConfig(ctx.env);
-    ctx.log("config loaded");
+    const channels = findChannelsByAdapter("twilio-voice");
+    if (channels.length === 0) {
+      ctx.log("no twilio-voice channels found, skipping");
+      return;
+    }
+
+    // Validate callback URL is available
+    try {
+      loadCallbackBaseUrl(ctx.env);
+    } catch (err) {
+      ctx.log(`callback URL not configured, skipping: ${err instanceof Error ? err.message : String(err)}`);
+      return;
+    }
 
     // Create routes
-    this.routes = createTwilioRoutes(config);
+    this.routes = createTwilioRoutes();
 
     // Register "twilio-voice" channel-adapter
     // Voice is synchronous via TwiML webhook response pattern — send() is a no-op
@@ -29,17 +40,18 @@ export const twilioModule: BackboneModule = {
       },
     }));
 
-    ctx.log("started");
+    started = true;
+    ctx.log(`started (${channels.length} channel(s))`);
   },
 
   async stop(): Promise<void> {
     clearCalls();
-    config = null;
+    started = false;
     this.routes = undefined;
   },
 
   health(): ModuleHealth {
-    if (!config) {
+    if (!started) {
       return { status: "unhealthy", details: { reason: "not started" } };
     }
 

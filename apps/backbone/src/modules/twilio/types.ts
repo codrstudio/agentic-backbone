@@ -10,6 +10,7 @@ export interface VoiceSession {
   reason?: string;
   status: TwilioCallStatus;
   createdAt: number;
+  config: TwilioConfig;
 }
 
 // --- Call Status ---

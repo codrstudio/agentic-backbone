@@ -4,6 +4,7 @@ import { createCall, getCall, updateCallStatus, removeCall, listActiveCalls } fr
 import { buildSayAndGatherTwiml, buildHangupTwiml, parseEndCallSignal } from "./twiml.js";
 import { findChannelsByAdapter } from "../../channels/lookup.js";
 import { findOrCreateSession, sendMessage } from "../../conversations/index.js";
+import { loadTwilioConfigFromChannel } from "./config.js";
 import type { TwilioCallStatus } from "./types.js";
 
 const TERMINAL_STATUSES: TwilioCallStatus[] = ["completed", "busy", "no-answer", "canceled", "failed"];
@@ -29,7 +30,7 @@ function twimlResponse(c: Context, xml: string): Response {
   return c.text(xml, 200, { "Content-Type": "application/xml" });
 }
 
-export function createTwilioRoutes(config: TwilioConfig): Hono {
+export function createTwilioRoutes(): Hono {
   const app = new Hono();
 
   // --- POST /calls — Create outbound call ---
@@ -54,6 +55,13 @@ export function createTwilioRoutes(config: TwilioConfig): Hono {
     const agentId = channel.metadata.agent as string | undefined;
     if (!agentId) {
       return c.json({ ok: false, error: "channel_has_no_agent" }, 400);
+    }
+
+    let config: TwilioConfig;
+    try {
+      config = loadTwilioConfigFromChannel(channel);
+    } catch (err) {
+      return c.json({ ok: false, error: err instanceof Error ? err.message : String(err) }, 500);
     }
 
     const statusCallbackUrl = `${config.callbackBaseUrl}/api/v1/ai/modules/twilio/webhook/status`;
@@ -103,6 +111,7 @@ export function createTwilioRoutes(config: TwilioConfig): Hono {
       reason: body.reason,
       status: "queued",
       createdAt: Date.now(),
+      config,
     });
 
     return c.json({ ok: true, data: { callSid: data.sid, sessionId: session.session_id } });
@@ -116,14 +125,11 @@ export function createTwilioRoutes(config: TwilioConfig): Hono {
     const from = form.From;
     const direction = form.Direction;
 
-    if (!callSid) {
-      return twimlResponse(c, buildHangupTwiml(config, "Erro interno."));
-    }
-
     let voiceSession = getCall(callSid);
 
     if (voiceSession) {
       // Outbound call — we already have a session
+      const cfg = voiceSession.config;
       const agentMessage = voiceSession.reason ?? "O usuário atendeu a ligação.";
       const agentResponse = await consumeAgentResponse(
         voiceSession.senderId,
@@ -133,15 +139,15 @@ export function createTwilioRoutes(config: TwilioConfig): Hono {
       const cleaned = stripChannelPrefix(agentResponse);
 
       if (!cleaned) {
-        return twimlResponse(c, buildHangupTwiml(config, "Desculpe, ocorreu um erro."));
+        return twimlResponse(c, buildHangupTwiml(cfg, "Desculpe, ocorreu um erro."));
       }
 
-      const { shouldEnd, cleanText } = parseEndCallSignal(cleaned, config.endCallToken);
+      const { shouldEnd, cleanText } = parseEndCallSignal(cleaned, cfg.endCallToken);
       if (shouldEnd) {
-        return twimlResponse(c, buildHangupTwiml(config, cleanText || "Ate logo."));
+        return twimlResponse(c, buildHangupTwiml(cfg, cleanText || "Ate logo."));
       }
 
-      return twimlResponse(c, buildSayAndGatherTwiml(config, cleanText, callSid));
+      return twimlResponse(c, buildSayAndGatherTwiml(cfg, cleanText, callSid));
     }
 
     // Inbound call — find channel and create session
@@ -149,12 +155,23 @@ export function createTwilioRoutes(config: TwilioConfig): Hono {
     const channel = channels[0];
 
     if (!channel) {
-      return twimlResponse(c, buildHangupTwiml(config, "Servico indisponivel."));
+      // Fallback config just for the hangup TwiML
+      const fallbackConfig = { voice: "Polly.Camila", language: "pt-BR" } as TwilioConfig;
+      return twimlResponse(c, buildHangupTwiml(fallbackConfig, "Servico indisponivel."));
     }
 
     const agentId = channel.metadata.agent as string | undefined;
     if (!agentId) {
-      return twimlResponse(c, buildHangupTwiml(config, "Servico indisponivel."));
+      const fallbackConfig = { voice: "Polly.Camila", language: "pt-BR" } as TwilioConfig;
+      return twimlResponse(c, buildHangupTwiml(fallbackConfig, "Servico indisponivel."));
+    }
+
+    let config: TwilioConfig;
+    try {
+      config = loadTwilioConfigFromChannel(channel);
+    } catch {
+      const fallbackConfig = { voice: "Polly.Camila", language: "pt-BR" } as TwilioConfig;
+      return twimlResponse(c, buildHangupTwiml(fallbackConfig, "Servico indisponivel."));
     }
 
     const senderId = from || "unknown";
@@ -169,6 +186,7 @@ export function createTwilioRoutes(config: TwilioConfig): Hono {
       direction: (direction === "outbound-api" ? "outbound" : "inbound"),
       status: "in-progress",
       createdAt: Date.now(),
+      config,
     });
 
     voiceSession = getCall(callSid)!;
@@ -201,17 +219,21 @@ export function createTwilioRoutes(config: TwilioConfig): Hono {
     const speechResult = form.SpeechResult;
 
     if (!callSid) {
-      return twimlResponse(c, buildHangupTwiml(config, "Erro interno."));
+      const fallbackConfig = { voice: "Polly.Camila", language: "pt-BR" } as TwilioConfig;
+      return twimlResponse(c, buildHangupTwiml(fallbackConfig, "Erro interno."));
     }
 
     const voiceSession = getCall(callSid);
     if (!voiceSession) {
-      return twimlResponse(c, buildHangupTwiml(config, "Sessao nao encontrada."));
+      const fallbackConfig = { voice: "Polly.Camila", language: "pt-BR" } as TwilioConfig;
+      return twimlResponse(c, buildHangupTwiml(fallbackConfig, "Sessao nao encontrada."));
     }
+
+    const cfg = voiceSession.config;
 
     if (!speechResult) {
       // No speech detected — re-prompt
-      return twimlResponse(c, buildSayAndGatherTwiml(config, "Desculpe, nao entendi. Pode repetir?", callSid));
+      return twimlResponse(c, buildSayAndGatherTwiml(cfg, "Desculpe, nao entendi. Pode repetir?", callSid));
     }
 
     const agentMessage = speechResult;
@@ -223,15 +245,15 @@ export function createTwilioRoutes(config: TwilioConfig): Hono {
     const cleaned = stripChannelPrefix(agentResponse);
 
     if (!cleaned) {
-      return twimlResponse(c, buildHangupTwiml(config, "Desculpe, ocorreu um erro."));
+      return twimlResponse(c, buildHangupTwiml(cfg, "Desculpe, ocorreu um erro."));
     }
 
-    const { shouldEnd, cleanText } = parseEndCallSignal(cleaned, config.endCallToken);
+    const { shouldEnd, cleanText } = parseEndCallSignal(cleaned, cfg.endCallToken);
     if (shouldEnd) {
-      return twimlResponse(c, buildHangupTwiml(config, cleanText || "Ate logo."));
+      return twimlResponse(c, buildHangupTwiml(cfg, cleanText || "Ate logo."));
     }
 
-    return twimlResponse(c, buildSayAndGatherTwiml(config, cleanText, callSid));
+    return twimlResponse(c, buildSayAndGatherTwiml(cfg, cleanText, callSid));
   });
 
   // --- POST /webhook/status — Twilio call status updates ---

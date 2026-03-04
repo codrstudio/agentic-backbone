@@ -8,8 +8,9 @@ import { twilioModule } from "./twilio/index.js";
  *
  * Conditional registration: modules that depend on environment
  * variables are only included when those variables are defined.
+ * Twilio always loads — start() skips graciously if no twilio-voice channels exist.
  */
 export const modules: BackboneModule[] = [
   ...(process.env.EVOLUTION_URL ? [evolutionModule] : []),
-  ...(process.env.TWILIO_ACCOUNT_SID ? [twilioModule] : []),
+  twilioModule,
 ];
