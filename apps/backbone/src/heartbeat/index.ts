@@ -119,8 +119,8 @@ async function tick(agentId: string): Promise<void> {
   }
 
   // Guard: empty instructions
-  const prompt = await assemblePrompt(agentId, "heartbeat");
-  if (!prompt) {
+  const assembled = await assemblePrompt(agentId, "heartbeat");
+  if (!assembled) {
     state.lastStatus = "skipped";
     state.lastSkipReason = "empty-instructions";
     logHeartbeat({ agentId, status: "skipped", reason: "empty-instructions" });
@@ -154,12 +154,13 @@ async function tick(agentId: string): Promise<void> {
       hookEvent: "agent:before",
       agentId,
       role: "heartbeat",
-      prompt,
+      prompt: assembled.userMessage,
     });
 
-    for await (const event of runAgent(prompt, {
+    for await (const event of runAgent(assembled.userMessage, {
       role: "heartbeat",
       tools: composeAgentTools(agentId, "heartbeat"),
+      system: assembled.system,
     })) {
       if (event.type === "result" && event.content) {
         fullText = event.content;

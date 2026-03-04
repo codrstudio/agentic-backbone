@@ -71,8 +71,8 @@ async function executeMessagePayload(
 
   const mode = payload.kind;
   const userMessage = `[cron:${job.agentId}/${job.slug}] ${payload.message}`;
-  const prompt = await assemblePrompt(job.agentId, mode, { userMessage });
-  if (!prompt) {
+  const assembled = await assemblePrompt(job.agentId, mode, { userMessage });
+  if (!assembled) {
     const durationMs = Date.now() - startMs;
     logCronRun({
       jobSlug: job.slug,
@@ -93,9 +93,10 @@ async function executeMessagePayload(
 
   process.env.AGENT_ID = job.agentId;
   const execution = (async () => {
-    for await (const event of runAgent(prompt, {
+    for await (const event of runAgent(assembled.userMessage, {
       role: "cron",
       tools: composeAgentTools(job.agentId, "cron"),
+      system: assembled.system,
     })) {
       if (event.type === "result" && event.content) {
         fullText = event.content;

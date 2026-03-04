@@ -190,7 +190,10 @@ export async function* sendMessage(
     message,
   });
 
-  const prompt = await assemblePrompt(agentId, "conversation", { userMessage: message }) ?? "";
+  const assembled = await assemblePrompt(agentId, "conversation", { userMessage: message });
+  if (!assembled) {
+    throw new Error(`Agent ${agentId} has no conversation instructions`);
+  }
 
   let fullText = "";
   let sdkSessionId = session.sdk_session_id ?? undefined;
@@ -202,13 +205,14 @@ export async function* sendMessage(
     agentId,
     role: "conversation",
     sessionId,
-    prompt,
+    prompt: assembled.userMessage,
   });
 
-  for await (const event of runAgent(prompt, {
+  for await (const event of runAgent(assembled.userMessage, {
     sessionId: sdkSessionId,
     role: "conversation",
     tools: composeAgentTools(agentId, "conversation", { sessionId, userId }),
+    system: assembled.system,
   })) {
     // Capture SDK session on first init for future resume
     if (event.type === "init" && event.sessionId) {

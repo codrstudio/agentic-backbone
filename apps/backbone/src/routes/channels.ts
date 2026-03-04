@@ -128,9 +128,10 @@ channelRoutes.post("/channels/:slug/messages", async (c) => {
 
   (async () => {
     try {
-      const prompt = await assemblePrompt(agent, "conversation", { userMessage: message }) ?? "";
+      const assembled = await assemblePrompt(agent, "conversation", { userMessage: message });
+      if (!assembled) return;
       let fullText = "";
-      for await (const event of runAgent(prompt, { role: "conversation" })) {
+      for await (const event of runAgent(assembled.userMessage, { role: "conversation", system: assembled.system })) {
         if (event.type === "result" && event.content) {
           fullText = event.content;
         } else if (event.type === "text" && event.content) {

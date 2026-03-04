@@ -31,9 +31,10 @@ systemRoutes.post("/system/messages", async (c) => {
 
   (async () => {
     try {
-      const prompt = await assemblePrompt("system.main", "conversation", { userMessage: message }) ?? "";
+      const assembled = await assemblePrompt("system.main", "conversation", { userMessage: message });
+      if (!assembled) return;
       let fullText = "";
-      for await (const event of runAgent(prompt, { role: "conversation" })) {
+      for await (const event of runAgent(assembled.userMessage, { role: "conversation", system: assembled.system })) {
         if (event.type === "result" && event.content) {
           fullText = event.content;
         } else if (event.type === "text" && event.content) {
@@ -96,7 +97,7 @@ systemRoutes.get("/system/env", (c) => {
   const denied = requireSysuser(c);
   if (denied) return denied;
   return c.json({
-    ANTHROPIC_API_KEY: !!process.env.ANTHROPIC_API_KEY,
+    OPENROUTER_API_KEY: !!process.env.OPENROUTER_API_KEY,
     OPENAI_API_KEY: !!process.env.OPENAI_API_KEY,
     BACKBONE_PORT: process.env.BACKBONE_PORT,
     NODE_ENV: process.env.NODE_ENV,

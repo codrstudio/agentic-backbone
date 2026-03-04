@@ -327,7 +327,7 @@ agentRoutes.post("/agents/:id/request", async (c) => {
 
   if (wantsSSE) {
     return streamSSE(c, async (stream) => {
-      for await (const event of runAgent(assembled, { role: "request" })) {
+      for await (const event of runAgent(assembled.userMessage, { role: "request", system: assembled.system })) {
         await stream.writeSSE({ data: JSON.stringify(event) });
       }
     });
@@ -337,7 +337,7 @@ agentRoutes.post("/agents/:id/request", async (c) => {
   const startMs = Date.now();
   let result = "";
   let usage: unknown;
-  for await (const event of runAgent(assembled, { role: "request" })) {
+  for await (const event of runAgent(assembled.userMessage, { role: "request", system: assembled.system })) {
     if (event.type === "result" && event.content) {
       result = event.content;
     } else if (event.type === "text" && event.content) {
@@ -385,7 +385,7 @@ agentRoutes.post("/agents/:id/services/:slug", async (c) => {
 
   if (wantsSSE) {
     return streamSSE(c, async (stream) => {
-      for await (const event of runAgent(assembled, { role: "request" })) {
+      for await (const event of runAgent(assembled.userMessage, { role: "request", system: assembled.system })) {
         await stream.writeSSE({ data: JSON.stringify(event) });
       }
     });
@@ -394,7 +394,7 @@ agentRoutes.post("/agents/:id/services/:slug", async (c) => {
   const startMs = Date.now();
   let result = "";
   let usage: unknown;
-  for await (const event of runAgent(assembled, { role: "request" })) {
+  for await (const event of runAgent(assembled.userMessage, { role: "request", system: assembled.system })) {
     if (event.type === "result" && event.content) {
       result = event.content;
     } else if (event.type === "text" && event.content) {
