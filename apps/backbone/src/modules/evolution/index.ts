@@ -9,13 +9,11 @@ import type { EvolutionConfig } from "./types.js";
 
 function calculateHumanDelay(text: string): number {
   const length = text.length;
-  const charsPerSecond = 2.0 + Math.random() * 2.5;  // 2.0–4.5 chars/s
-  const rawTypingMs = (length / charsPerSecond) * 1000;
-  const jitter = 0.75 + Math.random() * 0.5;          // ±25%
-  const typingMs = rawTypingMs * jitter;
-  const preSendPause = 200 + Math.random() * 600;     // 200–800ms
-  const total = Math.max(800, Math.min(20_000, typingMs + preSendPause));
-  return Math.round(total);
+  // Base: 50ms per char — linear and proportional to message size
+  const baseMs = length * 50;
+  // Small jitter: ±15%
+  const jitter = 0.85 + Math.random() * 0.3;
+  return Math.round(Math.max(400, Math.min(10_000, baseMs * jitter)));
 }
 
 let probe: EvolutionProbe | null = null;
@@ -96,8 +94,9 @@ export const evolutionModule: BackboneModule = {
             headers: { "Content-Type": "application/json", apikey: apiKey },
             body: JSON.stringify({
               number: recipientId,
-              textMessage: { text: content },
-              options: { delay: calculateHumanDelay(content), presence: "composing" },
+              text: content,
+              delay: calculateHumanDelay(content),
+              presence: "composing",
             }),
           });
           if (!res.ok) {
