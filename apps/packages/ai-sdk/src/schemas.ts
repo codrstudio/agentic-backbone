@@ -17,13 +17,13 @@ export const UsageDataSchema = z.object({
 export const AgentEventSchema = z.discriminatedUnion("type", [
   z.object({ type: z.literal("init"), sessionId: z.string().optional() }),
   z.object({ type: z.literal("text"), content: z.string() }),
+  z.object({ type: z.literal("step_finish") }),
   z.object({ type: z.literal("result"), content: z.string() }),
   z.object({ type: z.literal("usage"), usage: UsageDataSchema }),
 ]);
 
 // --- Options (o que o backbone passa) ---
 export const AgentRunOptionsSchema = z.object({
-  provider: z.string(),
   model: z.string(),
   apiKey: z.string(),
   prompt: z.string(),
@@ -33,6 +33,7 @@ export const AgentRunOptionsSchema = z.object({
   tools: z.record(z.any()).optional(),
   maxTurns: z.number().optional(),
   providerConfig: z.record(z.any()).optional(),
+  system: z.string().optional(),
 });
 
 export type AgentEvent = z.infer<typeof AgentEventSchema>;

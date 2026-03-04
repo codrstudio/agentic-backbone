@@ -91,12 +91,9 @@ export interface LlmPlan {
   thinking?: { type: "adaptive" } | { type: "enabled"; budgetTokens: number } | { type: "disabled" };
 }
 
-export type LlmProvider = "claude" | "ai";
-
 export interface LlmConfig {
-  provider: LlmProvider;
   active: string;
-  plans: Record<string, Record<string, LlmPlan>>;
+  plans: Record<string, LlmPlan>;
 }
 
 // --- Web Search ---

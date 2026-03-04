@@ -16,12 +16,9 @@ export interface LlmPlan {
   thinking?: { type: "adaptive" } | { type: "enabled"; budgetTokens: number } | { type: "disabled" };
 }
 
-export type LlmProvider = "claude" | "ai";
-
 export interface LlmConfig {
-  provider: LlmProvider;
   active: string;
-  plans: Record<string, Record<string, LlmPlan>>;
+  plans: Record<string, LlmPlan>;
 }
 
 // --- Path ---
@@ -45,19 +42,11 @@ export function saveLlmConfig(config: LlmConfig): void {
 
 export function getActivePlan(): LlmPlan {
   const config = loadLlmConfig();
-  const providerPlans = config.plans[config.provider];
-  if (!providerPlans) {
-    throw new Error(`Provider "${config.provider}" not found in llm.json`);
-  }
-  const plan = providerPlans[config.active];
+  const plan = config.plans[config.active];
   if (!plan) {
-    throw new Error(`LLM plan "${config.active}" not found for provider "${config.provider}" in llm.json`);
+    throw new Error(`LLM plan "${config.active}" not found in llm.json`);
   }
   return plan;
-}
-
-export function resolveProvider(): LlmProvider {
-  return loadLlmConfig().provider;
 }
 
 export function resolveProfile(role: string): LlmProfile {

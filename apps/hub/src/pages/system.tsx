@@ -1,23 +1,18 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { systemInfoQuery, systemEnvQuery, contextTreeQuery, useRefreshSystem } from "@/api/system";
-import { llmConfigQuery, useUpdateLlmPlan, useUpdateLlmProvider, webSearchConfigQuery, useUpdateWebSearchProvider } from "@/api/settings";
+import { llmConfigQuery, useUpdateLlmPlan, webSearchConfigQuery, useUpdateWebSearchProvider } from "@/api/settings";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { PageHeader } from "@/components/shared/page-header";
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { RefreshCw, FolderTree, Server, KeyRound, Zap, Search, ChevronRight, Folder, FolderOpen, FileText } from "lucide-react";
-import type { LlmPlan, LlmProvider, WebSearchProviderType } from "@/api/types";
+import type { LlmPlan, WebSearchProviderType } from "@/api/types";
 import { cn } from "@/lib/utils";
 
-const PROVIDER_LABELS: Record<LlmProvider, string> = {
-  claude: "Claude",
-  ai: "Ai (OpenRouter)",
-};
 
 const WEB_SEARCH_OPTIONS: { provider: WebSearchProviderType; label: string; description: string }[] = [
   { provider: "duckduckgo", label: "DuckDuckGo", description: "Busca gratuita via scraping. Sem API key." },
@@ -33,11 +28,9 @@ export function SystemPage() {
   const { data: webSearchConfig } = useQuery(webSearchConfigQuery);
   const refresh = useRefreshSystem();
   const updatePlan = useUpdateLlmPlan();
-  const updateProvider = useUpdateLlmProvider();
   const updateWebSearch = useUpdateWebSearchProvider();
 
-  const activeProvider = llmConfig?.provider ?? "claude";
-  const providerPlans = llmConfig?.plans[activeProvider] ?? {};
+  const plans = llmConfig?.plans ?? {};
 
   return (
     <div className="space-y-6">
@@ -54,37 +47,16 @@ export function SystemPage() {
       {/* LLM Plan Card */}
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-base flex items-center gap-2">
-              <Zap className="h-4 w-4" /> Plano LLM
-            </CardTitle>
-            {llmConfig && (
-              <Tabs
-                value={activeProvider}
-                onValueChange={(v) => updateProvider.mutate(v as LlmProvider)}
-              >
-                <TabsList className="h-8">
-                  {Object.keys(llmConfig.plans).map((p) => (
-                    <TabsTrigger
-                      key={p}
-                      value={p}
-                      className="text-xs px-3 h-7"
-                      disabled={updateProvider.isPending}
-                    >
-                      {PROVIDER_LABELS[p as LlmProvider] ?? p}
-                    </TabsTrigger>
-                  ))}
-                </TabsList>
-              </Tabs>
-            )}
-          </div>
+          <CardTitle className="text-base flex items-center gap-2">
+            <Zap className="h-4 w-4" /> Plano LLM
+          </CardTitle>
         </CardHeader>
         <CardContent>
           {llmConfig ? (
             <div className="grid gap-3 sm:grid-cols-3">
-              {Object.entries(providerPlans).map(([key, plan]) => (
+              {Object.entries(plans).map(([key, plan]) => (
                 <LlmPlanCard
-                  key={`${activeProvider}-${key}`}
+                  key={key}
                   planKey={key}
                   plan={plan}
                   isActive={llmConfig.active === key}
