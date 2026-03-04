@@ -2,9 +2,7 @@
 
 ## Contexto
 
-Os créditos da Claude Agent SDK estão sendo consumidos rapidamente porque o `query()` é chamado **sem especificar modelo** — o SDK usa o modelo padrão (Sonnet), mesmo para heartbeats simples. O objetivo é criar um sistema de **planos de consumo** que permita ao usuário escolher entre perfis econômico/padrão/otimizado, controlando modelo, effort e thinking por função. O plano **econômico** será o padrão.
-
-Descoberta-chave: o SDK aceita `options.model`, `options.effort` e `options.thinking`.
+O sistema usa Vercel AI SDK + OpenRouter como motor LLM. O objetivo é criar um sistema de **planos de consumo** que permita ao usuário escolher entre perfis econômico/padrão/otimizado, controlando modelo, effort e thinking por função.
 
 Referência: padrão de `profiles` por função do `codr.studio/agiliza/backbone/config/llm.json`.
 
@@ -71,7 +69,7 @@ llm.json → loadLlmConfig() → getActivePlan() → resolveModel(role)
                                                 → resolveEffort()
                                                 → resolveThinking()
                                                         ↓
-                                               query({ options: { model, effort, thinking } })
+                                               runAgent({ model, effort, thinking })
 ```
 
 ### Módulos

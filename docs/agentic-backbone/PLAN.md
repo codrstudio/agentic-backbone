@@ -2,12 +2,12 @@
 
 ## Contexto
 
-O **third-brain** (`D:\sources\_unowned\third-brain`) validou o conceito OpenClaw com sucesso: heartbeat autonomo, memoria semantica (PostgreSQL + pgvector), skills, adapters, SSE streaming, e dashboard React. Agora vamos implementar o CONCEPT.md completo no agentic-backbone, portando os padroes comprovados do third-brain e adaptando para SQLite + Claude Agent SDK.
+O **third-brain** (`D:\sources\_unowned\third-brain`) validou o conceito OpenClaw com sucesso: heartbeat autonomo, memoria semantica (PostgreSQL + pgvector), skills, adapters, SSE streaming, e dashboard React. Agora vamos implementar o CONCEPT.md completo no agentic-backbone, portando os padroes comprovados do third-brain e adaptando para SQLite + Vercel AI SDK.
 
 **O que ja existe no agentic-backbone** (~430 linhas de codigo funcional):
 
 - Hono HTTP server (porta 7700) com 4 endpoints
-- Agent runner wrapping Claude Agent SDK `query()` com `AsyncGenerator<AgentEvent>`
+- Agent runner wrapping Vercel AI SDK com `AsyncGenerator<AgentEvent>`
 - Sessoes SQLite + in-memory Map
 - Context loader (`SOUL.md`, skills, tools, adapters, heartbeat instructions)
 - Heartbeat 30s com guards (already-running, empty-instructions, duplicate) e `HEARTBEAT_OK`
@@ -350,7 +350,7 @@ Fases 3 e 4 podem ser desenvolvidas em paralelo apos Fase 2.
 | Vector search | sqlite-vec (vec0) | Recomendado pelo autor, substitui sqlite-vss deprecated |
 | Embeddings | OpenAI text-embedding-3-small (1536d) | Mais acessivel e custo-efetivo; abstraction permite trocar depois |
 | Event bus | Node.js EventEmitter nativo | Suficiente para processo unico; evita dependencia extra |
-| LLM motor | Claude Agent SDK `query()` | Ja implementado; backbone e orquestrador, nao motor |
+| LLM motor | Vercel AI SDK + OpenRouter | Backbone e orquestrador, nao motor |
 | Source of truth | Markdown files | SQLite e indice descartavel; deletar `.sqlite` e re-indexar |
 | Working directory | `context/agents/{agentId}/` | Agent SDK resolve paths relativos corretamente |
 

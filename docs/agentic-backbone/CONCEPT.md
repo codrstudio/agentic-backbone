@@ -6,7 +6,7 @@ Documento vivo que descreve o conceito do sistema como ele está sendo construí
 
 ## O que é
 
-O Agentic Backbone é um servidor **Node.js + Hono** que funciona como infraestrutura para um agente autônomo persistente. Construído com o **Claude Agent SDK**, expõe uma interface **REST + SSE**.
+O Agentic Backbone é um servidor **Node.js + Hono** que funciona como infraestrutura para um agente autônomo persistente. Usa **Vercel AI SDK + OpenRouter** como motor LLM, expondo uma interface **REST + SSE**.
 
 Qualquer sistema que adote o backbone ganha automaticamente um agente inteligente interno — o **System Heartbeat** — que opera continuamente executando tarefas sistêmicas.
 
@@ -291,7 +291,7 @@ Guard checks ──(skip)──▶ log razão, agendar próximo
 Montar prompt (SOUL.md + HEARTBEAT.md + contexto)
     │
     ▼
-Chamar Claude Agent SDK via query()
+Chamar LLM via Vercel AI SDK
     │
     ▼
 Normalizar resposta (strip HEARTBEAT_OK token, markup)
@@ -452,8 +452,8 @@ Conversas acontecem **COM agents, ATRAVÉS de channels**. Pertencem ao agent, n�
 
 - Cada sessão tem um identificador único
 - A sessão armazena memória conversacional
-- O Claude Agent SDK gerencia continuidade via `resume: sessionId`
-- O Claude Agent SDK gerencia compaction internamente (compressão de contexto ao se aproximar do limite de tokens)
+- O AI SDK gerencia continuidade via session persistence
+- O AI SDK gerencia compaction internamente (compressão de contexto ao se aproximar do limite de tokens)
 
 ### Session Lifecycle
 
@@ -518,7 +518,7 @@ O backbone funciona como **supervisor de processos**: spawna child processes, ca
 
 ### Fluxo
 
-O agent roda **dentro** do backbone. Acessa o motor de jobs via **MCP tools nativas** do Claude Agent SDK — sem HTTP round-trip.
+O agent roda **dentro** do backbone. Acessa o motor de jobs via **tools nativas** — sem HTTP round-trip.
 
 ```
 Agente (heartbeat)
@@ -546,9 +546,9 @@ Backbone supervisiona:
 - **Sweeper** — finished jobs são limpos da memória após 30min TTL
 - **Graceful shutdown** — SIGTERM/SIGINT mata todos os running jobs
 
-### MCP Tools (acesso interno)
+### Tools (acesso interno)
 
-O agent acessa jobs via MCP tools nativas, injetadas pelo backbone no Claude Agent SDK:
+O agent acessa jobs via tools nativas, injetadas pelo backbone no AI SDK:
 
 | Tool | Descrição |
 |------|-----------|
@@ -579,7 +579,7 @@ DELETE /jobs/:id       → limpar finished job da memória
 |---|---|
 | Runtime | Node.js, TypeScript |
 | HTTP | Hono + @hono/node-server |
-| AI/LLM | Claude Agent SDK (`@anthropic-ai/claude-agent-sdk`) |
+| AI/LLM | Vercel AI SDK (`ai`) + OpenRouter |
 | Database | SQLite (better-sqlite3) — índice apenas, não source of truth |
 | Transporte | REST + SSE |
 | Dados | Markdown filesystem (source of truth) |
@@ -597,7 +597,7 @@ DELETE /jobs/:id       → limpar finished job da memória
 5. **Channel é tubo** — não tem recursos, só roteia mensagens
 6. **Lazy reading** — listar nomes/descrições, carregar conteúdo sob demanda
 7. **Cost awareness** — guard checks, deduplicação, ackMaxChars — evitar LLM calls desnecessárias
-8. **Claude Agent SDK como motor** — o backbone é um orquestrador, não um engine de tools
+8. **AI SDK como motor** — o backbone é um orquestrador, não um engine de tools
 9. **Hooks são side-effects** — observam o ciclo de vida, não modificam o fluxo principal
 
 ---

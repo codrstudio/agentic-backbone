@@ -75,9 +75,8 @@ All environment variables are defined in the root `.env` file — the single sou
 - `BACKBONE_PORT` — Backbone HTTP port (e.g. `7700`)
 
 **API keys:**
-- `ANTHROPIC_API_KEY` (required for `claude` provider) — Claude API access
+- `OPENROUTER_API_KEY` (required) — OpenRouter API access
 - `OPENAI_API_KEY` (optional) — enables memory embeddings via `text-embedding-3-small`
-- `OPENROUTER_API_KEY` (required for `ai` provider) — OpenRouter API access
 
 **Other:**
 - `HUB_PORT` — Hub dev server port (e.g. `7701`)
@@ -97,14 +96,14 @@ This is an **npm workspaces monorepo** with two apps and one internal package:
 
 | Package | Path | Purpose |
 |---|---|---|
-| `@agentic-backbone/backbone` | `apps/backbone` | Autonomous multi-agent runtime (Node.js, Hono, Claude Agent SDK) |
+| `@agentic-backbone/backbone` | `apps/backbone` | Autonomous multi-agent runtime (Node.js, Hono, Vercel AI SDK) |
 | `@agentic-backbone/hub` | `apps/hub` | Admin UI / chat (React 19, TanStack Router, shadcn/ui, PWA) |
-| `@agentic-backbone/ai-sdk` | `apps/packages/ai-sdk` | Alternative agent runtime via Vercel AI SDK + OpenRouter |
+| `@agentic-backbone/ai-sdk` | `apps/packages/ai-sdk` | Agent runtime via Vercel AI SDK + OpenRouter |
 
 ### Core Flow
 
 ```
-HTTP (Hono, :7700) → Routes → Conversations → Agent Runner → Provider (claude | ai)
+HTTP (Hono, :7700) → Routes → Conversations → Agent Runner → AI SDK (OpenRouter)
                          │                          ↓
                          │                    SSE streaming → client
                          │
@@ -123,18 +122,13 @@ Agents exist and operate in three distinct modes:
 | **conversation** | User message via chat | `assembleConversationPrompt()` | Reactive — the agent responds via chat within a session. |
 | **cron** (agendado) | Cron schedule expression | `executeCronJob()` | Scheduled — the agent is woken by a cron job defined in `CRON.md` files. |
 
-All three modes ultimately call `runAgent()`, which dispatches to the active LLM provider.
+All three modes ultimately call `runAgent()`, which uses the AI SDK via OpenRouter.
 
-### LLM Provider System
+### LLM Plan System
 
-Two providers, switchable at runtime via `context/system/llm.json`:
+Uses Vercel AI SDK (`ai@^6`) via OpenRouter. Configured in `context/system/llm.json`.
 
-| Provider | SDK | API | Key env var |
-|---|---|---|---|
-| `claude` | `@anthropic-ai/claude-agent-sdk` | Anthropic direct | `ANTHROPIC_API_KEY` |
-| `ai` | Vercel AI SDK (`ai@^4`) | OpenRouter | `OPENROUTER_API_KEY` |
-
-**Plans** define per-role model profiles (`conversation`, `heartbeat`, `memory`). Three plans per provider: `economico`, `padrao`, `otimizado`. The active provider + plan is set in `context/system/llm.json` (editable at runtime via the `/settings` route).
+**Plans** define per-role model profiles (`conversation`, `heartbeat`, `memory`). Multiple plans available: `economico`, `padrao`, `otimizado`, etc. The active plan is set in `context/system/llm.json` (editable at runtime via the `/settings` route). Plans are flat — `plans.economico`, `plans.padrao`, etc.
 
 `resolveModel(role)` in `settings/llm.ts` is the single point of model selection.
 
@@ -155,7 +149,7 @@ Two providers, switchable at runtime via `context/system/llm.json`:
 |---|---|
 | `index.ts` | Hono server entry; mounts routes, bootstraps subsystems |
 | `routes/` | REST + SSE endpoints (health, conversations, channels, users, agents, cron, jobs, settings, system events) |
-| `agent/` | `runAgent()` async generator — dispatches to `providers/claude.ts` or `providers/ai.ts` based on `resolveProvider()` |
+| `agent/` | `runAgent()` async generator — calls ai-sdk proxy with model/role/tools |
 | `agents/` | Agent registry — discovers `AGENT.md` files, parses frontmatter config. Agent IDs use `owner.slug` dot notation |
 | `conversations/` | Session lifecycle (create/get/sendMessage). SQLite for session index, filesystem for message history (JSONL) |
 | `channels/` | Channel registry + system channel for heartbeat/system message delivery |
