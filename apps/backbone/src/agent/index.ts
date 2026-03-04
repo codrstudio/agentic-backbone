@@ -64,7 +64,7 @@ export async function* runAgent(
     sessionDir: join(process.cwd(), "data", "ai-sessions"),
     role,
     tools: options?.tools,
-    maxTurns: 30,
+    maxTurns: 100,
     ...(options?.system ? { system: options.system } : {}),
     providerConfig: {
       ...(effort ? { effort } : {}),

@@ -57,7 +57,7 @@ export async function* runAgent(raw: unknown): AsyncGenerator<AgentEvent> {
     apiKey: options.apiKey,
     sessionId: options.sessionId,
     sessionDir: options.sessionDir,
-    maxSteps: options.maxTurns ?? 30,
+    maxSteps: options.maxTurns ?? 100,
     ...(onWebSearch ? { onWebSearch } : {}),
     ...(options.tools ? { tools: options.tools } : {}),
     ...(options.system ? { system: { append: options.system } } : {}),
