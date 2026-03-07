@@ -108,7 +108,7 @@
     "id": "F-102",
     "name": "LGPD: endpoints backend + API Hub",
     "description": "Criar apps/backbone/src/routes/lgpd.ts com: GET/PUT /lgpd/data-map/:agentId, GET /lgpd/consent-log (filtros: agentId, userRef, dateRange), GET/POST /lgpd/rights-requests, PATCH /lgpd/rights-requests/:id (atualiza status+response+resolved_at), POST /lgpd/report (retorna JSON com mapa+pedidos+log). Middleware de verificacao de permissao admin ou compliance. Montar no index.ts. Criar apps/hub/src/api/lgpd.ts com queryOptions para data-map e rights-requests.",
-    "status": "blocked",
+    "status": "passing",
     "priority": 6,
     "agent": "coder",
     "task": "vibe-code",
@@ -124,7 +124,8 @@
       "Endpoint retorna 403 para usuario sem permissao admin/compliance",
       "`npm run typecheck` passa sem erros"
     ],
-    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-5/worktree/sprints/sprint-5/3-prps/PRP-26-lgpd-compliance-dashboard.md"
+    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-5/worktree/sprints/sprint-5/3-prps/PRP-26-lgpd-compliance-dashboard.md",
+    "completed_at": "2026-03-07T23:27:06.151Z"
   },
   {
     "id": "F-103",
