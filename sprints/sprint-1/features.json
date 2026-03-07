@@ -14,7 +14,7 @@
       "vite.config.ts tem proxy /api para backbone e plugin TanStackRouterVite",
       "tsconfig.json com strict: true, target ES2022, path alias @/*"
     ],
-    "prp_path": "sprints/sprint-1/3-prps/PRP-01-scaffold-hub.md"
+    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-1/worktree/sprints/sprint-1/3-prps/PRP-01-scaffold-hub.md"
   },
   {
     "id": "F-002",
@@ -31,7 +31,7 @@
       "Dark mode funciona via classe dark no html",
       "Nenhuma cor Tailwind direta (bg-blue-500 etc.) no codigo fonte"
     ],
-    "prp_path": "sprints/sprint-1/3-prps/PRP-01-scaffold-hub.md"
+    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-1/worktree/sprints/sprint-1/3-prps/PRP-01-scaffold-hub.md"
   },
   {
     "id": "F-003",
@@ -49,7 +49,7 @@
       "request<T> injeta Authorization header automaticamente",
       "Resposta 401 limpa token e redireciona para /login"
     ],
-    "prp_path": "sprints/sprint-1/3-prps/PRP-01-scaffold-hub.md"
+    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-1/worktree/sprints/sprint-1/3-prps/PRP-01-scaffold-hub.md"
   },
   {
     "id": "F-004",
@@ -67,7 +67,7 @@
       "Breadcrumb exibe rota atual",
       "Rotas protegidas redirecionam para /login sem token"
     ],
-    "prp_path": "sprints/sprint-1/3-prps/PRP-01-scaffold-hub.md"
+    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-1/worktree/sprints/sprint-1/3-prps/PRP-01-scaffold-hub.md"
   },
   {
     "id": "F-005",
@@ -84,7 +84,7 @@
       "Evento heartbeat:status invalida query de stats do agente",
       "Tema dark/light funciona via toggle e persiste entre reloads"
     ],
-    "prp_path": "sprints/sprint-1/3-prps/PRP-01-scaffold-hub.md"
+    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-1/worktree/sprints/sprint-1/3-prps/PRP-01-scaffold-hub.md"
   },
   {
     "id": "F-006",
@@ -102,7 +102,7 @@
       "npm run build:hub gera build de producao sem erros",
       "Componentes shared (PageHeader, EmptyState, StatusBadge, ConfirmDialog) importaveis"
     ],
-    "prp_path": "sprints/sprint-1/3-prps/PRP-01-scaffold-hub.md"
+    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-1/worktree/sprints/sprint-1/3-prps/PRP-01-scaffold-hub.md"
   },
   {
     "id": "F-007",
@@ -122,7 +122,7 @@
       "Filtro ativo/inativo funciona",
       "Grid responsivo: 1/2/3 colunas conforme breakpoint"
     ],
-    "prp_path": "sprints/sprint-1/3-prps/PRP-02-dashboard-agentes.md"
+    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-1/worktree/sprints/sprint-1/3-prps/PRP-02-dashboard-agentes.md"
   },
   {
     "id": "F-008",
@@ -140,7 +140,7 @@
       "Header exibe breadcrumb Agentes > slug e StatusBadge",
       "Tabs placeholder exibem mensagem Em breve"
     ],
-    "prp_path": "sprints/sprint-1/3-prps/PRP-02-dashboard-agentes.md"
+    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-1/worktree/sprints/sprint-1/3-prps/PRP-02-dashboard-agentes.md"
   },
   {
     "id": "F-009",
@@ -157,7 +157,7 @@
       "Custo formatado com 4 decimais",
       "Metricas atualizam apos evento SSE heartbeat:status"
     ],
-    "prp_path": "sprints/sprint-1/3-prps/PRP-02-dashboard-agentes.md"
+    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-1/worktree/sprints/sprint-1/3-prps/PRP-02-dashboard-agentes.md"
   },
   {
     "id": "F-010",
@@ -176,7 +176,7 @@
       "Trigger manual dispara heartbeat e resultado aparece na timeline",
       "Botao Nova Conversa cria sessao e navega para /conversations/:id"
     ],
-    "prp_path": "sprints/sprint-1/3-prps/PRP-02-dashboard-agentes.md"
+    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-1/worktree/sprints/sprint-1/3-prps/PRP-02-dashboard-agentes.md"
   },
   {
     "id": "F-011",
@@ -194,7 +194,7 @@
       "Sucesso redireciona para /agents/:id?tab=config",
       "Botao cancelar volta para /agents"
     ],
-    "prp_path": "sprints/sprint-1/3-prps/PRP-03-gestao-agentes.md"
+    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-1/worktree/sprints/sprint-1/3-prps/PRP-03-gestao-agentes.md"
   },
   {
     "id": "F-012",
@@ -213,7 +213,7 @@
       "Preview markdown renderiza headers, listas, codigo, links",
       "Toggle preview funciona"
     ],
-    "prp_path": "sprints/sprint-1/3-prps/PRP-03-gestao-agentes.md"
+    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-1/worktree/sprints/sprint-1/3-prps/PRP-03-gestao-agentes.md"
   },
   {
     "id": "F-013",
@@ -231,7 +231,7 @@
       "Slider e input numerico estao sincronizados",
       "Dias da semana selecionaveis via checkboxes"
     ],
-    "prp_path": "sprints/sprint-1/3-prps/PRP-03-gestao-agentes.md"
+    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-1/worktree/sprints/sprint-1/3-prps/PRP-03-gestao-agentes.md"
   },
   {
     "id": "F-014",
@@ -248,7 +248,7 @@
       "Agrupamento por escopo funciona",
       "Cada item mostra nome, descricao e badge de escopo"
     ],
-    "prp_path": "sprints/sprint-1/3-prps/PRP-03-gestao-agentes.md"
+    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-1/worktree/sprints/sprint-1/3-prps/PRP-03-gestao-agentes.md"
   },
   {
     "id": "F-015",
@@ -265,7 +265,7 @@
       "Excluir pede confirmacao com digitacao do slug",
       "Excluir remove agente e redireciona para /agents"
     ],
-    "prp_path": "sprints/sprint-1/3-prps/PRP-03-gestao-agentes.md"
+    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-1/worktree/sprints/sprint-1/3-prps/PRP-03-gestao-agentes.md"
   },
   {
     "id": "F-016",
@@ -283,7 +283,7 @@
       "Filtro por agente funciona",
       "Nova Conversa cria sessao e navega para /conversations/:id"
     ],
-    "prp_path": "sprints/sprint-1/3-prps/PRP-04-chat-conversas.md"
+    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-1/worktree/sprints/sprint-1/3-prps/PRP-04-chat-conversas.md"
   },
   {
     "id": "F-017",
@@ -303,7 +303,7 @@
       "Auto-scroll funciona durante streaming",
       "Botao scroll-to-bottom aparece quando usuario scrollou para cima"
     ],
-    "prp_path": "sprints/sprint-1/3-prps/PRP-04-chat-conversas.md"
+    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-1/worktree/sprints/sprint-1/3-prps/PRP-04-chat-conversas.md"
   },
   {
     "id": "F-018",
@@ -322,7 +322,7 @@
       "Textarea expande ate 5 linhas",
       "Focus automatico ao abrir chat"
     ],
-    "prp_path": "sprints/sprint-1/3-prps/PRP-04-chat-conversas.md"
+    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-1/worktree/sprints/sprint-1/3-prps/PRP-04-chat-conversas.md"
   },
   {
     "id": "F-019",
@@ -339,7 +339,7 @@
       "Excluir conversa pede confirmacao e redireciona para lista",
       "Tab Conversas no agente mostra conversas filtradas pelo agente"
     ],
-    "prp_path": "sprints/sprint-1/3-prps/PRP-04-chat-conversas.md"
+    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-1/worktree/sprints/sprint-1/3-prps/PRP-04-chat-conversas.md"
   },
   {
     "id": "F-020",
@@ -357,7 +357,7 @@
       "Filtro por tipo funciona",
       "Click no card navega para /channels/:slug"
     ],
-    "prp_path": "sprints/sprint-1/3-prps/PRP-05-canais-whatsapp.md"
+    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-1/worktree/sprints/sprint-1/3-prps/PRP-05-canais-whatsapp.md"
   },
   {
     "id": "F-021",
@@ -375,7 +375,7 @@
       "Excluir canal pede confirmacao",
       "Tab ativa persiste na URL"
     ],
-    "prp_path": "sprints/sprint-1/3-prps/PRP-05-canais-whatsapp.md"
+    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-1/worktree/sprints/sprint-1/3-prps/PRP-05-canais-whatsapp.md"
   },
   {
     "id": "F-022",
@@ -394,7 +394,7 @@
       "Apos parear, avanca para passo 3 com status Conectado",
       "Botao Concluir fecha wizard e invalida queries"
     ],
-    "prp_path": "sprints/sprint-1/3-prps/PRP-05-canais-whatsapp.md"
+    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-1/worktree/sprints/sprint-1/3-prps/PRP-05-canais-whatsapp.md"
   },
   {
     "id": "F-023",
@@ -412,7 +412,7 @@
       "Auto-scroll funciona com mensagens novas",
       "ScrollArea do shadcn com scroll interno"
     ],
-    "prp_path": "sprints/sprint-1/3-prps/PRP-05-canais-whatsapp.md"
+    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-1/worktree/sprints/sprint-1/3-prps/PRP-05-canais-whatsapp.md"
   },
   {
     "id": "F-024",
@@ -429,7 +429,7 @@
       "MEMORY.md vazio exibe empty state orientativo",
       "Cards numericos formatados corretamente"
     ],
-    "prp_path": "sprints/sprint-1/3-prps/PRP-06-memoria-semantica.md"
+    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-1/worktree/sprints/sprint-1/3-prps/PRP-06-memoria-semantica.md"
   },
   {
     "id": "F-025",
@@ -448,7 +448,7 @@
       "Empty state quando nenhum resultado",
       "Loading state durante busca"
     ],
-    "prp_path": "sprints/sprint-1/3-prps/PRP-06-memoria-semantica.md"
+    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-1/worktree/sprints/sprint-1/3-prps/PRP-06-memoria-semantica.md"
   },
   {
     "id": "F-026",
@@ -466,7 +466,7 @@
       "Reset limpa memoria e atualiza UI",
       "Toast de sucesso/erro exibido apos operacao"
     ],
-    "prp_path": "sprints/sprint-1/3-prps/PRP-06-memoria-semantica.md"
+    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-1/worktree/sprints/sprint-1/3-prps/PRP-06-memoria-semantica.md"
   },
   {
     "id": "F-027",
@@ -485,7 +485,7 @@
       "Botao play executa job manualmente",
       "Proxima execucao calculada e exibida"
     ],
-    "prp_path": "sprints/sprint-1/3-prps/PRP-07-agendamento-cron.md"
+    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-1/worktree/sprints/sprint-1/3-prps/PRP-07-agendamento-cron.md"
   },
   {
     "id": "F-028",
@@ -505,7 +505,7 @@
       "Preview de proximas 5 execucoes no fuso do usuario",
       "Tipo Personalizado aceita cron manual com validacao"
     ],
-    "prp_path": "sprints/sprint-1/3-prps/PRP-07-agendamento-cron.md"
+    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-1/worktree/sprints/sprint-1/3-prps/PRP-07-agendamento-cron.md"
   },
   {
     "id": "F-029",
@@ -525,7 +525,7 @@
       "Edicao carrega valores existentes",
       "Sucesso fecha dialog e invalida queries"
     ],
-    "prp_path": "sprints/sprint-1/3-prps/PRP-07-agendamento-cron.md"
+    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-1/worktree/sprints/sprint-1/3-prps/PRP-07-agendamento-cron.md"
   },
   {
     "id": "F-030",
@@ -546,6 +546,6 @@
       "Tab Agenda no agente filtra jobs do agente",
       "Botao Novo Job na tab pre-seleciona agente"
     ],
-    "prp_path": "sprints/sprint-1/3-prps/PRP-07-agendamento-cron.md"
+    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-1/worktree/sprints/sprint-1/3-prps/PRP-07-agendamento-cron.md"
   }
 ]
