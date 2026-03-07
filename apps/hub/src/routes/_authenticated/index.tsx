@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { PageHeader } from "@/components/shared/page-header";
 import { StatCard } from "@/components/dashboard/stat-card";
+import { ActivityTimeline } from "@/components/dashboard/activity-timeline";
 import { Skeleton } from "@/components/ui/skeleton";
 import { dashboardQueryOptions, type DashboardData } from "@/api/dashboard";
 
@@ -101,6 +102,8 @@ function DashboardPage() {
           />
         </div>
       )}
+
+      {data && <ActivityTimeline events={data.recentActivity} />}
     </div>
   );
 }
