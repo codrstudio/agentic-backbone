@@ -10,10 +10,8 @@
   },
   "dependencies": {
     "@agentic-backbone/ai-sdk": "*",
-
-    "ai": "^4",
-    "zod": "^3",
     "@hono/node-server": "^1",
+    "ai": "^4",
     "better-sqlite3": "^11",
     "chokidar": "^5.0.0",
     "croner": "^10.0.1",
@@ -22,12 +20,14 @@
     "mysql2": "^3.17.1",
     "pg": "^8.18.0",
     "pidusage": "^4.0.1",
-    "sqlite-vec": "^0.1.7-alpha.2"
+    "sqlite-vec": "^0.1.7-alpha.2",
+    "zod": "^3"
   },
   "devDependencies": {
     "@types/better-sqlite3": "^7",
     "@types/js-yaml": "^4.0.9",
     "@types/node": "^22",
+    "@types/pg": "^8.18.0",
     "@types/pidusage": "^2.0.5",
     "tsx": "^4",
     "typescript": "^5"
