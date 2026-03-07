@@ -2,7 +2,7 @@
   "wave": 2,
   "sprint": 2,
   "decision": "go",
-  "decision_rationale": "Sprint 1 entregou 30 features cobrindo gestao completa de agentes, chat, WhatsApp, memoria e cron. Das 20 novas discoveries do Sprint 2, 11 tem score >= 8 e nenhuma esta implementada. O mercado brasileiro de IA agentica cresce 31% ao ano (IDC: US$ 3,4 bi em 2026). PMEs lideram adocao (65%) mas citam custo e complexidade como bloqueadores. O Hub precisa evoluir de 'gestao de agentes' para 'plataforma operacional completa' com dashboard, custos, notificacoes e gestao de equipe. Concorrentes (Business AI Meta, Copilot Studio) avancam em WhatsApp mas nenhum combina agentes autonomos + UI amigavel + self-hosted + pt-BR. Decisao GO inequivoca.",
+  "decision_rationale": "GO inequivoco. Das 46 discoveries acumuladas (Sprints 1+2), 21 foram implementadas no Sprint 1 e 25 permanecem pendentes. Entre as nao implementadas, 18 tem score > 7 (incluindo 2 com score 10: D-015 dashboard de sistema e G-015 visao panoramica). Seis discoveries com score 9 (D-014 custos, D-016 usuarios, D-018 notificacoes, G-014 dashboard custos, G-016 gestao equipe, G-018 alertas push) representam capacidades criticas para a evolucao de 'gestao de agentes' para 'plataforma operacional completa'. O mercado brasileiro de IA agentica cresce 31% ao ano (IDC: US$ 3,4 bi em 2026), concorrentes avancam (Meta Business AI, Copilot Studio) mas nenhum combina agentes autonomos + UI amigavel + self-hosted + pt-BR + observabilidade operacional. As 4 discoveries parciais (D-004, D-009, D-012, G-008, G-012) tambem justificam continuidade. Nao ha cenario de STOP: a maioria das discoveries pendentes esta acima de 7 e varias acima de 9.",
   "discoveries": [
     {
       "id": "D-001",
