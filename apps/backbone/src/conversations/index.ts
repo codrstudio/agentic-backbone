@@ -88,6 +88,16 @@ const deleteSessionStmt = db.prepare(
   `DELETE FROM sessions WHERE session_id = ?`
 );
 
+const setTakeoverStmt = db.prepare(
+  `UPDATE sessions SET takeover_by = ?, takeover_at = datetime('now'), updated_at = datetime('now')
+   WHERE session_id = ?`
+);
+
+const clearTakeoverStmt = db.prepare(
+  `UPDATE sessions SET takeover_by = NULL, takeover_at = NULL, updated_at = datetime('now')
+   WHERE session_id = ?`
+);
+
 // --- Message counter for flush ---
 
 const messageCounters = new Map<string, number>();
@@ -152,6 +162,16 @@ export function updateSession(
 export function deleteSession(sessionId: string): boolean {
   const result = deleteSessionStmt.run(sessionId);
   return result.changes > 0;
+}
+
+export function setTakeover(sessionId: string, operatorSlug: string): Session | null {
+  setTakeoverStmt.run(operatorSlug, sessionId);
+  return getSession(sessionId);
+}
+
+export function releaseTakeover(sessionId: string): Session | null {
+  clearTakeoverStmt.run(sessionId);
+  return getSession(sessionId);
 }
 
 export function findOrCreateSession(agentId: string, userId: string, channelId: string): Session {

@@ -9,6 +9,30 @@ export interface Conversation {
   updatedAt: string;
 }
 
+export interface Session {
+  session_id: string;
+  user_id: string;
+  agent_id: string;
+  channel_id: string | null;
+  sdk_session_id: string | null;
+  title: string | null;
+  takeover_by: string | null;
+  takeover_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface TakeoverResult {
+  sessionId: string;
+  takenOverBy: string;
+  takenOverAt: string;
+}
+
+export interface ReleaseResult {
+  sessionId: string;
+  released: boolean;
+}
+
 export function conversationsQueryOptions() {
   return queryOptions({
     queryKey: ["conversations"],
@@ -61,5 +85,24 @@ export function agentConversationsQueryOptions(agentId: string) {
   return queryOptions({
     queryKey: ["conversations", { agentId }],
     queryFn: () => request<Conversation[]>(`/conversations?agent_id=${encodeURIComponent(agentId)}`),
+  });
+}
+
+export function sessionQueryOptions(sessionId: string) {
+  return queryOptions({
+    queryKey: ["conversations", sessionId, "session"],
+    queryFn: () => request<Session>(`/conversations/${sessionId}`),
+  });
+}
+
+export async function takeoverConversation(sessionId: string): Promise<TakeoverResult> {
+  return request<TakeoverResult>(`/conversations/${sessionId}/takeover`, {
+    method: "POST",
+  });
+}
+
+export async function releaseConversation(sessionId: string): Promise<ReleaseResult> {
+  return request<ReleaseResult>(`/conversations/${sessionId}/release`, {
+    method: "POST",
   });
 }
