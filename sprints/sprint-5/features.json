@@ -90,7 +90,7 @@
     "id": "F-101",
     "name": "LGPD DB: tabelas lgpd_data_map, lgpd_consent_log, lgpd_rights_requests",
     "description": "Criar tabelas LGPD no SQLite com migracao automatica no startup. lgpd_data_map: id AUTOINCREMENT, agent_id, data_type, label, purpose, legal_basis, retention_days, updated_at; unique index (agent_id, data_type). lgpd_consent_log: id, agent_id, channel_id, user_ref, action, purpose, ip_address, recorded_at; indexes por agent_id e user_ref. lgpd_rights_requests: id TEXT PK, user_ref, right_type, agent_id, description, status (open/closed/pending), response, requested_at, resolved_at; indexes por user_ref e status.",
-    "status": "pending",
+    "status": "passing",
     "priority": 5,
     "agent": "coder",
     "task": "vibe-code",
@@ -101,7 +101,8 @@
       "Migracao idempotente",
       "`npm run typecheck` passa sem erros"
     ],
-    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-5/worktree/sprints/sprint-5/3-prps/PRP-26-lgpd-compliance-dashboard.md"
+    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-5/worktree/sprints/sprint-5/3-prps/PRP-26-lgpd-compliance-dashboard.md",
+    "completed_at": "2026-03-07T23:23:31.153Z"
   },
   {
     "id": "F-102",

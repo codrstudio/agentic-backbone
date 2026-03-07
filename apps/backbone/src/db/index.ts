@@ -365,4 +365,45 @@ db.exec(`
   CREATE INDEX IF NOT EXISTS idx_webhook_events_status ON webhook_events(status);
 `);
 
+db.exec(`
+  CREATE TABLE IF NOT EXISTS lgpd_data_map (
+    id             INTEGER PRIMARY KEY AUTOINCREMENT,
+    agent_id       TEXT NOT NULL,
+    data_type      TEXT NOT NULL,
+    label          TEXT NOT NULL,
+    purpose        TEXT NOT NULL,
+    legal_basis    TEXT NOT NULL,
+    retention_days INTEGER,
+    updated_at     TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+  CREATE UNIQUE INDEX IF NOT EXISTS idx_lgpd_map_agent_type ON lgpd_data_map(agent_id, data_type);
+
+  CREATE TABLE IF NOT EXISTS lgpd_consent_log (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    agent_id    TEXT NOT NULL,
+    channel_id  TEXT NOT NULL,
+    user_ref    TEXT NOT NULL,
+    action      TEXT NOT NULL,
+    purpose     TEXT NOT NULL,
+    ip_address  TEXT,
+    recorded_at TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+  CREATE INDEX IF NOT EXISTS idx_lgpd_consent_agent ON lgpd_consent_log(agent_id);
+  CREATE INDEX IF NOT EXISTS idx_lgpd_consent_user ON lgpd_consent_log(user_ref);
+
+  CREATE TABLE IF NOT EXISTS lgpd_rights_requests (
+    id           TEXT PRIMARY KEY,
+    user_ref     TEXT NOT NULL,
+    right_type   TEXT NOT NULL,
+    agent_id     TEXT,
+    description  TEXT,
+    status       TEXT NOT NULL DEFAULT 'open',
+    response     TEXT,
+    requested_at TEXT NOT NULL DEFAULT (datetime('now')),
+    resolved_at  TEXT
+  );
+  CREATE INDEX IF NOT EXISTS idx_lgpd_rights_user ON lgpd_rights_requests(user_ref);
+  CREATE INDEX IF NOT EXISTS idx_lgpd_rights_status ON lgpd_rights_requests(status);
+`);
+
 export { db };
