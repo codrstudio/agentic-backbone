@@ -4,6 +4,7 @@ import { FilePlus2 } from "lucide-react";
 import { PageHeader } from "@/components/shared/page-header";
 import { TemplateGallery } from "@/components/agents/template-gallery";
 import { AgentForm } from "@/components/agents/agent-form";
+import { CreateFromTemplateWizard } from "@/components/agents/create-from-template-wizard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
@@ -34,6 +35,27 @@ function NewAgentPage() {
   const handleScratch = () => {
     navigate({ to: "/agents/new", search: { template: "scratch" } });
   };
+
+  if (template && template !== "scratch") {
+    return (
+      <div className="space-y-6">
+        <PageHeader
+          title="Criar agente a partir de template"
+          description="Configure seu novo agente em 3 passos"
+          actions={
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => navigate({ to: "/agents/new", search: {} })}
+            >
+              Voltar para galeria
+            </Button>
+          }
+        />
+        <CreateFromTemplateWizard templateSlug={template} />
+      </div>
+    );
+  }
 
   if (template === "scratch") {
     return (
