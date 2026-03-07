@@ -114,6 +114,7 @@ function invalidateByEvent(event: SystemEvent) {
       const agentId = event.data?.agentId as string | undefined;
       if (agentId) {
         queryClient.invalidateQueries({ queryKey: ["agents", agentId, "stats"] });
+        queryClient.invalidateQueries({ queryKey: ["agents", agentId, "heartbeat-history"] });
       }
       queryClient.invalidateQueries({ queryKey: ["agents"] });
       break;

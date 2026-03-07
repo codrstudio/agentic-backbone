@@ -22,3 +22,10 @@ export function conversationQueryOptions(id: string) {
     queryFn: () => request<Conversation>(`/conversations/${id}`),
   });
 }
+
+export async function createConversation(agentId: string): Promise<Conversation> {
+  return request<Conversation>("/conversations", {
+    method: "POST",
+    body: JSON.stringify({ agentId }),
+  });
+}

@@ -39,6 +39,25 @@ export function agentStatsQueryOptions(id: string) {
   });
 }
 
+export interface HeartbeatLogEntry {
+  id: string;
+  status: "ok" | "skipped" | "error";
+  durationMs: number;
+  preview?: string;
+  createdAt: string;
+}
+
+export function agentHeartbeatHistoryQueryOptions(id: string) {
+  return queryOptions({
+    queryKey: ["agents", id, "heartbeat-history"],
+    queryFn: () => request<HeartbeatLogEntry[]>(`/agents/${id}/heartbeat/history`),
+  });
+}
+
 export async function toggleAgentEnabled(id: string): Promise<void> {
   await request(`/agents/${id}/heartbeat/toggle`, { method: "POST" });
+}
+
+export async function triggerHeartbeat(id: string): Promise<void> {
+  await request(`/agents/${id}/heartbeat/trigger`, { method: "POST" });
 }
