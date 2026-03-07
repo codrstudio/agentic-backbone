@@ -117,6 +117,7 @@ function invalidateByEvent(event: SystemEvent) {
         queryClient.invalidateQueries({ queryKey: ["agents", agentId, "heartbeat-history"] });
       }
       queryClient.invalidateQueries({ queryKey: ["agents"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard"] });
       break;
     }
     case "registry:adapters":
@@ -129,6 +130,7 @@ function invalidateByEvent(event: SystemEvent) {
       break;
     case "job:status":
       queryClient.invalidateQueries({ queryKey: ["jobs"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard"] });
       break;
   }
 }
