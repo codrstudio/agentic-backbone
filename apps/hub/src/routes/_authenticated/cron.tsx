@@ -1,13 +1,14 @@
 import { useState, useMemo, useCallback } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Calendar, Play, Search, Plus, Pencil } from "lucide-react";
+import { Calendar, Play, Search, Plus, Pencil, ArrowLeft } from "lucide-react";
 import cronstrue from "cronstrue/i18n";
 import { CronExpressionParser } from "cron-parser";
 import { PageHeader } from "@/components/shared/page-header";
 import { EmptyState } from "@/components/shared/empty-state";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { CronJobForm } from "@/components/cron/cron-job-form";
+import { CronJobDetail } from "@/components/cron/cron-job-detail";
 import {
   cronJobsQueryOptions,
   runCronJobManually,
@@ -120,6 +121,7 @@ function CronPage() {
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
   const [formOpen, setFormOpen] = useState(false);
   const [editingJob, setEditingJob] = useState<CronJob | undefined>(undefined);
+  const [selectedJob, setSelectedJob] = useState<CronJob | null>(null);
 
   const { data: jobs, isLoading } = useQuery(
     cronJobsQueryOptions({ includeDisabled: true })
@@ -179,6 +181,28 @@ function CronPage() {
     { value: "active", label: "Ativos" },
     { value: "inactive", label: "Inativos" },
   ];
+
+  if (selectedJob) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setSelectedJob(null)}
+          >
+            <ArrowLeft className="mr-1 size-4" />
+            Voltar
+          </Button>
+        </div>
+        <CronJobDetail
+          job={selectedJob}
+          agentName={agentNameMap[selectedJob.agentId]}
+          onDeleted={() => setSelectedJob(null)}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -286,6 +310,7 @@ function CronPage() {
                     setEditingJob(j);
                     setFormOpen(true);
                   }}
+                  onSelect={setSelectedJob}
                   isRunning={
                     runMutation.isPending &&
                     runMutation.variables?.agentId === job.agentId &&
@@ -315,12 +340,14 @@ function CronJobRow({
   agentName,
   onRun,
   onEdit,
+  onSelect,
   isRunning,
 }: {
   job: CronJob;
   agentName?: string;
   onRun: (agentId: string, slug: string) => void;
   onEdit: (job: CronJob) => void;
+  onSelect: (job: CronJob) => void;
   isRunning: boolean;
 }) {
   const nextRun = computeNextRun(job);
@@ -329,7 +356,7 @@ function CronJobRow({
     : null;
 
   return (
-    <TableRow>
+    <TableRow className="cursor-pointer" onClick={() => onSelect(job)}>
       <TableCell>
         <Badge variant="outline">{agentName ?? job.agentId}</Badge>
       </TableCell>

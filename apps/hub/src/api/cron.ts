@@ -107,3 +107,34 @@ export async function updateCronJob(
     body: JSON.stringify(payload),
   });
 }
+
+export async function deleteCronJob(agentId: string, slug: string) {
+  return request<{ ok: boolean }>(`/cron/jobs/${agentId}/${slug}`, {
+    method: "DELETE",
+  });
+}
+
+export interface CronRunEntry {
+  ts: number;
+  status: "ok" | "error" | "timeout" | "skipped";
+  duration_ms: number;
+  tokens?: { input?: number; output?: number };
+  cost_usd?: number;
+  preview?: string;
+  error?: string;
+}
+
+export function cronRunHistoryQueryOptions(
+  agentId: string,
+  slug: string,
+  page = 1,
+  limit = 20,
+) {
+  return queryOptions({
+    queryKey: ["cron-runs", agentId, slug, page],
+    queryFn: () =>
+      request<{ runs: CronRunEntry[]; total: number }>(
+        `/cron/jobs/${agentId}/${slug}/runs?page=${page}&limit=${limit}`,
+      ),
+  });
+}

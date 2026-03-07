@@ -21,6 +21,7 @@ import { AgentActions } from "@/components/agents/agent-actions";
 import { AgentConfigTabs } from "@/components/agents/agent-config-tabs";
 import { AgentConversations } from "@/components/agents/agent-conversations";
 import { MemoryStatusPanel } from "@/components/agents/memory-status-panel";
+import { AgentCronTab } from "@/components/agents/agent-cron-tab";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { useSSEEvent } from "@/hooks/use-sse";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -182,19 +183,9 @@ function AgentDetailPage() {
           <MemoryStatusPanel agentId={id} />
         </TabsContent>
         <TabsContent value="cron">
-          <PlaceholderTab label="Agenda" />
+          <AgentCronTab agentId={id} />
         </TabsContent>
       </Tabs>
-    </div>
-  );
-}
-
-function PlaceholderTab({ label }: { label: string }) {
-  return (
-    <div className="flex min-h-48 items-center justify-center rounded-lg border border-dashed">
-      <p className="text-sm text-muted-foreground">
-        {label} — Em breve
-      </p>
     </div>
   );
 }
