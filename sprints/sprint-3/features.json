@@ -471,7 +471,7 @@
     "id": "F-071",
     "name": "Templates no filesystem (5 templates iniciais)",
     "description": "Criar 5 templates em context/.templates/agents/: atendente, vendedor, suporte-tecnico, monitor-sistemas, assistente-pessoal. Cada um com TEMPLATE.md (frontmatter: name, description, icon, category, tags, heartbeat_enabled, active_hours), SOUL.md, CONVERSATION.md, HEARTBEAT.md pre-prontos em pt-BR.",
-    "status": "pending",
+    "status": "passing",
     "priority": 23,
     "agent": "coder",
     "task": "vibe-code",
@@ -484,7 +484,8 @@
       "HEARTBEAT.md do monitor-sistemas tem conteudo (heartbeat habilitado)",
       "Demais HEARTBEAT.md vazios (heartbeat desabilitado)"
     ],
-    "prp_path": "sprints/sprint-3/3-prps/PRP-18-templates-agente.md"
+    "prp_path": "sprints/sprint-3/3-prps/PRP-18-templates-agente.md",
+    "completed_at": "2026-03-07T00:00:00.000Z"
   },
   {
     "id": "F-072",
