@@ -550,7 +550,7 @@
     "id": "F-027",
     "name": "Lista de cron jobs",
     "description": "Substituir placeholder /cron: fetch jobs, tabela com colunas agente (badge), nome, agenda legivel (cronstrue pt-BR), status (badge), proxima execucao (cron-parser), ultima execucao. Filtro por agente e ativo/inativo. Botao play por linha para executar manualmente. Botao Novo Job.",
-    "status": "pending",
+    "status": "passing",
     "priority": 27,
     "agent": "coder",
     "task": "vibe-code",
@@ -565,7 +565,8 @@
       "Botao play executa job manualmente",
       "Proxima execucao calculada e exibida"
     ],
-    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-1/worktree/sprints/sprint-1/3-prps/PRP-07-agendamento-cron.md"
+    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-1/worktree/sprints/sprint-1/3-prps/PRP-07-agendamento-cron.md",
+    "completed_at": "2026-03-07T12:30:00Z"
   },
   {
     "id": "F-028",

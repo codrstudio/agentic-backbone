@@ -17,6 +17,8 @@
     "@types/qrcode.react": "^1.0.5",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "cron-parser": "^5.5.0",
+    "cronstrue": "^3.13.0",
     "lucide-react": "^0.577.0",
     "qrcode.react": "^4.2.0",
     "react": "^19",
