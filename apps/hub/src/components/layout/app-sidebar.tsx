@@ -1,5 +1,6 @@
 import { Link, useMatchRoute } from "@tanstack/react-router";
 import {
+  LayoutDashboard,
   Bot,
   MessageSquare,
   Radio,
@@ -19,6 +20,7 @@ import {
 } from "@/components/ui/sidebar";
 
 const navItems = [
+  { label: "Dashboard", icon: LayoutDashboard, to: "/" as const },
   { label: "Agentes", icon: Bot, to: "/agents" as const },
   { label: "Conversas", icon: MessageSquare, to: "/conversations" as const },
   { label: "Canais", icon: Radio, to: "/channels" as const },
@@ -40,7 +42,7 @@ export function AppSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               {navItems.map((item) => {
-                const isActive = !!matchRoute({ to: item.to, fuzzy: true });
+                const isActive = !!matchRoute({ to: item.to, fuzzy: item.to !== "/" });
                 return (
                   <SidebarMenuItem key={item.to}>
                     <SidebarMenuButton isActive={isActive} render={<Link to={item.to} />}>

@@ -11,6 +11,7 @@ import {
 import { PageHeader } from "@/components/shared/page-header";
 import { StatCard } from "@/components/dashboard/stat-card";
 import { ActivityTimeline } from "@/components/dashboard/activity-timeline";
+import { UpcomingCronJobs } from "@/components/dashboard/upcoming-cron-jobs";
 import { Skeleton } from "@/components/ui/skeleton";
 import { dashboardQueryOptions, type DashboardData } from "@/api/dashboard";
 
@@ -103,7 +104,12 @@ function DashboardPage() {
         </div>
       )}
 
-      {data && <ActivityTimeline events={data.recentActivity} />}
+      {data && (
+        <div className="grid gap-6 lg:grid-cols-2">
+          <ActivityTimeline events={data.recentActivity} />
+          <UpcomingCronJobs jobs={data.cronJobs.nextRuns} />
+        </div>
+      )}
     </div>
   );
 }
