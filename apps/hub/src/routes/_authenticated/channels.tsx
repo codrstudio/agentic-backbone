@@ -5,10 +5,17 @@ import { Radio, Plus, Search } from "lucide-react";
 import { PageHeader } from "@/components/shared/page-header";
 import { EmptyState } from "@/components/shared/empty-state";
 import { ChannelCard } from "@/components/channels/channel-card";
+import { WhatsAppSetup } from "@/components/channels/whatsapp-setup";
 import { channelsQueryOptions } from "@/api/channels";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import {
   Select,
   SelectContent,
@@ -27,6 +34,7 @@ function ChannelsPage() {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState<TypeFilter>("all");
+  const [whatsappSetupOpen, setWhatsappSetupOpen] = useState(false);
 
   const { data: channels, isLoading } = useQuery(channelsQueryOptions());
 
@@ -52,10 +60,7 @@ function ChannelsPage() {
         title="Canais"
         description="Canais de comunicacao dos agentes"
         actions={
-          <Button
-            size="sm"
-            onClick={() => navigate({ to: "/channels/new" as string })}
-          >
+          <Button size="sm" onClick={() => setWhatsappSetupOpen(true)}>
             <Plus className="mr-1 size-4" />
             Novo Canal
           </Button>
@@ -115,6 +120,15 @@ function ChannelsPage() {
           ))}
         </div>
       )}
+
+      <Dialog open={whatsappSetupOpen} onOpenChange={setWhatsappSetupOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Configurar WhatsApp</DialogTitle>
+          </DialogHeader>
+          <WhatsAppSetup onComplete={() => setWhatsappSetupOpen(false)} />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

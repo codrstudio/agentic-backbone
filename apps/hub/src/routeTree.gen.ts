@@ -18,6 +18,7 @@ import { Route as AuthenticatedConversationsRouteImport } from './routes/_authen
 import { Route as AuthenticatedChannelsRouteImport } from './routes/_authenticated/channels'
 import { Route as AuthenticatedAgentsRouteImport } from './routes/_authenticated/agents'
 import { Route as AuthenticatedConversationsIdRouteImport } from './routes/_authenticated/conversations.$id'
+import { Route as AuthenticatedChannelsSlugRouteImport } from './routes/_authenticated/channels.$slug'
 import { Route as AuthenticatedAgentsNewRouteImport } from './routes/_authenticated/agents.new'
 import { Route as AuthenticatedAgentsIdRouteImport } from './routes/_authenticated/agents.$id'
 
@@ -67,6 +68,12 @@ const AuthenticatedConversationsIdRoute =
     path: '/$id',
     getParentRoute: () => AuthenticatedConversationsRoute,
   } as any)
+const AuthenticatedChannelsSlugRoute =
+  AuthenticatedChannelsSlugRouteImport.update({
+    id: '/$slug',
+    path: '/$slug',
+    getParentRoute: () => AuthenticatedChannelsRoute,
+  } as any)
 const AuthenticatedAgentsNewRoute = AuthenticatedAgentsNewRouteImport.update({
   id: '/new',
   path: '/new',
@@ -82,24 +89,26 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/agents': typeof AuthenticatedAgentsRouteWithChildren
-  '/channels': typeof AuthenticatedChannelsRoute
+  '/channels': typeof AuthenticatedChannelsRouteWithChildren
   '/conversations': typeof AuthenticatedConversationsRouteWithChildren
   '/cron': typeof AuthenticatedCronRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/agents/$id': typeof AuthenticatedAgentsIdRoute
   '/agents/new': typeof AuthenticatedAgentsNewRoute
+  '/channels/$slug': typeof AuthenticatedChannelsSlugRoute
   '/conversations/$id': typeof AuthenticatedConversationsIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/agents': typeof AuthenticatedAgentsRouteWithChildren
-  '/channels': typeof AuthenticatedChannelsRoute
+  '/channels': typeof AuthenticatedChannelsRouteWithChildren
   '/conversations': typeof AuthenticatedConversationsRouteWithChildren
   '/cron': typeof AuthenticatedCronRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/agents/$id': typeof AuthenticatedAgentsIdRoute
   '/agents/new': typeof AuthenticatedAgentsNewRoute
+  '/channels/$slug': typeof AuthenticatedChannelsSlugRoute
   '/conversations/$id': typeof AuthenticatedConversationsIdRoute
 }
 export interface FileRoutesById {
@@ -108,12 +117,13 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/login': typeof LoginRoute
   '/_authenticated/agents': typeof AuthenticatedAgentsRouteWithChildren
-  '/_authenticated/channels': typeof AuthenticatedChannelsRoute
+  '/_authenticated/channels': typeof AuthenticatedChannelsRouteWithChildren
   '/_authenticated/conversations': typeof AuthenticatedConversationsRouteWithChildren
   '/_authenticated/cron': typeof AuthenticatedCronRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/agents/$id': typeof AuthenticatedAgentsIdRoute
   '/_authenticated/agents/new': typeof AuthenticatedAgentsNewRoute
+  '/_authenticated/channels/$slug': typeof AuthenticatedChannelsSlugRoute
   '/_authenticated/conversations/$id': typeof AuthenticatedConversationsIdRoute
 }
 export interface FileRouteTypes {
@@ -128,6 +138,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/agents/$id'
     | '/agents/new'
+    | '/channels/$slug'
     | '/conversations/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -140,6 +151,7 @@ export interface FileRouteTypes {
     | '/settings'
     | '/agents/$id'
     | '/agents/new'
+    | '/channels/$slug'
     | '/conversations/$id'
   id:
     | '__root__'
@@ -153,6 +165,7 @@ export interface FileRouteTypes {
     | '/_authenticated/settings'
     | '/_authenticated/agents/$id'
     | '/_authenticated/agents/new'
+    | '/_authenticated/channels/$slug'
     | '/_authenticated/conversations/$id'
   fileRoutesById: FileRoutesById
 }
@@ -227,6 +240,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedConversationsIdRouteImport
       parentRoute: typeof AuthenticatedConversationsRoute
     }
+    '/_authenticated/channels/$slug': {
+      id: '/_authenticated/channels/$slug'
+      path: '/$slug'
+      fullPath: '/channels/$slug'
+      preLoaderRoute: typeof AuthenticatedChannelsSlugRouteImport
+      parentRoute: typeof AuthenticatedChannelsRoute
+    }
     '/_authenticated/agents/new': {
       id: '/_authenticated/agents/new'
       path: '/new'
@@ -257,6 +277,19 @@ const AuthenticatedAgentsRouteChildren: AuthenticatedAgentsRouteChildren = {
 const AuthenticatedAgentsRouteWithChildren =
   AuthenticatedAgentsRoute._addFileChildren(AuthenticatedAgentsRouteChildren)
 
+interface AuthenticatedChannelsRouteChildren {
+  AuthenticatedChannelsSlugRoute: typeof AuthenticatedChannelsSlugRoute
+}
+
+const AuthenticatedChannelsRouteChildren: AuthenticatedChannelsRouteChildren = {
+  AuthenticatedChannelsSlugRoute: AuthenticatedChannelsSlugRoute,
+}
+
+const AuthenticatedChannelsRouteWithChildren =
+  AuthenticatedChannelsRoute._addFileChildren(
+    AuthenticatedChannelsRouteChildren,
+  )
+
 interface AuthenticatedConversationsRouteChildren {
   AuthenticatedConversationsIdRoute: typeof AuthenticatedConversationsIdRoute
 }
@@ -273,7 +306,7 @@ const AuthenticatedConversationsRouteWithChildren =
 
 interface AuthenticatedRouteChildren {
   AuthenticatedAgentsRoute: typeof AuthenticatedAgentsRouteWithChildren
-  AuthenticatedChannelsRoute: typeof AuthenticatedChannelsRoute
+  AuthenticatedChannelsRoute: typeof AuthenticatedChannelsRouteWithChildren
   AuthenticatedConversationsRoute: typeof AuthenticatedConversationsRouteWithChildren
   AuthenticatedCronRoute: typeof AuthenticatedCronRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
@@ -281,7 +314,7 @@ interface AuthenticatedRouteChildren {
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAgentsRoute: AuthenticatedAgentsRouteWithChildren,
-  AuthenticatedChannelsRoute: AuthenticatedChannelsRoute,
+  AuthenticatedChannelsRoute: AuthenticatedChannelsRouteWithChildren,
   AuthenticatedConversationsRoute: AuthenticatedConversationsRouteWithChildren,
   AuthenticatedCronRoute: AuthenticatedCronRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,

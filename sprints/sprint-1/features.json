@@ -444,7 +444,7 @@
     "id": "F-022",
     "name": "Setup WhatsApp (wizard QR Code)",
     "description": "Criar components/channels/whatsapp-setup.tsx: wizard 3 passos. Passo 1: input nome instancia, POST /adapters com connector evolution. Passo 2: renderizar QR code (qrcode.react), polling condicional 5s para status, auto-refresh QR 30s. Passo 3: exibir numero pareado e status conectado, botao Concluir.",
-    "status": "blocked",
+    "status": "passing",
     "priority": 22,
     "agent": "coder",
     "task": "vibe-code",
@@ -459,13 +459,14 @@
       "Apos parear, avanca para passo 3 com status Conectado",
       "Botao Concluir fecha wizard e invalida queries"
     ],
-    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-1/worktree/sprints/sprint-1/3-prps/PRP-05-canais-whatsapp.md"
+    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-1/worktree/sprints/sprint-1/3-prps/PRP-05-canais-whatsapp.md",
+    "completed_at": "2026-03-07T10:00:00Z"
   },
   {
     "id": "F-023",
     "name": "Feed de mensagens do canal",
     "description": "Substituir placeholder tab Mensagens. Criar components/channels/channel-message-feed.tsx: conecta SSE /channels/:slug/events, timeline vertical com mensagens inbound/outbound, icone de direcao, remetente, conteudo, timestamp. Auto-scroll com novas mensagens.",
-    "status": "blocked",
+    "status": "pending",
     "priority": 23,
     "agent": "coder",
     "task": "vibe-code",
