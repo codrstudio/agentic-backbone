@@ -466,7 +466,7 @@
     "id": "F-023",
     "name": "Feed de mensagens do canal",
     "description": "Substituir placeholder tab Mensagens. Criar components/channels/channel-message-feed.tsx: conecta SSE /channels/:slug/events, timeline vertical com mensagens inbound/outbound, icone de direcao, remetente, conteudo, timestamp. Auto-scroll com novas mensagens.",
-    "status": "pending",
+    "status": "passing",
     "priority": 23,
     "agent": "coder",
     "task": "vibe-code",
@@ -480,7 +480,8 @@
       "Auto-scroll funciona com mensagens novas",
       "ScrollArea do shadcn com scroll interno"
     ],
-    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-1/worktree/sprints/sprint-1/3-prps/PRP-05-canais-whatsapp.md"
+    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-1/worktree/sprints/sprint-1/3-prps/PRP-05-canais-whatsapp.md",
+    "completed_at": "2026-03-07T10:30:00Z"
   },
   {
     "id": "F-024",

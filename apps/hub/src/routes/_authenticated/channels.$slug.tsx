@@ -4,6 +4,7 @@ import { Activity, Settings, MessageSquare, ChevronRight } from "lucide-react";
 import { channelQueryOptions } from "@/api/channels";
 import { ChannelStatusTab } from "@/components/channels/channel-status-tab";
 import { ChannelConfigTab } from "@/components/channels/channel-config-tab";
+import { ChannelMessageFeed } from "@/components/channels/channel-message-feed";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -111,11 +112,7 @@ function ChannelDetailPage() {
           <ChannelConfigTab channel={channel} />
         </TabsContent>
         <TabsContent value="messages">
-          <div className="flex min-h-48 items-center justify-center rounded-lg border border-dashed">
-            <p className="text-sm text-muted-foreground">
-              Mensagens — Em breve
-            </p>
-          </div>
+          <ChannelMessageFeed channelSlug={slug} />
         </TabsContent>
       </Tabs>
     </div>
