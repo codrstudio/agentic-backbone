@@ -127,6 +127,7 @@ function invalidateByEvent(event: SystemEvent) {
     case "channel:message":
       queryClient.invalidateQueries({ queryKey: ["channels"] });
       queryClient.invalidateQueries({ queryKey: ["conversations"] });
+      queryClient.invalidateQueries({ queryKey: ["inbox"] });
       break;
     case "session:takeover": {
       const sessionId = event.data?.sessionId as string | undefined;

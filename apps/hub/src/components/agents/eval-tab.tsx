@@ -59,11 +59,7 @@ function EvalSetCard({
           <div className="flex items-center gap-2 shrink-0">
             <EvalScoreBadge score={lastScore} />
             <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="size-7">
-                  <MoreHorizontal className="size-4" />
-                </Button>
-              </DropdownMenuTrigger>
+              <DropdownMenuTrigger render={<Button variant="ghost" size="icon" className="size-7"><MoreHorizontal className="size-4" /></Button>} />
               <DropdownMenuContent align="end">
                 <DropdownMenuItem onClick={onEdit}>
                   <Pencil className="mr-2 size-3.5" />

@@ -45,7 +45,7 @@ export function FeedbackReasonPopover({
 
   return (
     <Popover open={open} onOpenChange={handleOpenChange}>
-      <PopoverTrigger asChild>{children}</PopoverTrigger>
+      <PopoverTrigger render={children as React.ReactElement} />
       <PopoverContent className="w-52 p-3" align="start">
         <p className="mb-2 text-xs font-medium text-muted-foreground">
           Motivo da avaliação negativa

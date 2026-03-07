@@ -14,6 +14,7 @@ import {
   ShieldCheck,
   ShieldAlert,
   Plug,
+  Inbox,
 } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -29,10 +30,14 @@ import {
 } from "@/components/ui/sidebar";
 import { pendingApprovalsQueryOptions } from "@/api/approvals";
 import { securitySummaryQueryOptions } from "@/api/security";
+import { inboxQueryOptions } from "@/api/inbox";
 import { useSSEEvent, type SystemEvent } from "@/hooks/use-sse";
 
-const navItems = [
+const navItemsBefore = [
   { label: "Dashboard", icon: LayoutDashboard, to: "/" as const },
+] as const;
+
+const navItemsAfter = [
   { label: "Agentes", icon: Bot, to: "/agents" as const },
   { label: "Conversas", icon: MessageSquare, to: "/conversations" as const },
   { label: "Canais", icon: Radio, to: "/channels" as const },
@@ -55,6 +60,9 @@ export function AppSidebar() {
   const hasCriticalEvents =
     (securitySummary?.bySeverity.find((s) => s.severity === "critical")?.count ?? 0) > 0;
 
+  const { data: inboxData } = useQuery(inboxQueryOptions({ status: "waiting", limit: 1 }));
+  const waitingCount = inboxData?.total ?? 0;
+
   useSSEEvent(
     "approval:pending",
     useCallback(
@@ -65,6 +73,17 @@ export function AppSidebar() {
     ),
   );
 
+  useSSEEvent(
+    "channel:message",
+    useCallback(
+      (_event: SystemEvent) => {
+        queryClient.invalidateQueries({ queryKey: ["inbox"] });
+      },
+      [queryClient],
+    ),
+  );
+
+  const isInboxActive = !!matchRoute({ to: "/inbox", fuzzy: true });
   const isApprovalsActive = !!matchRoute({ to: "/approvals", fuzzy: true });
   const isAdaptersActive = !!matchRoute({ to: "/adapters", fuzzy: true });
   const isSecurityActive = !!matchRoute({ to: "/security", fuzzy: true });
@@ -78,8 +97,36 @@ export function AppSidebar() {
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
-              {navItems.map((item) => {
+              {navItemsBefore.map((item) => {
                 const isActive = !!matchRoute({ to: item.to, fuzzy: item.to !== "/" });
+                return (
+                  <SidebarMenuItem key={item.to}>
+                    <SidebarMenuButton isActive={isActive} render={<Link to={item.to} />}>
+                      <item.icon />
+                      <span>{item.label}</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
+
+              {/* Inbox with waiting badge */}
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  isActive={isInboxActive}
+                  render={<Link to="/inbox" />}
+                >
+                  <Inbox />
+                  <span className="flex-1">Inbox</span>
+                  {waitingCount > 0 && (
+                    <span className="ml-auto inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-bold text-destructive-foreground">
+                      {waitingCount > 99 ? "99+" : waitingCount}
+                    </span>
+                  )}
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+
+              {navItemsAfter.map((item) => {
+                const isActive = !!matchRoute({ to: item.to, fuzzy: true });
                 return (
                   <SidebarMenuItem key={item.to}>
                     <SidebarMenuButton isActive={isActive} render={<Link to={item.to} />}>

@@ -50,7 +50,7 @@ export function TopReasonsChart({ reasons }: TopReasonsChartProps) {
               <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
               <XAxis type="number" tick={{ fontSize: 11 }} allowDecimals={false} />
               <YAxis type="category" dataKey="reason" tick={{ fontSize: 11 }} width={120} />
-              <Tooltip formatter={(v: number) => [v, "Ocorrencias"]} />
+              <Tooltip formatter={(v) => [v, "Ocorrencias"]} />
               <Bar dataKey="count" fill="hsl(var(--destructive))" radius={[0, 4, 4, 0]} />
             </BarChart>
           </ResponsiveContainer>

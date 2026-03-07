@@ -103,11 +103,7 @@ export function AdapterCard({ adapter, onEdit }: Props) {
               disabled={toggleMutation.isPending}
             />
             <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-7 w-7">
-                  <MoreHorizontal className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
+              <DropdownMenuTrigger render={<Button variant="ghost" size="icon" className="h-7 w-7"><MoreHorizontal className="h-4 w-4" /></Button>} />
               <DropdownMenuContent align="end">
                 <DropdownMenuItem onClick={() => onEdit(adapter)}>
                   <Pencil className="mr-2 h-4 w-4" />

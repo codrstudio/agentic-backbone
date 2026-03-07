@@ -22,6 +22,7 @@ import { Route as AuthenticatedChannelsRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedAnalyticsRouteImport } from './routes/_authenticated/analytics'
 import { Route as AuthenticatedAgentsRouteImport } from './routes/_authenticated/agents'
 import { Route as AuthenticatedSecurityIndexRouteImport } from './routes/_authenticated/security/index'
+import { Route as AuthenticatedInboxIndexRouteImport } from './routes/_authenticated/inbox/index'
 import { Route as AuthenticatedApprovalsIndexRouteImport } from './routes/_authenticated/approvals/index'
 import { Route as AuthenticatedAdaptersIndexRouteImport } from './routes/_authenticated/adapters/index'
 import { Route as AuthenticatedJobsIdRouteImport } from './routes/_authenticated/jobs.$id'
@@ -98,6 +99,11 @@ const AuthenticatedSecurityIndexRoute =
     path: '/security/',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedInboxIndexRoute = AuthenticatedInboxIndexRouteImport.update({
+  id: '/inbox/',
+  path: '/inbox/',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedApprovalsIndexRoute =
   AuthenticatedApprovalsIndexRouteImport.update({
     id: '/approvals/',
@@ -163,6 +169,7 @@ export interface FileRoutesByFullPath {
   '/jobs/$id': typeof AuthenticatedJobsIdRoute
   '/adapters/': typeof AuthenticatedAdaptersIndexRoute
   '/approvals/': typeof AuthenticatedApprovalsIndexRoute
+  '/inbox/': typeof AuthenticatedInboxIndexRoute
   '/security/': typeof AuthenticatedSecurityIndexRoute
   '/agents/$id/eval-runs/$runId': typeof AuthenticatedAgentsIdEvalRunsRunIdRoute
 }
@@ -185,6 +192,7 @@ export interface FileRoutesByTo {
   '/jobs/$id': typeof AuthenticatedJobsIdRoute
   '/adapters': typeof AuthenticatedAdaptersIndexRoute
   '/approvals': typeof AuthenticatedApprovalsIndexRoute
+  '/inbox': typeof AuthenticatedInboxIndexRoute
   '/security': typeof AuthenticatedSecurityIndexRoute
   '/agents/$id/eval-runs/$runId': typeof AuthenticatedAgentsIdEvalRunsRunIdRoute
 }
@@ -209,6 +217,7 @@ export interface FileRoutesById {
   '/_authenticated/jobs/$id': typeof AuthenticatedJobsIdRoute
   '/_authenticated/adapters/': typeof AuthenticatedAdaptersIndexRoute
   '/_authenticated/approvals/': typeof AuthenticatedApprovalsIndexRoute
+  '/_authenticated/inbox/': typeof AuthenticatedInboxIndexRoute
   '/_authenticated/security/': typeof AuthenticatedSecurityIndexRoute
   '/_authenticated/agents/$id/eval-runs/$runId': typeof AuthenticatedAgentsIdEvalRunsRunIdRoute
 }
@@ -233,6 +242,7 @@ export interface FileRouteTypes {
     | '/jobs/$id'
     | '/adapters/'
     | '/approvals/'
+    | '/inbox/'
     | '/security/'
     | '/agents/$id/eval-runs/$runId'
   fileRoutesByTo: FileRoutesByTo
@@ -255,6 +265,7 @@ export interface FileRouteTypes {
     | '/jobs/$id'
     | '/adapters'
     | '/approvals'
+    | '/inbox'
     | '/security'
     | '/agents/$id/eval-runs/$runId'
   id:
@@ -278,6 +289,7 @@ export interface FileRouteTypes {
     | '/_authenticated/jobs/$id'
     | '/_authenticated/adapters/'
     | '/_authenticated/approvals/'
+    | '/_authenticated/inbox/'
     | '/_authenticated/security/'
     | '/_authenticated/agents/$id/eval-runs/$runId'
   fileRoutesById: FileRoutesById
@@ -378,6 +390,13 @@ declare module '@tanstack/react-router' {
       path: '/security'
       fullPath: '/security/'
       preLoaderRoute: typeof AuthenticatedSecurityIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/inbox/': {
+      id: '/_authenticated/inbox/'
+      path: '/inbox'
+      fullPath: '/inbox/'
+      preLoaderRoute: typeof AuthenticatedInboxIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/approvals/': {
@@ -517,6 +536,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
   AuthenticatedAdaptersIndexRoute: typeof AuthenticatedAdaptersIndexRoute
   AuthenticatedApprovalsIndexRoute: typeof AuthenticatedApprovalsIndexRoute
+  AuthenticatedInboxIndexRoute: typeof AuthenticatedInboxIndexRoute
   AuthenticatedSecurityIndexRoute: typeof AuthenticatedSecurityIndexRoute
 }
 
@@ -533,6 +553,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
   AuthenticatedAdaptersIndexRoute: AuthenticatedAdaptersIndexRoute,
   AuthenticatedApprovalsIndexRoute: AuthenticatedApprovalsIndexRoute,
+  AuthenticatedInboxIndexRoute: AuthenticatedInboxIndexRoute,
   AuthenticatedSecurityIndexRoute: AuthenticatedSecurityIndexRoute,
 }
 

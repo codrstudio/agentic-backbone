@@ -45,8 +45,8 @@ export function QualityTrendChart({ trend }: QualityTrendChartProps) {
                 tickFormatter={(v: number) => `${v}%`}
               />
               <Tooltip
-                formatter={(value: number) => [`${value}%`, "Aprovacao"]}
-                labelFormatter={(label: string) => `Data: ${label}`}
+                formatter={(value) => [`${value}%`, "Aprovacao"]}
+                labelFormatter={(label) => `Data: ${label}`}
               />
               <Line
                 type="monotone"

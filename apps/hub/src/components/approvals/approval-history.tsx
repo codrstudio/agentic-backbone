@@ -48,7 +48,7 @@ export function ApprovalHistory() {
     <div className="space-y-4">
       {/* Filters */}
       <div className="flex flex-wrap gap-2">
-        <Select value={statusFilter} onValueChange={setStatusFilter}>
+        <Select value={statusFilter} onValueChange={(v) => v && setStatusFilter(v)}>
           <SelectTrigger className="w-[150px]">
             <SelectValue />
           </SelectTrigger>
@@ -59,7 +59,7 @@ export function ApprovalHistory() {
             <SelectItem value="expired">Expirado</SelectItem>
           </SelectContent>
         </Select>
-        <Select value={agentFilter} onValueChange={setAgentFilter}>
+        <Select value={agentFilter} onValueChange={(v) => v && setAgentFilter(v)}>
           <SelectTrigger className="w-[200px]">
             <SelectValue />
           </SelectTrigger>
