@@ -150,10 +150,16 @@ export async function uploadKnowledgeDoc(
 
 async function reindexAndUpdateDoc(agentId: string, docId: number): Promise<void> {
   try {
+    const doc = getDocById.get(docId, agentId) as KnowledgeDoc | undefined;
+    if (!doc) return;
+
     const mgr = getAgentMemoryManager(agentId);
     await mgr.sync({ force: true });
-    const { chunkCount } = mgr.status();
-    updateDocStatus.run({ id: docId, status: "indexed", chunks: chunkCount, error: null });
+
+    // Count only the chunks belonging to this specific document
+    const filePath = `knowledge/${doc.slug}.md`;
+    const chunks = mgr.countFileChunks(filePath);
+    updateDocStatus.run({ id: docId, status: "indexed", chunks, error: null });
   } catch (err) {
     updateDocStatus.run({ id: docId, status: "error", chunks: 0, error: (err as Error).message });
   }
@@ -174,12 +180,16 @@ export async function deleteKnowledgeDoc(agentId: string, docId: number): Promis
   // Remove record
   deleteDocStmt.run({ id: docId });
 
-  // Reindex to remove stale embeddings
+  // Explicitly remove chunks from sqlite-vec + FTS5 for this file
+  const mgr = getAgentMemoryManager(agentId);
+  const filePath = `knowledge/${doc.slug}.md`;
+  mgr.removeFile(filePath);
+
+  // Sync to update internal state
   try {
-    const mgr = getAgentMemoryManager(agentId);
     await mgr.sync({ force: true });
   } catch {
-    // Best-effort reindex
+    // Best-effort sync
   }
 }
 
