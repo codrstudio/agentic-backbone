@@ -10,11 +10,21 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
+import { Route as AuthenticatedCronRouteImport } from './routes/_authenticated/cron'
+import { Route as AuthenticatedConversationsRouteImport } from './routes/_authenticated/conversations'
+import { Route as AuthenticatedChannelsRouteImport } from './routes/_authenticated/channels'
+import { Route as AuthenticatedAgentsRouteImport } from './routes/_authenticated/agents'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRoute = AuthenticatedRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -22,30 +32,96 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedCronRoute = AuthenticatedCronRouteImport.update({
+  id: '/cron',
+  path: '/cron',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedConversationsRoute =
+  AuthenticatedConversationsRouteImport.update({
+    id: '/conversations',
+    path: '/conversations',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedChannelsRoute = AuthenticatedChannelsRouteImport.update({
+  id: '/channels',
+  path: '/channels',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedAgentsRoute = AuthenticatedAgentsRouteImport.update({
+  id: '/agents',
+  path: '/agents',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/agents': typeof AuthenticatedAgentsRoute
+  '/channels': typeof AuthenticatedChannelsRoute
+  '/conversations': typeof AuthenticatedConversationsRoute
+  '/cron': typeof AuthenticatedCronRoute
+  '/settings': typeof AuthenticatedSettingsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/agents': typeof AuthenticatedAgentsRoute
+  '/channels': typeof AuthenticatedChannelsRoute
+  '/conversations': typeof AuthenticatedConversationsRoute
+  '/cron': typeof AuthenticatedCronRoute
+  '/settings': typeof AuthenticatedSettingsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/login': typeof LoginRoute
+  '/_authenticated/agents': typeof AuthenticatedAgentsRoute
+  '/_authenticated/channels': typeof AuthenticatedChannelsRoute
+  '/_authenticated/conversations': typeof AuthenticatedConversationsRoute
+  '/_authenticated/cron': typeof AuthenticatedCronRoute
+  '/_authenticated/settings': typeof AuthenticatedSettingsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login'
+  fullPaths:
+    | '/'
+    | '/login'
+    | '/agents'
+    | '/channels'
+    | '/conversations'
+    | '/cron'
+    | '/settings'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login'
-  id: '__root__' | '/' | '/login'
+  to:
+    | '/'
+    | '/login'
+    | '/agents'
+    | '/channels'
+    | '/conversations'
+    | '/cron'
+    | '/settings'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/login'
+    | '/_authenticated/agents'
+    | '/_authenticated/channels'
+    | '/_authenticated/conversations'
+    | '/_authenticated/cron'
+    | '/_authenticated/settings'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   LoginRoute: typeof LoginRoute
 }
 
@@ -58,6 +134,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -65,11 +148,67 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/settings': {
+      id: '/_authenticated/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AuthenticatedSettingsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/cron': {
+      id: '/_authenticated/cron'
+      path: '/cron'
+      fullPath: '/cron'
+      preLoaderRoute: typeof AuthenticatedCronRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/conversations': {
+      id: '/_authenticated/conversations'
+      path: '/conversations'
+      fullPath: '/conversations'
+      preLoaderRoute: typeof AuthenticatedConversationsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/channels': {
+      id: '/_authenticated/channels'
+      path: '/channels'
+      fullPath: '/channels'
+      preLoaderRoute: typeof AuthenticatedChannelsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/agents': {
+      id: '/_authenticated/agents'
+      path: '/agents'
+      fullPath: '/agents'
+      preLoaderRoute: typeof AuthenticatedAgentsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
   }
 }
 
+interface AuthenticatedRouteChildren {
+  AuthenticatedAgentsRoute: typeof AuthenticatedAgentsRoute
+  AuthenticatedChannelsRoute: typeof AuthenticatedChannelsRoute
+  AuthenticatedConversationsRoute: typeof AuthenticatedConversationsRoute
+  AuthenticatedCronRoute: typeof AuthenticatedCronRoute
+  AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
+}
+
+const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedAgentsRoute: AuthenticatedAgentsRoute,
+  AuthenticatedChannelsRoute: AuthenticatedChannelsRoute,
+  AuthenticatedConversationsRoute: AuthenticatedConversationsRoute,
+  AuthenticatedCronRoute: AuthenticatedCronRoute,
+  AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
+}
+
+const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
+  AuthenticatedRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRoute: AuthenticatedRouteWithChildren,
   LoginRoute: LoginRoute,
 }
 export const routeTree = rootRouteImport
