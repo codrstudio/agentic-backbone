@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { MessageSquare, Plus, Search, Bot } from "lucide-react";
+import { MessageSquare, Plus, Search, Bot, User } from "lucide-react";
 import { PageHeader } from "@/components/shared/page-header";
 import { EmptyState } from "@/components/shared/empty-state";
 import { Badge } from "@/components/ui/badge";
@@ -60,6 +60,8 @@ function ConversationItem({
   agentLabel: string;
   onClick: () => void;
 }) {
+  const hasOperator = !!conversation.takeover_by;
+
   return (
     <button
       type="button"
@@ -75,6 +77,12 @@ function ConversationItem({
             <Bot className="mr-1 size-3" />
             {agentLabel}
           </Badge>
+          {hasOperator && (
+            <Badge variant="default" className="shrink-0 text-xs">
+              <User className="mr-1 size-3" />
+              Operador
+            </Badge>
+          )}
           <span className="truncate text-sm font-medium">
             {conversation.title || "Sem titulo"}
           </span>
@@ -97,6 +105,7 @@ function ConversationsPage() {
   const queryClient = useQueryClient();
   const [search, setSearch] = useState("");
   const [agentFilter, setAgentFilter] = useState<string>("all");
+  const [operatorFilter, setOperatorFilter] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedAgent, setSelectedAgent] = useState<string>("");
 
@@ -129,9 +138,10 @@ function ConversationsPage() {
         (c.title ?? "").toLowerCase().includes(search.toLowerCase());
       const matchesAgent =
         agentFilter === "all" || c.agentId === agentFilter;
-      return matchesSearch && matchesAgent;
+      const matchesOperator = !operatorFilter || !!c.takeover_by;
+      return matchesSearch && matchesAgent && matchesOperator;
     });
-  }, [sorted, search, agentFilter]);
+  }, [sorted, search, agentFilter, operatorFilter]);
 
   const agentOptions = useMemo(() => {
     if (!agents) return [];
@@ -197,6 +207,15 @@ function ConversationsPage() {
             ))}
           </SelectContent>
         </Select>
+        <Button
+          variant={operatorFilter ? "default" : "outline"}
+          size="sm"
+          onClick={() => setOperatorFilter((v) => !v)}
+          className="shrink-0"
+        >
+          <User className="mr-1 size-4" />
+          Com operador
+        </Button>
       </div>
 
       {loadingConversations ? (

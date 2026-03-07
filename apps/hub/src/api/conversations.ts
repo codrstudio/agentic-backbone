@@ -7,6 +7,8 @@ export interface Conversation {
   title?: string;
   lastMessage?: string;
   updatedAt: string;
+  takeover_by: string | null;
+  takeover_at: string | null;
 }
 
 export interface Session {

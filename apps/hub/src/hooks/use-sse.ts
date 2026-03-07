@@ -128,6 +128,14 @@ function invalidateByEvent(event: SystemEvent) {
       queryClient.invalidateQueries({ queryKey: ["channels"] });
       queryClient.invalidateQueries({ queryKey: ["conversations"] });
       break;
+    case "session:takeover": {
+      const sessionId = event.data?.sessionId as string | undefined;
+      queryClient.invalidateQueries({ queryKey: ["conversations"] });
+      if (sessionId) {
+        queryClient.invalidateQueries({ queryKey: ["conversations", sessionId, "session"] });
+      }
+      break;
+    }
     case "job:status":
       queryClient.invalidateQueries({ queryKey: ["jobs"] });
       queryClient.invalidateQueries({ queryKey: ["dashboard"] });
