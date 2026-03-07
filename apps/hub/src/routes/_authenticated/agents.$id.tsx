@@ -8,7 +8,8 @@ import {
   Clock,
   ChevronRight,
 } from "lucide-react";
-import { agentQueryOptions } from "@/api/agents";
+import { agentQueryOptions, agentStatsQueryOptions } from "@/api/agents";
+import { AgentMetrics } from "@/components/agents/agent-metrics";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -44,6 +45,7 @@ function AgentDetailPage() {
   const activeTab = tab ?? "overview";
 
   const { data: agent, isLoading } = useQuery(agentQueryOptions(id));
+  const { data: stats } = useQuery(agentStatsQueryOptions(id));
 
   function handleTabChange(value: TabValue) {
     navigate({
@@ -111,7 +113,11 @@ function AgentDetailPage() {
         </TabsList>
 
         <TabsContent value="overview">
-          <PlaceholderTab label="Visao Geral" />
+          {stats ? (
+            <AgentMetrics stats={stats} />
+          ) : (
+            <PlaceholderTab label="Visao Geral" />
+          )}
         </TabsContent>
         <TabsContent value="config">
           <PlaceholderTab label="Configuracao" />

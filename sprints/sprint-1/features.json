@@ -170,7 +170,7 @@
     "id": "F-009",
     "name": "Metricas de heartbeat",
     "description": "Criar components/agents/agent-metrics.tsx: grid de 4 cards numericos (total execucoes, por status ok/skipped/error, custo total USD, duracao media). Fetch via agentStatsQueryOptions. SSE heartbeat:status invalida query de stats.",
-    "status": "blocked",
+    "status": "passing",
     "priority": 9,
     "agent": "coder",
     "task": "vibe-code",
@@ -183,7 +183,8 @@
       "Custo formatado com 4 decimais",
       "Metricas atualizam apos evento SSE heartbeat:status"
     ],
-    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-1/worktree/sprints/sprint-1/3-prps/PRP-02-dashboard-agentes.md"
+    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-1/worktree/sprints/sprint-1/3-prps/PRP-02-dashboard-agentes.md",
+    "completed_at": "2026-03-07T06:10:00Z"
   },
   {
     "id": "F-010",
@@ -210,7 +211,7 @@
     "id": "F-011",
     "name": "Formulario de criacao de agente",
     "description": "Criar routes/_authenticated/agents.new.tsx e components/agents/agent-form.tsx: formulario com campos slug (kebab-case, validacao), owner (select), descricao, enabled (switch). POST /agents, redirect para /agents/:id?tab=config apos sucesso.",
-    "status": "blocked",
+    "status": "pending",
     "priority": 11,
     "agent": "coder",
     "task": "vibe-code",
@@ -472,7 +473,7 @@
     "id": "F-024",
     "name": "Status da memoria + MEMORY.md viewer",
     "description": "Substituir placeholder tab Memoria em agents.$id.tsx. Secao Status: 2 cards numericos (arquivos indexados, chunks), timestamp ultima sync. Secao Fatos: fetch MEMORY.md via GET /agents/:id/files/MEMORY.md, renderizar markdown somente-leitura, empty state se vazio. Criar components/agents/memory-status-panel.tsx.",
-    "status": "blocked",
+    "status": "pending",
     "priority": 24,
     "agent": "coder",
     "task": "vibe-code",
