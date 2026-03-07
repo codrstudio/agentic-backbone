@@ -4,6 +4,7 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { useUIStore } from "@/lib/store";
+import { NotificationBell } from "@/components/notifications/notification-bell";
 
 const routeLabels: Record<string, string> = {
   "/agents": "Agentes",
@@ -66,7 +67,8 @@ export function BreadcrumbBar() {
           </nav>
         </>
       )}
-      <div className="ml-auto">
+      <div className="ml-auto flex items-center gap-1">
+        <NotificationBell />
         <Button variant="ghost" size="icon" onClick={toggleTheme} aria-label="Alternar tema">
           {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
         </Button>

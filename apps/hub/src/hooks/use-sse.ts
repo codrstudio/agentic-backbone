@@ -132,5 +132,8 @@ function invalidateByEvent(event: SystemEvent) {
       queryClient.invalidateQueries({ queryKey: ["jobs"] });
       queryClient.invalidateQueries({ queryKey: ["dashboard"] });
       break;
+    case "notification:new":
+      queryClient.invalidateQueries({ queryKey: ["notifications"] });
+      break;
   }
 }
