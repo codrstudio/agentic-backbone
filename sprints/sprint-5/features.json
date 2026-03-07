@@ -279,7 +279,7 @@
     "id": "F-110",
     "name": "Multi-agent: logica de orquestracao em runAgent()",
     "description": "Quando agente tem role: supervisor, antes de executar normalmente chamar LLM com prompt de roteamento XML (lista de handoffs como context). Se action: delegate — atualizar sessions.current_agent_id e sessions.orchestration_path (append), executar runAgent() do membro com contexto completo da conversa, anotar mensagem em messages.jsonl com campo agentId. Se action: respond ou nenhum membro adequado — supervisor responde diretamente. Implementar sem blocar o fluxo de streaming existente.",
-    "status": "blocked",
+    "status": "passing",
     "priority": 14,
     "agent": "coder",
     "task": "vibe-code",
@@ -296,7 +296,8 @@
       "Sistema funciona com 3+ membros configurados",
       "`npm run typecheck` passa sem erros"
     ],
-    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-5/worktree/sprints/sprint-5/3-prps/PRP-28-multi-agent-orchestration.md"
+    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-5/worktree/sprints/sprint-5/3-prps/PRP-28-multi-agent-orchestration.md",
+    "completed_at": "2026-03-07T23:54:30.609Z"
   },
   {
     "id": "F-111",
