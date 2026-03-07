@@ -139,6 +139,24 @@ export function agentMemoryStatusQueryOptions(id: string) {
   });
 }
 
+export interface MemorySearchResult {
+  path: string;
+  snippet: string;
+  score: number;
+  source: "vector" | "text";
+}
+
+export async function searchAgentMemory(
+  id: string,
+  query: string,
+  limit = 10,
+): Promise<MemorySearchResult[]> {
+  return request<MemorySearchResult[]>(`/agents/${id}/memory/search`, {
+    method: "POST",
+    body: JSON.stringify({ query, limit }),
+  });
+}
+
 export async function saveHeartbeatConfig(
   id: string,
   config: HeartbeatConfigData,

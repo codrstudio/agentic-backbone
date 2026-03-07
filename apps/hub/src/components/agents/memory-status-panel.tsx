@@ -9,6 +9,7 @@ import {
   agentFileQueryOptions,
 } from "@/api/agents";
 import type { MemoryStatus } from "@/api/agents";
+import { MemorySearchBox } from "./memory-search-box";
 
 interface MemoryStatusPanelProps {
   agentId: string;
@@ -89,6 +90,18 @@ export function MemoryStatusPanel({ agentId }: MemoryStatusPanelProps) {
           </CardContent>
         </Card>
       )}
+
+      {/* Busca Semantica */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-sm font-medium">
+            Busca Semantica
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <MemorySearchBox agentId={agentId} />
+        </CardContent>
+      </Card>
     </div>
   );
 }
