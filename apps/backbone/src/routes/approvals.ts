@@ -1,5 +1,6 @@
 import { Hono } from "hono";
 import { db } from "../db/index.js";
+import { resolveApproval } from "../tools/approval-manager.js";
 
 export const approvalRoutes = new Hono();
 
@@ -48,6 +49,8 @@ approvalRoutes.post("/approval-requests/:id/approve", (c) => {
     "UPDATE approval_requests SET status = 'approved', decided_by = ?, decided_at = datetime('now') WHERE id = ?"
   ).run(decidedBy, id);
 
+  resolveApproval(Number(id), "approved");
+
   return c.json({ ok: true });
 });
 
@@ -69,14 +72,28 @@ approvalRoutes.post("/approval-requests/:id/reject", async (c) => {
     "UPDATE approval_requests SET status = 'rejected', decided_by = ?, decided_at = datetime('now'), payload = json_patch(payload, json_object('rejection_reason', ?)) WHERE id = ?"
   ).run(decidedBy, reason, id);
 
+  resolveApproval(Number(id), "rejected");
+
   return c.json({ ok: true });
 });
 
 // Background job: expire pending requests past their expires_at
 function expireStaleApprovals() {
+  const expired = db
+    .prepare(
+      "SELECT id FROM approval_requests WHERE status = 'pending' AND expires_at < datetime('now')"
+    )
+    .all() as { id: number }[];
+
+  if (expired.length === 0) return;
+
   db.prepare(
     "UPDATE approval_requests SET status = 'expired' WHERE status = 'pending' AND expires_at < datetime('now')"
   ).run();
+
+  for (const { id } of expired) {
+    resolveApproval(id, "expired");
+  }
 }
 
 // Run immediately and then every minute

@@ -143,5 +143,8 @@ function invalidateByEvent(event: SystemEvent) {
     case "notification:new":
       queryClient.invalidateQueries({ queryKey: ["notifications"] });
       break;
+    case "approval:pending":
+      queryClient.invalidateQueries({ queryKey: ["approvals", "pending"] });
+      break;
   }
 }

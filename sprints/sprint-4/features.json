@@ -132,7 +132,7 @@
     "id": "F-081",
     "name": "Interceptor de tool HITL + frontmatter requires_approval + SSE",
     "description": "Ler frontmatter requires_approval, approval_label e approval_timeout_seconds em TOOL.md no loader de tools existente. Implementar interceptor no fluxo de tool call: se requires_approval = true, criar registro em approval_requests (status: pending, expires_at = now + timeout), emitir evento SSE 'approval:pending' no event bus ({type, approvalId, agentId, actionLabel, expiresAt}), suspender execucao aguardando Promise que resolve quando status muda (approved/rejected/expired). Se approved: executar tool com payload original. Se rejected: retornar ApprovalRejectedError ao agente. Se expired: retornar ApprovalExpiredError. Hook useSSE do Hub deve tratar approval:pending invalidando ['approvals', 'pending'].",
-    "status": "pending",
+    "status": "passing",
     "priority": 7,
     "agent": "coder",
     "task": "vibe-code",
@@ -148,7 +148,8 @@
       "Apos POST /reject, agente recebe erro e informa usuario que acao foi cancelada",
       "npm run typecheck passa sem erros"
     ],
-    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-4/worktree/sprints/sprint-4/3-prps/PRP-20-aprovacao-humana-hitl.md"
+    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-4/worktree/sprints/sprint-4/3-prps/PRP-20-aprovacao-humana-hitl.md",
+    "completed_at": "2026-03-07T20:35:30Z"
   },
   {
     "id": "F-082",
