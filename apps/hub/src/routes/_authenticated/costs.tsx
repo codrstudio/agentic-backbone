@@ -15,7 +15,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { CostSummaryCards } from "@/components/costs/cost-summary-cards";
-import { costSummaryQueryOptions } from "@/api/costs";
+import { CostTrendChart } from "@/components/costs/cost-trend-chart";
+import { CostByAgentChart } from "@/components/costs/cost-by-agent-chart";
+import { CostByOperationChart } from "@/components/costs/cost-by-operation-chart";
+import { costSummaryQueryOptions, costTrendQueryOptions } from "@/api/costs";
 import { agentsQueryOptions } from "@/api/agents";
 
 function todayISO(): string {
@@ -61,6 +64,7 @@ function CostsPage() {
   );
 
   const { data, isLoading } = useQuery(costSummaryQueryOptions(queryParams));
+  const { data: trendData } = useQuery(costTrendQueryOptions(queryParams));
   const { data: agents } = useQuery(agentsQueryOptions());
 
   const agentNameMap = useMemo(() => {
@@ -141,7 +145,31 @@ function CostsPage() {
           description="Nao ha dados de custo para o periodo selecionado."
         />
       ) : (
-        <CostSummaryCards data={data} />
+        <>
+          <CostSummaryCards data={data} />
+
+          {/* Charts */}
+          <div className="space-y-4">
+            {trendData && trendData.points.length > 0 && (
+              <CostTrendChart data={trendData.points} />
+            )}
+
+            <div className="grid gap-4 grid-cols-1 md:grid-cols-2">
+              {data.byAgent.length > 0 && (
+                <CostByAgentChart
+                  data={data.byAgent}
+                  agentNameMap={agentNameMap}
+                />
+              )}
+              {data.byOperation.length > 0 && (
+                <CostByOperationChart
+                  data={data.byOperation}
+                  totalCostUsd={data.totalCostUsd}
+                />
+              )}
+            </div>
+          </div>
+        </>
       )}
     </div>
   );
