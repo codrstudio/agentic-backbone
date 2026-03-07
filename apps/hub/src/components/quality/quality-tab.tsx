@@ -80,7 +80,7 @@ export function QualityTab({ agentId, days }: QualityTabProps) {
       ) : null}
 
       {/* Low rated table */}
-      <LowRatedTable items={lowRated ?? []} isLoading={lowRatedLoading} />
+      <LowRatedTable agentId={agentId} items={lowRated ?? []} isLoading={lowRatedLoading} />
     </div>
   );
 }
