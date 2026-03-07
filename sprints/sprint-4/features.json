@@ -294,7 +294,7 @@
     "id": "F-088",
     "name": "Thumbs up/down na interface de conversa",
     "description": "Criar componente MessageFeedback (components/conversations/message-feedback.tsx) exibido em cada mensagem do agente na pagina de conversa. Comportamento: botoes thumbs up/down aparecem no hover (desktop) ou sempre visiveis (mobile). Thumbs down abre FeedbackReasonPopover (components/conversations/feedback-reason-popover.tsx) com radio group de motivos em pt-BR (resposta_incorreta, sem_contexto, incompleta, tom_inadequado, outro). Motivo selecionado submete POST feedback. Thumbs up submete diretamente sem popover. Botao com rating ativo destacado; clicar novamente executa DELETE. Estado de feedback carregado com a conversa.",
-    "status": "pending",
+    "status": "passing",
     "priority": 14,
     "agent": "coder",
     "task": "vibe-code",
@@ -311,7 +311,8 @@
       "Estado de feedback persistido: ao recarregar conversa, botoes refletem avaliacao existente",
       "npm run build:hub e npm run typecheck passam sem erros"
     ],
-    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-4/worktree/sprints/sprint-4/3-prps/PRP-22-feedback-loop-qualidade.md"
+    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-4/worktree/sprints/sprint-4/3-prps/PRP-22-feedback-loop-qualidade.md",
+    "completed_at": "2026-03-07T21:13:37Z"
   },
   {
     "id": "F-089",

@@ -148,10 +148,12 @@ function ConversationChatPage() {
 
   const historyMessages: ChatMessage[] = (rawMessages ?? []).map(
     (m: ConversationMessage) => ({
+      id: m.id,
       role: m.role,
       content: m.content,
       timestamp: m.timestamp,
       metadata: m.metadata,
+      feedback: m.feedback,
     }),
   );
 

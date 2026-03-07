@@ -16,6 +16,7 @@ import { emitNotification } from "../notifications/index.js";
 import { getAuthUser } from "./auth-helpers.js";
 import { getAgent } from "../agents/registry.js";
 import { parseBody } from "./helpers.js";
+import { db } from "../db/index.js";
 
 export const conversationRoutes = new Hono();
 
@@ -77,7 +78,24 @@ conversationRoutes.get("/conversations/:sessionId/messages", (c) => {
   const denied = assertSessionOwnership(c, session);
   if (denied) return denied;
   const messages = readMessages(session.agent_id, sessionId);
-  return c.json(messages);
+
+  // Load feedback for this session and attach to messages
+  const feedbackRows = db
+    .prepare(
+      `SELECT message_id, rating, reason FROM message_feedback WHERE session_id = ?`
+    )
+    .all(sessionId) as { message_id: string; rating: string; reason: string | null }[];
+  const feedbackByMessageId = new Map(feedbackRows.map((r) => [r.message_id, { rating: r.rating, reason: r.reason }]));
+
+  const messagesWithFeedback = messages.map((m) => {
+    const msg = m as { id?: string; ts: string; role: string; content: string; metadata?: Record<string, unknown> };
+    if (msg.id && feedbackByMessageId.has(msg.id)) {
+      return { ...msg, feedback: feedbackByMessageId.get(msg.id) };
+    }
+    return msg;
+  });
+
+  return c.json(messagesWithFeedback);
 });
 
 // --- Update Conversation ---
