@@ -318,7 +318,7 @@
     "id": "F-089",
     "name": "Aba Qualidade na pagina do agente",
     "description": "Criar rota routes/_authenticated/agents/$agentId/quality.tsx com QualityTab. Criar componentes: QualityOverviewCards (taxa de aprovacao, total de avaliacoes, boas/ruins), QualityTrendChart (LineChart de approvalRate por dia usando shadcn Chart/Recharts), TopReasonsChart (BarChart horizontal de count por reason), LowRatedTable (tabela com colunas entrada/saida/motivo/data). Filtro de periodo no topo: 7 dias, 30 dias, 90 dias (query param days). Adicionar aba 'Qualidade' na pagina do agente existente.",
-    "status": "pending",
+    "status": "passing",
     "priority": 15,
     "agent": "coder",
     "task": "vibe-code",
@@ -334,13 +334,14 @@
       "Filtro de periodo (7/30/90 dias) atualiza dados via query param days",
       "npm run build:hub e npm run typecheck passam sem erros"
     ],
-    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-4/worktree/sprints/sprint-4/3-prps/PRP-22-feedback-loop-qualidade.md"
+    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-4/worktree/sprints/sprint-4/3-prps/PRP-22-feedback-loop-qualidade.md",
+    "completed_at": "2026-03-07T21:18:38Z"
   },
   {
     "id": "F-090",
     "name": "Export de mensagens mal-avaliadas para golden set",
     "description": "Criar componente ExportToGoldenSetModal (components/quality/export-to-golden-set-modal.tsx). Botao 'Exportar para Golden Set' na LowRatedTable abre modal para selecionar eval set existente (via evalSetsQueryOptions do PRP-19) ou criar novo. Para cada item selecionado: POST /agents/:id/eval-sets/:setId/cases com input = pergunta do usuario e expected = vazio (operador preenche). Apos conclusao: redirecionar para aba Avaliacao do agente.",
-    "status": "blocked",
+    "status": "failing",
     "priority": 16,
     "agent": "coder",
     "task": "vibe-code",
