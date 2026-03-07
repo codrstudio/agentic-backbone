@@ -164,6 +164,7 @@ Uses Vercel AI SDK (`ai@^6`) via OpenRouter. Configured in `context/system/llm.j
 | `connectors/` | Unified connector system — built-in TypeScript connectors (mysql, postgres, evolution, twilio) with client factories, tools, schemas, and optional routes/channel-adapters |
 | `channel-adapters/` | Inbound channel adapter registry — SSE push, inbound message routing |
 | `watchers/` | chokidar hot-reload: `AGENT.md` → refreshes registry + heartbeat; `CHANNEL.md` → refreshes channels; `ADAPTER.yaml` → emits event. 300ms debounce |
+| `utils/` | Shared utilities — `sensitive.ts` (sensitive field masking for API responses) |
 | `users/` | User CRUD — filesystem-based (USER.md with frontmatter), permission model |
 | `context/` | Path resolution (`paths.ts`), resource resolver with precedence chain (`resolver.ts`), prompt assembly (`index.ts`), frontmatter parser |
 | `settings/` | `llm.ts` — runtime LLM config read/write, model resolution |
@@ -196,6 +197,8 @@ Markdown-centric persistent state store with YAML frontmatter:
 - **Session persistence** — SQLite stores session index (`data/backbone.sqlite`). Per-session data lives on filesystem: `SESSION.md` (metadata) + `messages.jsonl` (history).
 
 - **Memory pipeline** — Every 20 messages, a background agent extracts facts into `MEMORY.md`. All `.md` files in agent scope are chunked (400 tokens, 80 overlap), embedded, and indexed into per-agent SQLite databases (`agents/:id/.memory.sqlite`) with sqlite-vec for vector search + FTS5 for keyword search. Hybrid scoring: 0.7 vector + 0.3 text.
+
+- **Sensitive field masking** — `utils/sensitive.ts` provides a shared mechanism to mask secrets in API responses. `isSensitiveField(name)` tests field names against `/key|secret|token|password|pass/i`. `maskSensitiveFields(obj)` replaces matching values with `"***"`. `warnPlainTextSecrets(fields, context)` logs warnings when sensitive values are stored as plain text instead of `${VAR}` env references. Used by `connectors/registry.ts` for adapter credentials. When adding new resources with sensitive fields, use this utility instead of inline masking logic.
 
 - **`enabled` flag (frontmatter)** — Agent/resource activation is controlled by `enabled: true|false` in YAML frontmatter. The heartbeat scheduler only registers agents where both `enabled` and `heartbeat-enabled` are `true`.
 
