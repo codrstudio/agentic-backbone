@@ -12,6 +12,9 @@ import { flushMemory } from "../memory/flush.js";
 import { composeAgentTools } from "../agent/tools.js";
 import { getAgent } from "../agents/registry.js";
 import { triggerHook } from "../hooks/index.js";
+import { trackCost } from "../db/costs.js";
+import { trackConversation } from "../db/analytics.js";
+import type { UsageData } from "../agent/index.js";
 
 export { readMessages };
 
@@ -22,6 +25,8 @@ export interface Session {
   channel_id: string | null;
   sdk_session_id: string | null;
   title: string | null;
+  takeover_by: string | null;
+  takeover_at: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -33,7 +38,7 @@ const insertSession = db.prepare(
 );
 
 const selectSession = db.prepare(
-  `SELECT session_id, user_id, agent_id, channel_id, sdk_session_id, title, created_at, updated_at
+  `SELECT session_id, user_id, agent_id, channel_id, sdk_session_id, title, takeover_by, takeover_at, created_at, updated_at
    FROM sessions WHERE session_id = ?`
 );
 
@@ -43,27 +48,27 @@ const setSdkSessionId = db.prepare(
 );
 
 const selectAllSessions = db.prepare(
-  `SELECT session_id, user_id, agent_id, channel_id, sdk_session_id, title, created_at, updated_at
+  `SELECT session_id, user_id, agent_id, channel_id, sdk_session_id, title, takeover_by, takeover_at, created_at, updated_at
    FROM sessions ORDER BY updated_at DESC`
 );
 
 const selectSessionsByUser = db.prepare(
-  `SELECT session_id, user_id, agent_id, channel_id, sdk_session_id, title, created_at, updated_at
+  `SELECT session_id, user_id, agent_id, channel_id, sdk_session_id, title, takeover_by, takeover_at, created_at, updated_at
    FROM sessions WHERE user_id = ? ORDER BY updated_at DESC`
 );
 
 const selectSessionsByUserAndAgent = db.prepare(
-  `SELECT session_id, user_id, agent_id, channel_id, sdk_session_id, title, created_at, updated_at
+  `SELECT session_id, user_id, agent_id, channel_id, sdk_session_id, title, takeover_by, takeover_at, created_at, updated_at
    FROM sessions WHERE user_id = ? AND agent_id = ? ORDER BY updated_at DESC`
 );
 
 const selectSessionsByAgent = db.prepare(
-  `SELECT session_id, user_id, agent_id, channel_id, sdk_session_id, title, created_at, updated_at
+  `SELECT session_id, user_id, agent_id, channel_id, sdk_session_id, title, takeover_by, takeover_at, created_at, updated_at
    FROM sessions WHERE agent_id = ? ORDER BY updated_at DESC`
 );
 
 const findSessionByChannelKey = db.prepare(
-  `SELECT session_id, user_id, agent_id, channel_id, sdk_session_id, title, created_at, updated_at
+  `SELECT session_id, user_id, agent_id, channel_id, sdk_session_id, title, takeover_by, takeover_at, created_at, updated_at
    FROM sessions WHERE agent_id = ? AND user_id = ? AND channel_id = ?
    ORDER BY updated_at DESC LIMIT 1`
 );
@@ -81,6 +86,16 @@ const updateSessionTitle = db.prepare(
 
 const deleteSessionStmt = db.prepare(
   `DELETE FROM sessions WHERE session_id = ?`
+);
+
+const setTakeoverStmt = db.prepare(
+  `UPDATE sessions SET takeover_by = ?, takeover_at = datetime('now'), updated_at = datetime('now')
+   WHERE session_id = ?`
+);
+
+const clearTakeoverStmt = db.prepare(
+  `UPDATE sessions SET takeover_by = NULL, takeover_at = NULL, updated_at = datetime('now')
+   WHERE session_id = ?`
 );
 
 // --- Message counter for flush ---
@@ -106,6 +121,8 @@ export function createSession(userId: string, agentId = "system.main", channelId
     channel_id: channelId ?? null,
     sdk_session_id: null,
     title: null,
+    takeover_by: null,
+    takeover_at: null,
     created_at: now,
     updated_at: now,
   };
@@ -147,6 +164,16 @@ export function deleteSession(sessionId: string): boolean {
   return result.changes > 0;
 }
 
+export function setTakeover(sessionId: string, operatorSlug: string): Session | null {
+  setTakeoverStmt.run(operatorSlug, sessionId);
+  return getSession(sessionId);
+}
+
+export function releaseTakeover(sessionId: string): Session | null {
+  clearTakeoverStmt.run(sessionId);
+  return getSession(sessionId);
+}
+
 export function findOrCreateSession(agentId: string, userId: string, channelId: string): Session {
   const existing = findSessionByChannelKey.get(agentId, userId, channelId) as Session | undefined;
   if (existing) return existing;
@@ -175,6 +202,49 @@ export async function* sendMessage(
     throw new Error(`Agent ${agentId} not found`);
   }
 
+  // Takeover: session is under operator control
+  if (session.takeover_by !== null) {
+    const isOperator = userId === session.takeover_by;
+
+    if (isOperator) {
+      // Operator message: saved as assistant with operator metadata, no agent
+      appendMessage(agentId, sessionId, {
+        ts: new Date().toISOString(),
+        role: "assistant",
+        content: message,
+        metadata: { operator: true, operatorSlug: userId },
+      });
+
+      await triggerHook({
+        ts: Date.now(),
+        hookEvent: "message:sent",
+        userId,
+        sessionId,
+        content: message,
+      });
+
+      yield { type: "result", content: message };
+      return;
+    } else {
+      // External user message during takeover: saved normally, no agent
+      appendMessage(agentId, sessionId, {
+        ts: new Date().toISOString(),
+        role: "user",
+        content: message,
+      });
+
+      await triggerHook({
+        ts: Date.now(),
+        hookEvent: "message:received",
+        userId,
+        sessionId,
+        message,
+      });
+
+      return;
+    }
+  }
+
   // Persist user message
   appendMessage(agentId, sessionId, {
     ts: new Date().toISOString(),
@@ -197,6 +267,7 @@ export async function* sendMessage(
 
   let fullText = "";
   let sdkSessionId = session.sdk_session_id ?? undefined;
+  let usageData: UsageData | undefined;
   const agentStartMs = Date.now();
 
   await triggerHook({
@@ -226,6 +297,9 @@ export async function* sendMessage(
     if (event.type === "result" && event.content) {
       fullText = event.content;
     }
+    if (event.type === "usage" && event.usage) {
+      usageData = event.usage as UsageData;
+    }
 
     yield event;
   }
@@ -238,6 +312,24 @@ export async function* sendMessage(
     sessionId,
     resultText: fullText,
     durationMs: Date.now() - agentStartMs,
+  });
+
+  if (usageData) {
+    trackCost({
+      agentId,
+      operation: "conversation",
+      tokensIn: usageData.inputTokens,
+      tokensOut: usageData.outputTokens,
+      costUsd: usageData.totalCostUsd,
+    });
+  }
+
+  const durationMs = Date.now() - agentStartMs;
+  trackConversation({
+    agentId,
+    messagesIn: 1,
+    messagesOut: fullText ? 1 : 0,
+    durationMs,
   });
 
   // Persist assistant message

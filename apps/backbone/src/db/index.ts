@@ -29,6 +29,10 @@ try { db.exec(`ALTER TABLE sessions ADD COLUMN agent_id TEXT DEFAULT 'system.mai
 // Idempotent migration: add channel_id column
 try { db.exec(`ALTER TABLE sessions ADD COLUMN channel_id TEXT DEFAULT NULL`); } catch {}
 
+// Idempotent migration: add takeover columns
+try { db.exec(`ALTER TABLE sessions ADD COLUMN takeover_by TEXT DEFAULT NULL`); } catch {}
+try { db.exec(`ALTER TABLE sessions ADD COLUMN takeover_at TEXT DEFAULT NULL`); } catch {}
+
 db.exec(`
   CREATE TABLE IF NOT EXISTS heartbeat_log (
     id                     INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -94,6 +98,74 @@ db.exec(`
     user_slug    TEXT,
     created_at   TEXT NOT NULL DEFAULT (datetime('now'))
   );
+`);
+
+db.exec(`
+  CREATE TABLE IF NOT EXISTS cost_daily (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    date        TEXT NOT NULL,
+    agent_id    TEXT NOT NULL,
+    operation   TEXT NOT NULL,
+    tokens_in   INTEGER NOT NULL DEFAULT 0,
+    tokens_out  INTEGER NOT NULL DEFAULT 0,
+    cost_usd    REAL NOT NULL DEFAULT 0,
+    calls       INTEGER NOT NULL DEFAULT 0,
+    UNIQUE(date, agent_id, operation)
+  );
+  CREATE INDEX IF NOT EXISTS idx_cost_daily_date ON cost_daily(date);
+  CREATE INDEX IF NOT EXISTS idx_cost_daily_agent ON cost_daily(agent_id);
+`);
+
+db.exec(`
+  CREATE TABLE IF NOT EXISTS analytics_daily (
+    id                  INTEGER PRIMARY KEY AUTOINCREMENT,
+    date                TEXT NOT NULL,
+    agent_id            TEXT NOT NULL,
+    heartbeats_total    INTEGER NOT NULL DEFAULT 0,
+    heartbeats_ok       INTEGER NOT NULL DEFAULT 0,
+    heartbeats_error    INTEGER NOT NULL DEFAULT 0,
+    heartbeats_skipped  INTEGER NOT NULL DEFAULT 0,
+    conversations       INTEGER NOT NULL DEFAULT 0,
+    messages_in         INTEGER NOT NULL DEFAULT 0,
+    messages_out        INTEGER NOT NULL DEFAULT 0,
+    cron_total          INTEGER NOT NULL DEFAULT 0,
+    cron_ok             INTEGER NOT NULL DEFAULT 0,
+    cron_error          INTEGER NOT NULL DEFAULT 0,
+    response_ms_sum     REAL NOT NULL DEFAULT 0,
+    response_ms_count   INTEGER NOT NULL DEFAULT 0,
+    avg_response_ms     REAL,
+    UNIQUE(date, agent_id)
+  );
+  CREATE INDEX IF NOT EXISTS idx_analytics_daily_date ON analytics_daily(date);
+  CREATE INDEX IF NOT EXISTS idx_analytics_daily_agent ON analytics_daily(agent_id);
+`);
+
+db.exec(`
+  CREATE TABLE IF NOT EXISTS budget_alerts (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    scope       TEXT NOT NULL,
+    threshold   REAL NOT NULL,
+    period      TEXT NOT NULL,
+    enabled     INTEGER NOT NULL DEFAULT 1,
+    created_at  TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+`);
+
+db.exec(`
+  CREATE TABLE IF NOT EXISTS knowledge_docs (
+    id           INTEGER PRIMARY KEY AUTOINCREMENT,
+    agent_id     TEXT NOT NULL,
+    filename     TEXT NOT NULL,
+    slug         TEXT NOT NULL,
+    content_type TEXT NOT NULL,
+    size_bytes   INTEGER NOT NULL,
+    chunks       INTEGER NOT NULL DEFAULT 0,
+    status       TEXT NOT NULL DEFAULT 'processing',
+    error        TEXT,
+    created_at   TEXT NOT NULL DEFAULT (datetime('now')),
+    UNIQUE(agent_id, slug)
+  );
+  CREATE INDEX IF NOT EXISTS idx_knowledge_docs_agent ON knowledge_docs(agent_id);
 `);
 
 export { db };

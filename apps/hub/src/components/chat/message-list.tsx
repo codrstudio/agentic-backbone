@@ -2,17 +2,21 @@ import { useRef, useEffect, useCallback, useState } from "react";
 import { ArrowDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { MessageBubble, type ChatMessage } from "./message-bubble";
+import { TraceDrawer } from "@/components/traces/trace-drawer";
+import { OperatorMessage } from "@/components/conversations/operator-message";
 
 interface MessageListProps {
   messages: ChatMessage[];
   streamingContent?: string;
+  sessionId?: string;
 }
 
-export function MessageList({ messages, streamingContent }: MessageListProps) {
+export function MessageList({ messages, streamingContent, sessionId }: MessageListProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const [showScrollBtn, setShowScrollBtn] = useState(false);
   const isNearBottomRef = useRef(true);
+  const [traceOpen, setTraceOpen] = useState(false);
 
   const checkScroll = useCallback(() => {
     const el = containerRef.current;
@@ -48,9 +52,18 @@ export function MessageList({ messages, streamingContent }: MessageListProps) {
         onScroll={checkScroll}
       >
         <div className="mx-auto flex max-w-3xl flex-col gap-3">
-          {messages.map((msg, i) => (
-            <MessageBubble key={i} message={msg} />
-          ))}
+          {messages.map((msg, i) =>
+            msg.metadata?.operator === true ? (
+              <OperatorMessage key={i} message={msg} />
+            ) : (
+              <MessageBubble
+                key={i}
+                message={msg}
+                sessionId={sessionId}
+                onTrace={() => setTraceOpen(true)}
+              />
+            )
+          )}
 
           {streamingContent !== undefined && (
             <MessageBubble
@@ -72,6 +85,15 @@ export function MessageList({ messages, streamingContent }: MessageListProps) {
         >
           <ArrowDown className="size-4" />
         </Button>
+      )}
+
+      {sessionId && (
+        <TraceDrawer
+          type="conversation"
+          id={sessionId}
+          open={traceOpen}
+          onClose={() => setTraceOpen(false)}
+        />
       )}
     </div>
   );

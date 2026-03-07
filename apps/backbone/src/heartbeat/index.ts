@@ -12,6 +12,8 @@ import { composeAgentTools } from "../agent/tools.js";
 import { collectAgentResult } from "../utils/agent-stream.js";
 import { formatError } from "../utils/errors.js";
 import { emitNotification } from "../notifications/index.js";
+import { trackCost } from "../db/costs.js";
+import { trackHeartbeat } from "../db/analytics.js";
 
 const HEARTBEAT_OK = "HEARTBEAT_OK";
 const ACK_MAX_CHARS = 300;
@@ -83,6 +85,7 @@ function skipWithReason(state: HeartbeatState, agentId: string, reason: SkipReas
   state.lastSkipReason = reason;
   logHeartbeat({ agentId, status: "skipped", reason });
   eventBus.emit("heartbeat:status", { ts: Date.now(), agentId, status: "skipped", reason });
+  trackHeartbeat({ agentId, status: "skipped" });
 }
 
 function emitHeartbeatResult(agentId: string, status: string, extras: Record<string, unknown>): void {
@@ -163,6 +166,16 @@ async function tick(agentId: string): Promise<void> {
       durationMs: Date.now() - startMs,
     });
 
+    if (usageData) {
+      trackCost({
+        agentId,
+        operation: "heartbeat",
+        tokensIn: usageData.inputTokens,
+        tokensOut: usageData.outputTokens,
+        costUsd: usageData.totalCostUsd,
+      });
+    }
+
     const { shouldSkip, cleanText } = normalizeReply(fullText);
     const durationMs = Date.now() - startMs;
 
@@ -170,6 +183,7 @@ async function tick(agentId: string): Promise<void> {
       state.lastStatus = "ok";
       console.log(`[heartbeat:${agentId}] ok (${durationMs}ms)`);
       emitHeartbeatResult(agentId, "ok-token", { durationMs, usage: usageData });
+      trackHeartbeat({ agentId, status: "ok", durationMs });
       return;
     }
 
@@ -178,6 +192,7 @@ async function tick(agentId: string): Promise<void> {
       state.lastSkipReason = "duplicate";
       console.log(`[heartbeat:${agentId}] suppressed duplicate (${durationMs}ms)`);
       emitHeartbeatResult(agentId, "skipped", { durationMs, usage: usageData, reason: "duplicate" });
+      trackHeartbeat({ agentId, status: "skipped", durationMs });
       return;
     }
 
@@ -190,6 +205,7 @@ async function tick(agentId: string): Promise<void> {
       `[heartbeat:${agentId}] delivered (${durationMs}ms): ${preview}`
     );
     emitHeartbeatResult(agentId, "sent", { preview, durationMs, usage: usageData });
+    trackHeartbeat({ agentId, status: "ok", durationMs });
     const deliveryMode = agentConfig?.delivery;
     if (deliveryMode === "last-active") {
       const lastChannel = resolveLastActiveChannel(agentId, agentConfig.owner);
@@ -203,12 +219,14 @@ async function tick(agentId: string): Promise<void> {
     } else {
       deliverToSystemChannel(agentId, cleanText);
     }
+
   } catch (err) {
     const reason = formatError(err);
     const durationMs = Date.now() - startMs;
     state.lastStatus = "failed";
     console.error(`[heartbeat:${agentId}] failed:`, err);
     emitHeartbeatResult(agentId, "failed", { reason, durationMs });
+    trackHeartbeat({ agentId, status: "error", durationMs });
     emitNotification({
       type: "heartbeat_error",
       severity: "error",

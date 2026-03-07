@@ -1,7 +1,7 @@
 import type { Context } from "hono";
 import { streamSSE } from "hono/streaming";
 import { eventBus } from "./index.js";
-import type { HeartbeatStatusEvent, ChannelMessageEvent, RegistryChangeEvent, CronJobEvent, JobStatusEvent, NotificationNewEvent } from "./index.js";
+import type { HeartbeatStatusEvent, ChannelMessageEvent, RegistryChangeEvent, CronJobEvent, JobStatusEvent, NotificationNewEvent, SessionTakeoverEvent } from "./index.js";
 
 // --- Types ---
 
@@ -100,6 +100,10 @@ class SSEHub {
 
     eventBus.on("notification:new", (evt: NotificationNewEvent) => {
       this.broadcast("system", "notification:new", evt);
+    });
+
+    eventBus.on("session:takeover", (evt: SessionTakeoverEvent) => {
+      this.broadcast("system", "session:takeover", evt);
     });
 
     // Forward all module events to SSE (dynamic keys: module:{name}:{event})

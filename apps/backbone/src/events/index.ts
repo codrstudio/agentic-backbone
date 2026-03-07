@@ -64,6 +64,13 @@ export interface NotificationNewEvent {
   body?: string;
 }
 
+export interface SessionTakeoverEvent {
+  ts: number;
+  sessionId: string;
+  action: "takeover" | "release";
+  takenOverBy: string | null;
+}
+
 export interface BackboneEventMap {
   "heartbeat:status": HeartbeatStatusEvent;
   "channel:message": ChannelMessageEvent;
@@ -73,6 +80,7 @@ export interface BackboneEventMap {
   "cron:job": CronJobEvent;
   "job:status": JobStatusEvent;
   "notification:new": NotificationNewEvent;
+  "session:takeover": SessionTakeoverEvent;
 }
 
 // --- Typed Event Bus ---
