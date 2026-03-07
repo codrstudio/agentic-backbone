@@ -1,5 +1,6 @@
 import { tool } from "ai";
 import { z } from "zod";
+import { formatError } from "../../../utils/errors.js";
 
 export function createWhatsappListLabelsTool(slugs: [string, ...string[]]) {
   return {
@@ -14,7 +15,7 @@ export function createWhatsappListLabelsTool(slugs: [string, ...string[]]) {
           const client = connectorRegistry.createClient(args.instance);
           return await client.get(`/label/findLabels/${args.instance}`);
         } catch (err) {
-          return { error: err instanceof Error ? err.message : String(err) };
+          return { error: formatError(err) };
         }
       },
     }),

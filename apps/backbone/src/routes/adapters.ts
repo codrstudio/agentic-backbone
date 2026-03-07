@@ -1,5 +1,6 @@
 import { Hono } from "hono";
 import { connectorRegistry } from "../connectors/index.js";
+import { formatError } from "../utils/errors.js";
 
 export const connectorAdapterRoutes = new Hono();
 
@@ -29,7 +30,7 @@ connectorAdapterRoutes.patch("/adapters/:scope/:slug", async (c) => {
     const adapter = connectorRegistry.updateAdapter(scope, slug, body);
     return c.json(adapter);
   } catch (err) {
-    return c.json({ error: (err as Error).message }, 404);
+    return c.json({ error: formatError(err) }, 500);
   }
 });
 

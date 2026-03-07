@@ -3,6 +3,7 @@ import { z } from "zod";
 import { addCronJob } from "../index.js";
 import type { CronJobDef } from "../types.js";
 import { scheduleSchema, payloadSchema, toSchedule, toPayload, requireAgentId } from "./_schemas.js";
+import { formatError } from "../../utils/errors.js";
 
 export function createCronAddTool(): Record<string, any> {
   return {

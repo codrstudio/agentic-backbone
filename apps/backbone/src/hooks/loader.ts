@@ -4,6 +4,7 @@ import { pathToFileURL } from "node:url";
 import { parseFrontmatter } from "../context/frontmatter.js";
 import { sharedDir, systemDir, agentDir } from "../context/paths.js";
 import type { HookEntry, HookEventName, HookHandler } from "./types.js";
+import { formatError } from "../utils/errors.js";
 
 const HOOK_FILENAME = "HOOK.md";
 const HANDLER_FILENAME = "handler.mjs";
@@ -88,7 +89,7 @@ async function importHandlers(entries: HookEntry[]): Promise<void> {
     } catch (err) {
       entry.handler = null;
       entry.error =
-        err instanceof Error ? err.message : String(err);
+        formatError(err);
       console.warn(`[hooks] failed to load handler for ${entry.slug}:`, err);
     }
   }

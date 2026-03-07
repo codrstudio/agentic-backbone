@@ -1,5 +1,6 @@
 import { tool } from "ai";
 import { z } from "zod";
+import { formatError } from "../../../utils/errors.js";
 
 export function createWhatsappSendTextTool(slugs: [string, ...string[]]) {
   return {
@@ -27,7 +28,7 @@ export function createWhatsappSendTextTool(slugs: [string, ...string[]]) {
           const { instance, ...body } = args;
           return await client.send(`/message/sendText/${instance}`, body);
         } catch (err) {
-          return { error: err instanceof Error ? err.message : String(err) };
+          return { error: formatError(err) };
         }
       },
     }),

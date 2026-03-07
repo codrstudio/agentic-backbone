@@ -6,6 +6,7 @@ import { createTwilioRoutes } from "./routes.js";
 import { listActiveCalls, clearCalls } from "./calls.js";
 import { findChannelsByAdapter } from "../../channels/lookup.js";
 import { loadCallbackBaseUrl } from "./config.js";
+import { formatError } from "../../utils/errors.js";
 
 let started = false;
 
@@ -38,7 +39,7 @@ export const twilioConnector: ConnectorDef = {
     try {
       loadCallbackBaseUrl(ctx.env);
     } catch (err) {
-      ctx.log(`callback URL not configured, skipping: ${err instanceof Error ? err.message : String(err)}`);
+      ctx.log(`callback URL not configured, skipping: ${formatError(err)}`);
       return;
     }
 

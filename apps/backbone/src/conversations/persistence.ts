@@ -95,5 +95,12 @@ export function readMessages(
     .split("\n")
     .filter((l) => l.trim());
 
-  return lines.map((line) => JSON.parse(line) as PersistentMessage);
+  return lines.reduce<PersistentMessage[]>((msgs, line, i) => {
+    try {
+      msgs.push(JSON.parse(line) as PersistentMessage);
+    } catch {
+      console.warn(`[persistence] skipping malformed line ${i + 1} in ${jsonlPath}`);
+    }
+    return msgs;
+  }, []);
 }

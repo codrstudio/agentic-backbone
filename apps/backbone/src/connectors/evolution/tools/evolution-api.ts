@@ -1,5 +1,6 @@
 import { tool } from "ai";
 import { z } from "zod";
+import { formatError } from "../../../utils/errors.js";
 
 export function createEvolutionApiTool(slugs: [string, ...string[]]): Record<string, any> {
   return {
@@ -24,7 +25,7 @@ export function createEvolutionApiTool(slugs: [string, ...string[]]): Record<str
           }
           return result;
         } catch (err) {
-          return { error: err instanceof Error ? err.message : String(err) };
+          return { error: formatError(err) };
         }
       },
     }),

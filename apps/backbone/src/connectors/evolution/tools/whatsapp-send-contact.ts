@@ -1,5 +1,6 @@
 import { tool } from "ai";
 import { z } from "zod";
+import { formatError } from "../../../utils/errors.js";
 
 const contactItemSchema = z.object({
   fullName: z.string().describe("Nome completo do contato"),
@@ -25,7 +26,7 @@ export function createWhatsappSendContactTool(slugs: [string, ...string[]]) {
             contact: args.contact,
           });
         } catch (err) {
-          return { error: err instanceof Error ? err.message : String(err) };
+          return { error: formatError(err) };
         }
       },
     }),

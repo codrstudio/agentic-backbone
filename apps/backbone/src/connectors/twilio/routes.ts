@@ -6,6 +6,7 @@ import { findChannelsByAdapter } from "../../channels/lookup.js";
 import { findOrCreateSession, sendMessage } from "../../conversations/index.js";
 import { loadTwilioConfigFromChannel } from "./config.js";
 import type { TwilioCallStatus } from "./types.js";
+import { formatError } from "../../utils/errors.js";
 
 const TERMINAL_STATUSES: TwilioCallStatus[] = ["completed", "busy", "no-answer", "canceled", "failed"];
 
@@ -61,7 +62,7 @@ export function createTwilioRoutes(): Hono {
     try {
       config = loadTwilioConfigFromChannel(channel);
     } catch (err) {
-      return c.json({ ok: false, error: err instanceof Error ? err.message : String(err) }, 500);
+      return c.json({ ok: false, error: formatError(err) }, 500);
     }
 
     const statusCallbackUrl = `${config.callbackBaseUrl}/api/v1/ai/connectors/twilio/webhook/status`;

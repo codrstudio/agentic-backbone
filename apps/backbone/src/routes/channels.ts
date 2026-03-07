@@ -6,6 +6,8 @@ import { assemblePrompt } from "../context/index.js";
 import { runAgent } from "../agent/index.js";
 import { deliverToSystemChannel, deliverToChannel } from "../channels/system-channel.js";
 import { getAuthUser, filterByOwner, assertOwnership } from "./auth-helpers.js";
+import { formatError } from "../utils/errors.js";
+import { collectAgentResult } from "../utils/agent-stream.js";
 
 export const channelRoutes = new Hono();
 
@@ -45,7 +47,7 @@ channelRoutes.post("/channels", async (c) => {
     const channel = createChannel(body);
     return c.json(channel, 201);
   } catch (err) {
-    return c.json({ error: (err as Error).message }, 400);
+    return c.json({ error: formatError(err) }, 400);
   }
 });
 
@@ -63,7 +65,7 @@ channelRoutes.patch("/channels/:slug", async (c) => {
     const updated = updateChannel(channel.owner, slug, body);
     return c.json(updated);
   } catch (err) {
-    return c.json({ error: (err as Error).message }, 400);
+    return c.json({ error: formatError(err) }, 400);
   }
 });
 
@@ -130,14 +132,7 @@ channelRoutes.post("/channels/:slug/messages", async (c) => {
     try {
       const assembled = await assemblePrompt(agent, "conversation", { userMessage: message });
       if (!assembled) return;
-      let fullText = "";
-      for await (const event of runAgent(assembled.userMessage, { role: "conversation", system: assembled.system })) {
-        if (event.type === "result" && event.content) {
-          fullText = event.content;
-        } else if (event.type === "text" && event.content) {
-          fullText += event.content;
-        }
-      }
+      const { fullText } = await collectAgentResult(runAgent(assembled.userMessage, { role: "conversation", system: assembled.system }));
       if (fullText) {
         deliverToSystemChannel(agent, fullText);
       }

@@ -4,7 +4,9 @@ import { deliverToSystemChannel } from "../channels/system-channel.js";
 import { assemblePrompt } from "../context/index.js";
 import { composeAgentTools } from "../agent/tools.js";
 import { logCronRun } from "./log.js";
+import { collectAgentResult } from "../utils/agent-stream.js";
 import type { CronJob } from "./types.js";
+import { formatError } from "../utils/errors.js";
 
 const EXECUTION_TIMEOUT_MS = 10 * 60 * 1000;
 
@@ -27,7 +29,7 @@ export async function executeCronJob(job: CronJob): Promise<CronExecutionResult>
     }
   } catch (err) {
     const durationMs = Date.now() - startMs;
-    const error = err instanceof Error ? err.message : String(err);
+    const error = formatError(err);
 
     logCronRun({
       jobSlug: job.slug,
@@ -93,19 +95,15 @@ async function executeMessagePayload(
 
   process.env.AGENT_ID = job.agentId;
   const execution = (async () => {
-    for await (const event of runAgent(assembled.userMessage, {
-      role: "cron",
-      tools: composeAgentTools(job.agentId, "cron"),
-      system: assembled.system,
-    })) {
-      if (event.type === "result" && event.content) {
-        fullText = event.content;
-      } else if (event.type === "text" && event.content) {
-        fullText += event.content;
-      } else if (event.type === "usage" && event.usage) {
-        usageData = event.usage;
-      }
-    }
+    const result = await collectAgentResult(
+      runAgent(assembled.userMessage, {
+        role: "cron",
+        tools: composeAgentTools(job.agentId, "cron"),
+        system: assembled.system,
+      })
+    );
+    fullText = result.fullText;
+    usageData = result.usage;
   })();
 
   await Promise.race([execution, timeout]);

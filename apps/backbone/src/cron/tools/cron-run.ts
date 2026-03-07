@@ -2,6 +2,7 @@ import { tool } from "ai";
 import { z } from "zod";
 import { runCronJob } from "../index.js";
 import { requireAgentId } from "./_schemas.js";
+import { formatError } from "../../utils/errors.js";
 
 export function createCronRunTool(): Record<string, any> {
   return {

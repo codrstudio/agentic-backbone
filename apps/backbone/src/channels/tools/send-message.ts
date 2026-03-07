@@ -3,6 +3,7 @@ import { z } from "zod";
 import { listChannels } from "../registry.js";
 import { deliverToChannel } from "../system-channel.js";
 import { getAgent } from "../../agents/registry.js";
+import { formatError } from "../../utils/errors.js";
 
 interface MessageToolOptions {
   recipientId?: string;
@@ -35,7 +36,7 @@ export function createMessageTools(agentId: string, opts?: MessageToolOptions): 
           });
           return { sent: true, channel: args.channel };
         } catch (err) {
-          return { error: err instanceof Error ? err.message : String(err) };
+          return { error: formatError(err) };
         }
       },
     }),

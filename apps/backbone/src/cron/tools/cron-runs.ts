@@ -1,6 +1,7 @@
 import { tool } from "ai";
 import { z } from "zod";
 import { getCronRunHistory } from "../index.js";
+import { formatError } from "../../utils/errors.js";
 
 export function createCronRunsTool(): Record<string, any> {
   return {

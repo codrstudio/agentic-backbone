@@ -1,5 +1,6 @@
 import { tool } from "ai";
 import { z } from "zod";
+import { formatError } from "../../../utils/errors.js";
 
 export function createWhatsappMarkAsReadTool(slugs: [string, ...string[]]) {
   return {
@@ -20,7 +21,7 @@ export function createWhatsappMarkAsReadTool(slugs: [string, ...string[]]) {
             readMessages: args.readMessages,
           });
         } catch (err) {
-          return { error: err instanceof Error ? err.message : String(err) };
+          return { error: formatError(err) };
         }
       },
     }),

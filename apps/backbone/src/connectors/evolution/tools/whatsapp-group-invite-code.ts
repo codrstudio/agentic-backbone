@@ -1,5 +1,6 @@
 import { tool } from "ai";
 import { z } from "zod";
+import { formatError } from "../../../utils/errors.js";
 
 export function createWhatsappGroupInviteCodeTool(slugs: [string, ...string[]]) {
   return {
@@ -15,7 +16,7 @@ export function createWhatsappGroupInviteCodeTool(slugs: [string, ...string[]]) 
           const client = connectorRegistry.createClient(args.instance);
           return await client.get(`/group/inviteCode/${args.instance}?groupJid=${args.groupJid}`);
         } catch (err) {
-          return { error: err instanceof Error ? err.message : String(err) };
+          return { error: formatError(err) };
         }
       },
     }),

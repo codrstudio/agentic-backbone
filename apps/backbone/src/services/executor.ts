@@ -2,6 +2,7 @@ import { join } from "node:path";
 import { existsSync } from "node:fs";
 import { pathToFileURL } from "node:url";
 import type { Service } from "./types.js";
+import { formatError } from "../utils/errors.js";
 
 export interface ServiceExecResult {
   ok: boolean;
@@ -38,7 +39,7 @@ export async function executeServiceDirect(
     return {
       ok: false,
       data: null,
-      error: err instanceof Error ? err.message : String(err),
+      error: formatError(err),
       durationMs: Date.now() - startMs,
     };
   }

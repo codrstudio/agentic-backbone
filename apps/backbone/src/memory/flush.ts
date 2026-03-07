@@ -1,7 +1,7 @@
 import { runAgent } from "../agent/index.js";
+import { collectAgentResult } from "../utils/agent-stream.js";
 import { agentMemoryPath } from "../context/paths.js";
 import { getAgentMemoryManager } from "./manager.js";
-import { existsSync, readFileSync, appendFileSync } from "node:fs";
 
 export interface FlushResult {
   success: boolean;
@@ -31,18 +31,12 @@ export async function flushMemory(options: {
   ].join("\n");
 
   try {
-    let fullText = "";
-
-    for await (const event of runAgent(prompt, {
-      sessionId: sdkSessionId,
-      role: "memory",
-    })) {
-      if (event.type === "result" && event.content) {
-        fullText = event.content;
-      } else if (event.type === "text" && event.content) {
-        fullText += event.content;
-      }
-    }
+    const { fullText } = await collectAgentResult(
+      runAgent(prompt, {
+        sessionId: sdkSessionId,
+        role: "memory",
+      })
+    );
 
     const didWrite = !fullText.includes(NO_REPLY_TOKEN);
 

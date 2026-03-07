@@ -1,5 +1,6 @@
 import type { ConnectorContext } from "../types.js";
 import type { EvolutionConfig, ProbeResult } from "./types.js";
+import { formatError } from "../../utils/errors.js";
 
 type ApiState = "unknown" | "online" | "offline";
 

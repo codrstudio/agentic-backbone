@@ -1,6 +1,7 @@
 import { tool } from "ai";
 import { z } from "zod";
 import { getAgentMemoryManager } from "../manager.js";
+import { formatError } from "../../utils/errors.js";
 
 export function createMemorySearchTool(agentId: string): Record<string, any> {
   return {
@@ -23,7 +24,7 @@ export function createMemorySearchTool(agentId: string): Record<string, any> {
           });
           return { results };
         } catch (err) {
-          const msg = err instanceof Error ? err.message : String(err);
+          const msg = formatError(err);
           return { results: [], error: msg };
         }
       },

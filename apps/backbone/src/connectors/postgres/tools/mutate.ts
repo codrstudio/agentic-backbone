@@ -1,6 +1,7 @@
 import { tool } from "ai";
 import { z } from "zod";
 import { guardMutate } from "./_guards.js";
+import { formatError } from "../../../utils/errors.js";
 
 export function createPostgresMutateTool(
   slugs: [string, ...string[]],
@@ -22,7 +23,7 @@ export function createPostgresMutateTool(
           const instance = connectorRegistry.createClient(args.database);
           return await instance.mutate(args.sql);
         } catch (err) {
-          return { error: err instanceof Error ? err.message : String(err) };
+          return { error: formatError(err) };
         }
       },
     }),

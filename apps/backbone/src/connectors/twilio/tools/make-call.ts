@@ -4,6 +4,7 @@ import { findChannelsByAdapter } from "../../../channels/lookup.js";
 import { findOrCreateSession } from "../../../conversations/index.js";
 import { loadTwilioConfigFromChannel } from "../config.js";
 import { createCall } from "../calls.js";
+import { formatError } from "../../../utils/errors.js";
 
 export function createMakeCallTool(): Record<string, any> {
   return {
@@ -43,7 +44,7 @@ export function createMakeCallTool(): Record<string, any> {
         try {
           config = loadTwilioConfigFromChannel(channel);
         } catch (err) {
-          return { error: err instanceof Error ? err.message : String(err) };
+          return { error: formatError(err) };
         }
 
         const statusCallbackUrl = `${config.callbackBaseUrl}/api/v1/ai/connectors/twilio/webhook/status`;
@@ -75,7 +76,7 @@ export function createMakeCallTool(): Record<string, any> {
             body: params.toString(),
           });
         } catch (err) {
-          return { error: `twilio_network_error: ${err instanceof Error ? err.message : String(err)}` };
+          return { error: `twilio_network_error: ${formatError(err)}` };
         }
 
         if (!res.ok) {

@@ -12,7 +12,9 @@ function logAgentRun(entry: Record<string, unknown>): void {
   try {
     mkdirSync(join(process.cwd(), "data"), { recursive: true });
     appendFileSync(LOG_PATH, JSON.stringify(entry) + "\n");
-  } catch {}
+  } catch (err) {
+    console.warn("[agent] failed to log run:", err);
+  }
 }
 
 export async function* runAgent(
@@ -54,7 +56,9 @@ export async function* runAgent(
       const envContent = readFileSync(join(process.cwd(), ".env"), "utf-8");
       const match = envContent.match(/^BRAVE_API_KEY=(.+)$/m);
       if (match) braveApiKey = match[1].trim();
-    } catch {}
+    } catch (err) {
+      console.debug("[agent] .env read failed (BRAVE_API_KEY):", err);
+    }
   }
   yield* runProxyAgent({
     model,

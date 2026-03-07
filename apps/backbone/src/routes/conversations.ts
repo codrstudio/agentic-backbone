@@ -11,6 +11,7 @@ import {
 } from "../conversations/index.js";
 import { getAuthUser } from "./auth-helpers.js";
 import { getAgent } from "../agents/registry.js";
+import { parseBody } from "./helpers.js";
 
 export const conversationRoutes = new Hono();
 
@@ -42,7 +43,8 @@ conversationRoutes.get("/conversations", (c) => {
 
 conversationRoutes.post("/conversations", async (c) => {
   const auth = getAuthUser(c);
-  const body = await c.req.json<{ agentId?: string }>().catch(() => ({} as { agentId?: string }));
+  const body = await parseBody<{ agentId?: string }>(c);
+  if (body instanceof Response) return body;
   const agentId = body.agentId ?? "system.main";
 
   const agent = getAgent(agentId);

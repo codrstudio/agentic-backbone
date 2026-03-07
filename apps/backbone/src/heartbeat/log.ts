@@ -1,4 +1,5 @@
 import { db } from "../db/index.js";
+import { createRunLogQueries } from "../db/run-log.js";
 import type { UsageData } from "../agent/index.js";
 
 export interface HeartbeatLogParams {
@@ -49,16 +50,10 @@ const insertStmt = db.prepare(`
      @stopReason, @reason, @preview)
 `);
 
-const historyStmt = db.prepare(`
-  SELECT * FROM heartbeat_log
-  WHERE agent_id = ?
-  ORDER BY ts DESC
-  LIMIT ? OFFSET ?
-`);
-
-const countStmt = db.prepare(`
-  SELECT COUNT(*) as total FROM heartbeat_log WHERE agent_id = ?
-`);
+const { getHistory: getHeartbeatHistoryQuery } = createRunLogQueries<HeartbeatLogEntry>({
+  historyQuery: `SELECT * FROM heartbeat_log WHERE agent_id = ? ORDER BY ts DESC LIMIT ? OFFSET ?`,
+  countQuery: `SELECT COUNT(*) as total FROM heartbeat_log WHERE agent_id = ?`,
+});
 
 const statsStmt = db.prepare(`
   SELECT
@@ -120,11 +115,7 @@ export function getHeartbeatHistory(
   agentId: string,
   opts: { limit?: number; offset?: number } = {}
 ): { rows: HeartbeatLogEntry[]; total: number } {
-  const limit = opts.limit ?? 50;
-  const offset = opts.offset ?? 0;
-  const rows = historyStmt.all(agentId, limit, offset) as HeartbeatLogEntry[];
-  const { total } = countStmt.get(agentId) as { total: number };
-  return { rows, total };
+  return getHeartbeatHistoryQuery(agentId, opts);
 }
 
 export function getHeartbeatStats(agentId: string): HeartbeatStats {

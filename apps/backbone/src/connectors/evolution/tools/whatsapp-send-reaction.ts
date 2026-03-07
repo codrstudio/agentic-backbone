@@ -1,5 +1,6 @@
 import { tool } from "ai";
 import { z } from "zod";
+import { formatError } from "../../../utils/errors.js";
 
 const messageKeySchema = z.object({
   id: z.string().describe("ID da mensagem a reagir"),
@@ -25,7 +26,7 @@ export function createWhatsappSendReactionTool(slugs: [string, ...string[]]) {
             reaction: args.reaction,
           });
         } catch (err) {
-          return { error: err instanceof Error ? err.message : String(err) };
+          return { error: formatError(err) };
         }
       },
     }),

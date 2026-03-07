@@ -1,6 +1,7 @@
 import { tool } from "ai";
 import { z } from "zod";
 import { submitJob } from "../engine.js";
+import { formatError } from "../../utils/errors.js";
 
 export function createSubmitJobTool(): Record<string, any> {
   return {
@@ -35,7 +36,7 @@ export function createSubmitJobTool(): Record<string, any> {
             userId: process.env.USER_ID,
           });
         } catch (err) {
-          const msg = err instanceof Error ? err.message : String(err);
+          const msg = formatError(err);
           return { error: msg };
         }
       },

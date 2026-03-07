@@ -1,4 +1,5 @@
 import { db } from "../db/index.js";
+import { createRunLogQueries } from "../db/run-log.js";
 
 export interface CronRunLogParams {
   jobSlug: string;
@@ -35,16 +36,10 @@ const insertStmt = db.prepare(`
      @inputTokens, @outputTokens, @costUsd)
 `);
 
-const historyStmt = db.prepare(`
-  SELECT * FROM cron_run_log
-  WHERE job_slug = ?
-  ORDER BY ts DESC
-  LIMIT ? OFFSET ?
-`);
-
-const countStmt = db.prepare(`
-  SELECT COUNT(*) as total FROM cron_run_log WHERE job_slug = ?
-`);
+const { getHistory: getCronRunHistoryQuery } = createRunLogQueries<CronRunLogEntry>({
+  historyQuery: `SELECT * FROM cron_run_log WHERE job_slug = ? ORDER BY ts DESC LIMIT ? OFFSET ?`,
+  countQuery: `SELECT COUNT(*) as total FROM cron_run_log WHERE job_slug = ?`,
+});
 
 export function logCronRun(params: CronRunLogParams): void {
   insertStmt.run({
@@ -64,9 +59,5 @@ export function getCronRunHistory(
   jobSlug: string,
   opts: { limit?: number; offset?: number } = {}
 ): { rows: CronRunLogEntry[]; total: number } {
-  const limit = opts.limit ?? 50;
-  const offset = opts.offset ?? 0;
-  const rows = historyStmt.all(jobSlug, limit, offset) as CronRunLogEntry[];
-  const { total } = countStmt.get(jobSlug) as { total: number };
-  return { rows, total };
+  return getCronRunHistoryQuery(jobSlug, opts);
 }

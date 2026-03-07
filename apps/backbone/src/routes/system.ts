@@ -13,6 +13,7 @@ import { CONTEXT_DIR } from "../context/paths.js";
 import { db } from "../db/index.js";
 import { requireSysuser } from "./auth-helpers.js";
 import { getHookSnapshot } from "../hooks/index.js";
+import { collectAgentResult } from "../utils/agent-stream.js";
 
 export const systemRoutes = new Hono();
 
@@ -33,14 +34,7 @@ systemRoutes.post("/system/messages", async (c) => {
     try {
       const assembled = await assemblePrompt("system.main", "conversation", { userMessage: message });
       if (!assembled) return;
-      let fullText = "";
-      for await (const event of runAgent(assembled.userMessage, { role: "conversation", system: assembled.system })) {
-        if (event.type === "result" && event.content) {
-          fullText = event.content;
-        } else if (event.type === "text" && event.content) {
-          fullText += event.content;
-        }
-      }
+      const { fullText } = await collectAgentResult(runAgent(assembled.userMessage, { role: "conversation", system: assembled.system }));
       if (fullText) {
         deliverToSystemChannel("system.main", fullText);
       }

@@ -1,5 +1,6 @@
 import type { BackboneEventBus } from "../../events/index.js";
 import type { EvolutionConfig } from "./types.js";
+import { formatError } from "../../utils/errors.js";
 
 interface ActionState {
   attempts: number;
@@ -150,7 +151,7 @@ export class EvolutionActions {
 
       return { ok: false, error: "action_failed" };
     } catch (err) {
-      const errorMsg = err instanceof Error ? err.message : String(err);
+      const errorMsg = formatError(err);
       this.log(`${action} error: ${instanceName} — ${errorMsg}`);
 
       this.eventBus.emitModule("evolution", "action-failed", {

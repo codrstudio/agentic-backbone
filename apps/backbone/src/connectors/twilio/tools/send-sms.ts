@@ -2,6 +2,7 @@ import { tool } from "ai";
 import { z } from "zod";
 import { resolveTwilioConfig } from "./_resolve-config.js";
 import { createTwilioClient } from "../client.js";
+import { formatError } from "../../../utils/errors.js";
 
 export function createSendSmsTool(): Record<string, any> {
   return {
@@ -29,7 +30,7 @@ export function createSendSmsTool(): Record<string, any> {
         try {
           config = resolveTwilioConfig(args.channelId);
         } catch (err) {
-          return { error: err instanceof Error ? err.message : String(err) };
+          return { error: formatError(err) };
         }
 
         const client = createTwilioClient(
@@ -46,7 +47,7 @@ export function createSendSmsTool(): Record<string, any> {
           });
           return { sid: result.sid, status: result.status, to: result.to, from: result.from };
         } catch (err) {
-          return { error: `twilio_api_error: ${err instanceof Error ? err.message : String(err)}` };
+          return { error: `twilio_api_error: ${formatError(err)}` };
         }
       },
     }),

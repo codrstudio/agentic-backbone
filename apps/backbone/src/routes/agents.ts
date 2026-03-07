@@ -23,6 +23,9 @@ import { executeServiceDirect } from "../services/executor.js";
 import { assemblePrompt } from "../context/index.js";
 import { runAgent } from "../agent/index.js";
 import { getAuthUser, filterByOwner, assertOwnership } from "./auth-helpers.js";
+import { formatError } from "../utils/errors.js";
+import { collectAgentResult } from "../utils/agent-stream.js";
+import { parseBody } from "./helpers.js";
 
 export const agentRoutes = new Hono();
 
@@ -65,7 +68,7 @@ agentRoutes.post("/agents", async (c) => {
     const agent = createAgent(body);
     return c.json(agent, 201);
   } catch (err) {
-    return c.json({ error: (err as Error).message }, 400);
+    return c.json({ error: formatError(err) }, 400);
   }
 });
 
@@ -90,7 +93,7 @@ agentRoutes.patch("/agents/:id", async (c) => {
 
     return c.json(agent);
   } catch (err) {
-    return c.json({ error: (err as Error).message }, 404);
+    return c.json({ error: formatError(err) }, 500);
   }
 });
 
@@ -118,7 +121,7 @@ agentRoutes.post("/agents/:id/duplicate", async (c) => {
     const agent = duplicateAgent(sourceId, effectiveOwner, slug);
     return c.json(agent, 201);
   } catch (err) {
-    return c.json({ error: (err as Error).message }, 400);
+    return c.json({ error: formatError(err) }, 400);
   }
 });
 
@@ -152,7 +155,7 @@ agentRoutes.put("/agents/:id/files/*", async (c) => {
     writeAgentFile(agentId, filename, content);
     return c.json({ status: "saved" });
   } catch (err) {
-    return c.json({ error: (err as Error).message }, 400);
+    return c.json({ error: formatError(err) }, 400);
   }
 });
 
@@ -324,17 +327,7 @@ agentRoutes.post("/agents/:id/request", async (c) => {
 
   // JSON synchronous response
   const startMs = Date.now();
-  let result = "";
-  let usage: unknown;
-  for await (const event of runAgent(assembled.userMessage, { role: "request", system: assembled.system })) {
-    if (event.type === "result" && event.content) {
-      result = event.content;
-    } else if (event.type === "text" && event.content) {
-      result += event.content;
-    } else if (event.type === "usage" && event.usage) {
-      usage = event.usage;
-    }
-  }
+  const { fullText: result, usage } = await collectAgentResult(runAgent(assembled.userMessage, { role: "request", system: assembled.system }));
   return c.json({ result, usage, durationMs: Date.now() - startMs });
 });
 
@@ -351,7 +344,8 @@ agentRoutes.post("/agents/:id/services/:slug", async (c) => {
     return c.json({ error: `service '${serviceSlug}' not found` }, 404);
   }
 
-  const body = await c.req.json().catch(() => ({}));
+  const body = await parseBody(c);
+  if (body instanceof Response) return body;
 
   // skip-agent: execute directly without LLM
   if (service.skipAgent) {
@@ -381,16 +375,6 @@ agentRoutes.post("/agents/:id/services/:slug", async (c) => {
   }
 
   const startMs = Date.now();
-  let result = "";
-  let usage: unknown;
-  for await (const event of runAgent(assembled.userMessage, { role: "request", system: assembled.system })) {
-    if (event.type === "result" && event.content) {
-      result = event.content;
-    } else if (event.type === "text" && event.content) {
-      result += event.content;
-    } else if (event.type === "usage" && event.usage) {
-      usage = event.usage;
-    }
-  }
+  const { fullText: result, usage } = await collectAgentResult(runAgent(assembled.userMessage, { role: "request", system: assembled.system }));
   return c.json({ result, usage, durationMs: Date.now() - startMs });
 });

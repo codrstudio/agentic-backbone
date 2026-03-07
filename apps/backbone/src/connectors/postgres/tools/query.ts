@@ -1,6 +1,7 @@
 import { tool } from "ai";
 import { z } from "zod";
 import { guardQuery } from "./_guards.js";
+import { formatError } from "../../../utils/errors.js";
 
 export function createPostgresQueryTool(slugs: [string, ...string[]]): Record<string, any> {
   return {
@@ -18,7 +19,7 @@ export function createPostgresQueryTool(slugs: [string, ...string[]]): Record<st
           const instance = connectorRegistry.createClient(args.database);
           return await instance.query(args.sql);
         } catch (err) {
-          return { error: err instanceof Error ? err.message : String(err) };
+          return { error: formatError(err) };
         }
       },
     }),

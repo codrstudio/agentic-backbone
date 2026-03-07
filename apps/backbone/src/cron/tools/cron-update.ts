@@ -2,6 +2,7 @@ import { tool } from "ai";
 import { z } from "zod";
 import { updateCronJob } from "../index.js";
 import { scheduleSchema, payloadSchema, toSchedule, toPayload, requireAgentId } from "./_schemas.js";
+import { formatError } from "../../utils/errors.js";
 
 export function createCronUpdateTool(): Record<string, any> {
   return {

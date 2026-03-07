@@ -9,9 +9,9 @@ import {
   systemResourceDir,
   agentResourceDir,
   agentsDir,
-  parseAgentId,
-  userResourceDir,
 } from "../context/paths.js";
+import { getResourceDirs } from "../context/resolver.js";
+import { formatError } from "../utils/errors.js";
 import type {
   ConnectorDef,
   ConnectorContext,
@@ -22,6 +22,30 @@ import type {
 
 const KIND: ResourceKind = "adapters";
 const FILENAME = "ADAPTER.yaml";
+
+// Fields that contain secrets — matched case-insensitively against credential keys
+const SENSITIVE_PATTERN = /key|secret|token|password|pass/i;
+
+/** Replaces sensitive credential values with "***" for API responses */
+function maskCredentials(adapter: ResolvedAdapter): ResolvedAdapter {
+  const masked: Record<string, unknown> = {};
+  for (const [k, v] of Object.entries(adapter.credential)) {
+    masked[k] = SENSITIVE_PATTERN.test(k) ? "***" : v;
+  }
+  return { ...adapter, credential: masked };
+}
+
+/** Warns when credential values are plain text instead of ${VAR} references */
+function warnPlainTextCredentials(credential: Record<string, unknown>, slug: string): void {
+  for (const [k, v] of Object.entries(credential)) {
+    if (!SENSITIVE_PATTERN.test(k)) continue;
+    if (typeof v === "string" && v !== "" && !/^\$\{.+\}$/.test(v)) {
+      console.warn(
+        `[adapters] credential field "${k}" in adapter "${slug}" written as plain text — use \${VAR} referencing .env`
+      );
+    }
+  }
+}
 
 export class ConnectorRegistry {
   private connectors = new Map<string, ConnectorDef>();
@@ -43,26 +67,6 @@ export class ConnectorRegistry {
   }
 
   // --- Adapter YAML scanning ---
-
-  private getResourceDirs(agentId: string): { dir: string; source: string }[] {
-    const { owner } = parseAgentId(agentId);
-    const dirs: { dir: string; source: string }[] = [
-      { dir: sharedResourceDir(KIND), source: "shared" },
-    ];
-
-    if (owner === "system") {
-      dirs.push({ dir: systemResourceDir(KIND), source: "system" });
-    } else {
-      dirs.push({ dir: userResourceDir(owner, KIND), source: `user:${owner}` });
-    }
-
-    dirs.push({
-      dir: agentResourceDir(agentId, KIND),
-      source: `agent:${agentId}`,
-    });
-
-    return dirs;
-  }
 
   private scanAdaptersInDir(dir: string, source: string): ResolvedAdapter[] {
     if (!existsSync(dir)) return [];
@@ -100,7 +104,7 @@ export class ConnectorRegistry {
 
   resolveAdapters(agentId: string): Map<string, ResolvedAdapter> {
     const result = new Map<string, ResolvedAdapter>();
-    for (const { dir, source } of this.getResourceDirs(agentId)) {
+    for (const { dir, source } of getResourceDirs(agentId, KIND)) {
       for (const entry of this.scanAdaptersInDir(dir, source)) {
         result.set(entry.slug, entry); // last wins (higher precedence)
       }
@@ -130,6 +134,23 @@ export class ConnectorRegistry {
 
     this.clientCache.set(adapterSlug, instance);
     return instance;
+  }
+
+  // --- Cache invalidation ---
+
+  invalidateClient(slug: string): void {
+    const instance = this.clientCache.get(slug);
+    if (instance && typeof instance.close === "function") {
+      instance.close().catch(() => {});
+    }
+    this.clientCache.delete(slug);
+  }
+
+  invalidateAllClients(): void {
+    for (const slug of [...this.clientCache.keys()]) {
+      this.invalidateClient(slug);
+    }
+    console.log("[connectors] all client caches invalidated");
   }
 
   // --- Tool composition ---
@@ -196,7 +217,7 @@ export class ConnectorRegistry {
         ctx.log(`connector started: ${def.slug}`);
       } catch (err) {
         ctx.log(
-          `connector failed to start: ${def.slug} — ${err instanceof Error ? err.message : String(err)}`
+          `connector failed to start: ${def.slug} — ${formatError(err)}`
         );
       }
     }
@@ -272,13 +293,14 @@ export class ConnectorRegistry {
       }
     }
 
-    return adapters;
+    return adapters.map(maskCredentials);
   }
 
   getAdapter(scope: string, slug: string): ResolvedAdapter | null {
     const dir = this.resolveDir(scope);
     const entries = this.scanAdaptersInDir(dir, scope);
-    return entries.find((a) => a.slug === slug) ?? null;
+    const found = entries.find((a) => a.slug === slug) ?? null;
+    return found ? maskCredentials(found) : null;
   }
 
   updateAdapter(
@@ -301,7 +323,13 @@ export class ConnectorRegistry {
     if (updates.policy !== undefined) config.policy = updates.policy;
     if (updates.params !== undefined) config.params = updates.params;
 
+    // Warn about plain text credentials
+    const credential = (config.credential ?? config.params) as Record<string, unknown> | undefined;
+    if (credential) warnPlainTextCredentials(credential, slug);
+
     writeFileSync(yamlPath, yaml.dump(config, { lineWidth: -1, quotingType: '"' }));
+
+    this.invalidateClient(slug);
 
     const updated = this.getAdapter(scope, slug);
     if (!updated) throw new Error(`Failed to read adapter after update`);

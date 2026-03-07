@@ -49,7 +49,7 @@ function scanResourceDir(
 
 // --- Precedence chain ---
 
-function getResourceDirs(
+export function getResourceDirs(
   agentId: string,
   kind: ResourceKind
 ): { dir: string; source: string }[] {

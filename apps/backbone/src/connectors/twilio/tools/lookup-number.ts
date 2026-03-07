@@ -1,6 +1,7 @@
 import { tool } from "ai";
 import { z } from "zod";
 import { resolveTwilioConfig } from "./_resolve-config.js";
+import { formatError } from "../../../utils/errors.js";
 
 export function createLookupNumberTool(): Record<string, any> {
   return {
@@ -21,7 +22,7 @@ export function createLookupNumberTool(): Record<string, any> {
         try {
           config = resolveTwilioConfig(args.channelId);
         } catch (err) {
-          return { error: err instanceof Error ? err.message : String(err) };
+          return { error: formatError(err) };
         }
 
         const authHeader =
@@ -40,7 +41,7 @@ export function createLookupNumberTool(): Record<string, any> {
           }
           return await res.json();
         } catch (err) {
-          return { error: `twilio_network_error: ${err instanceof Error ? err.message : String(err)}` };
+          return { error: `twilio_network_error: ${formatError(err)}` };
         }
       },
     }),

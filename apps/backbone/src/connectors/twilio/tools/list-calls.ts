@@ -2,6 +2,7 @@ import { tool } from "ai";
 import { z } from "zod";
 import { resolveTwilioConfig } from "./_resolve-config.js";
 import { createTwilioClient } from "../client.js";
+import { formatError } from "../../../utils/errors.js";
 
 export function createListCallsTool(): Record<string, any> {
   return {
@@ -35,7 +36,7 @@ export function createListCallsTool(): Record<string, any> {
         try {
           config = resolveTwilioConfig(args.channelId);
         } catch (err) {
-          return { error: err instanceof Error ? err.message : String(err) };
+          return { error: formatError(err) };
         }
 
         const client = createTwilioClient(
@@ -56,7 +57,7 @@ export function createListCallsTool(): Record<string, any> {
           const result = await client.get(path);
           return { calls: result.calls, total: result.calls?.length ?? 0 };
         } catch (err) {
-          return { error: `twilio_api_error: ${err instanceof Error ? err.message : String(err)}` };
+          return { error: `twilio_api_error: ${formatError(err)}` };
         }
       },
     }),
