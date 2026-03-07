@@ -99,3 +99,39 @@ export async function saveAgentFile(
     body: JSON.stringify({ content }),
   });
 }
+
+export interface HeartbeatConfigData {
+  enabled: boolean;
+  intervalMs: number;
+  activeHoursStart?: string;
+  activeHoursEnd?: string;
+  activeHoursDays?: number[];
+}
+
+export function extractHeartbeatConfig(agent: Agent & { heartbeat?: { enabled: boolean; intervalMs: number }; metadata?: Record<string, unknown> }): HeartbeatConfigData {
+  return {
+    enabled: agent.heartbeat?.enabled ?? agent.heartbeatEnabled ?? false,
+    intervalMs: agent.heartbeat?.intervalMs ?? 30000,
+    activeHoursStart: (agent.metadata?.["active-hours-start"] as string) ?? undefined,
+    activeHoursEnd: (agent.metadata?.["active-hours-end"] as string) ?? undefined,
+    activeHoursDays: (agent.metadata?.["active-hours-days"] as number[]) ?? undefined,
+  };
+}
+
+export async function saveHeartbeatConfig(
+  id: string,
+  config: HeartbeatConfigData,
+): Promise<Agent> {
+  return request<Agent>(`/agents/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify({
+      heartbeatEnabled: config.enabled,
+      heartbeatInterval: config.intervalMs,
+      metadata: {
+        "active-hours-start": config.activeHoursStart ?? null,
+        "active-hours-end": config.activeHoursEnd ?? null,
+        "active-hours-days": config.activeHoursDays ?? null,
+      },
+    }),
+  });
+}

@@ -4,7 +4,9 @@ import { useQuery } from "@tanstack/react-query";
 import { FileText, MessageSquare, Heart } from "lucide-react";
 import { agentFileQueryOptions, saveAgentFile } from "@/api/agents";
 import { MarkdownEditor } from "@/components/shared/markdown-editor";
+import { HeartbeatConfig } from "@/components/agents/heartbeat-config";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 
 type SaveStatus = "idle" | "saving" | "saved" | "error";
@@ -61,12 +63,18 @@ export function AgentConfigTabs({ agentId, subtab }: AgentConfigTabsProps) {
       </nav>
 
       {/* Editor area */}
-      <div className="flex-1 min-w-0">
+      <div className="flex-1 min-w-0 space-y-6">
         <FileEditor
           key={`${agentId}-${activeConfig.filename}`}
           agentId={agentId}
           filename={activeConfig.filename}
         />
+        {activeSubtab === "heartbeat" && (
+          <>
+            <Separator />
+            <HeartbeatConfig agentId={agentId} />
+          </>
+        )}
       </div>
     </div>
   );
