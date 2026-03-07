@@ -1,6 +1,7 @@
 import { useCallback } from "react";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
+import { pendingApprovalsQueryOptions } from "@/api/approvals";
 import { Bell, AlertCircle, AlertTriangle, Info, CheckCheck } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -56,6 +57,9 @@ export function NotificationBell() {
   const unread = countData?.unread ?? 0;
   const notifications = recentData?.rows ?? [];
 
+  const { data: pendingApprovals } = useQuery(pendingApprovalsQueryOptions());
+  const hasPendingApprovals = (pendingApprovals?.length ?? 0) > 0;
+
   const markReadMutation = useMutation({
     mutationFn: markNotificationRead,
     onSuccess: () => {
@@ -100,20 +104,37 @@ export function NotificationBell() {
     markAllMutation.mutate();
   }
 
+  const bellButton = (
+    <Button variant="ghost" size="icon" aria-label="Notificacoes" className="relative">
+      <Bell className="h-4 w-4" />
+      {(unread > 0 || hasPendingApprovals) && (
+        <span className="absolute -top-0.5 -right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-bold text-destructive-foreground">
+          {unread > 99 ? "99+" : unread > 0 ? unread : "!"}
+        </span>
+      )}
+    </Button>
+  );
+
+  if (hasPendingApprovals) {
+    return (
+      <Button
+        variant="ghost"
+        size="icon"
+        aria-label="Aprovacoes pendentes"
+        className="relative"
+        onClick={() => navigate({ to: "/approvals" as string })}
+      >
+        <Bell className="h-4 w-4" />
+        <span className="absolute -top-0.5 -right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-bold text-destructive-foreground">
+          !
+        </span>
+      </Button>
+    );
+  }
+
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger
-        render={
-          <Button variant="ghost" size="icon" aria-label="Notificacoes" className="relative">
-            <Bell className="h-4 w-4" />
-            {unread > 0 && (
-              <span className="absolute -top-0.5 -right-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-bold text-destructive-foreground">
-                {unread > 99 ? "99+" : unread}
-              </span>
-            )}
-          </Button>
-        }
-      />
+      <DropdownMenuTrigger render={bellButton} />
       <DropdownMenuContent align="end" sideOffset={8} className="w-80">
         <DropdownMenuLabel>Notificacoes</DropdownMenuLabel>
         <DropdownMenuSeparator />

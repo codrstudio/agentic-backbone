@@ -1,3 +1,4 @@
+import { useCallback } from "react";
 import { Link, useMatchRoute } from "@tanstack/react-router";
 import {
   LayoutDashboard,
@@ -10,7 +11,9 @@ import {
   DollarSign,
   TrendingUp,
   Settings,
+  ShieldCheck,
 } from "lucide-react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Sidebar,
   SidebarContent,
@@ -21,6 +24,8 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import { pendingApprovalsQueryOptions } from "@/api/approvals";
+import { useSSEEvent, type SystemEvent } from "@/hooks/use-sse";
 
 const navItems = [
   { label: "Dashboard", icon: LayoutDashboard, to: "/" as const },
@@ -37,6 +42,22 @@ const navItems = [
 
 export function AppSidebar() {
   const matchRoute = useMatchRoute();
+  const queryClient = useQueryClient();
+
+  const { data: pending } = useQuery(pendingApprovalsQueryOptions());
+  const pendingCount = pending?.length ?? 0;
+
+  useSSEEvent(
+    "approval:pending",
+    useCallback(
+      (_event: SystemEvent) => {
+        queryClient.invalidateQueries({ queryKey: ["approvals", "pending"] });
+      },
+      [queryClient],
+    ),
+  );
+
+  const isApprovalsActive = !!matchRoute({ to: "/approvals", fuzzy: true });
 
   return (
     <Sidebar>
@@ -58,6 +79,22 @@ export function AppSidebar() {
                   </SidebarMenuItem>
                 );
               })}
+
+              {/* Approvals with badge */}
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  isActive={isApprovalsActive}
+                  render={<Link to="/approvals" />}
+                >
+                  <ShieldCheck />
+                  <span className="flex-1">Aprovacoes</span>
+                  {pendingCount > 0 && (
+                    <span className="ml-auto inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-bold text-destructive-foreground">
+                      {pendingCount > 99 ? "99+" : pendingCount}
+                    </span>
+                  )}
+                </SidebarMenuButton>
+              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
