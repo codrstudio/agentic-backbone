@@ -17,6 +17,7 @@ import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authen
 import { Route as AuthenticatedJobsRouteImport } from './routes/_authenticated/jobs'
 import { Route as AuthenticatedCronRouteImport } from './routes/_authenticated/cron'
 import { Route as AuthenticatedCostsRouteImport } from './routes/_authenticated/costs'
+import { Route as AuthenticatedAnalyticsRouteImport } from './routes/_authenticated/analytics'
 import { Route as AuthenticatedConversationsRouteImport } from './routes/_authenticated/conversations'
 import { Route as AuthenticatedChannelsRouteImport } from './routes/_authenticated/channels'
 import { Route as AuthenticatedAgentsRouteImport } from './routes/_authenticated/agents'
@@ -59,6 +60,11 @@ const AuthenticatedJobsRoute = AuthenticatedJobsRouteImport.update({
 const AuthenticatedCostsRoute = AuthenticatedCostsRouteImport.update({
   id: '/costs',
   path: '/costs',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedAnalyticsRoute = AuthenticatedAnalyticsRouteImport.update({
+  id: '/analytics',
+  path: '/analytics',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedCronRoute = AuthenticatedCronRouteImport.update({
@@ -114,6 +120,7 @@ export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
   '/login': typeof LoginRoute
   '/agents': typeof AuthenticatedAgentsRouteWithChildren
+  '/analytics': typeof AuthenticatedAnalyticsRoute
   '/channels': typeof AuthenticatedChannelsRouteWithChildren
   '/conversations': typeof AuthenticatedConversationsRouteWithChildren
   '/costs': typeof AuthenticatedCostsRoute
@@ -130,6 +137,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/agents': typeof AuthenticatedAgentsRouteWithChildren
+  '/analytics': typeof AuthenticatedAnalyticsRoute
   '/channels': typeof AuthenticatedChannelsRouteWithChildren
   '/conversations': typeof AuthenticatedConversationsRouteWithChildren
   '/costs': typeof AuthenticatedCostsRoute
@@ -149,6 +157,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/login': typeof LoginRoute
   '/_authenticated/agents': typeof AuthenticatedAgentsRouteWithChildren
+  '/_authenticated/analytics': typeof AuthenticatedAnalyticsRoute
   '/_authenticated/channels': typeof AuthenticatedChannelsRouteWithChildren
   '/_authenticated/conversations': typeof AuthenticatedConversationsRouteWithChildren
   '/_authenticated/costs': typeof AuthenticatedCostsRoute
@@ -169,6 +178,7 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/agents'
+    | '/analytics'
     | '/channels'
     | '/conversations'
     | '/costs'
@@ -185,6 +195,7 @@ export interface FileRouteTypes {
   to:
     | '/login'
     | '/agents'
+    | '/analytics'
     | '/channels'
     | '/conversations'
     | '/costs'
@@ -203,6 +214,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/login'
     | '/_authenticated/agents'
+    | '/_authenticated/analytics'
     | '/_authenticated/channels'
     | '/_authenticated/conversations'
     | '/_authenticated/costs'
@@ -265,6 +277,13 @@ declare module '@tanstack/react-router' {
       path: '/jobs'
       fullPath: '/jobs'
       preLoaderRoute: typeof AuthenticatedJobsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/analytics': {
+      id: '/_authenticated/analytics'
+      path: '/analytics'
+      fullPath: '/analytics'
+      preLoaderRoute: typeof AuthenticatedAnalyticsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/costs': {
@@ -393,6 +412,7 @@ const AuthenticatedJobsRouteWithChildren =
 
 interface AuthenticatedRouteChildren {
   AuthenticatedAgentsRoute: typeof AuthenticatedAgentsRouteWithChildren
+  AuthenticatedAnalyticsRoute: typeof AuthenticatedAnalyticsRoute
   AuthenticatedChannelsRoute: typeof AuthenticatedChannelsRouteWithChildren
   AuthenticatedConversationsRoute: typeof AuthenticatedConversationsRouteWithChildren
   AuthenticatedCostsRoute: typeof AuthenticatedCostsRoute
@@ -405,6 +425,7 @@ interface AuthenticatedRouteChildren {
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAgentsRoute: AuthenticatedAgentsRouteWithChildren,
+  AuthenticatedAnalyticsRoute: AuthenticatedAnalyticsRoute,
   AuthenticatedChannelsRoute: AuthenticatedChannelsRouteWithChildren,
   AuthenticatedConversationsRoute: AuthenticatedConversationsRouteWithChildren,
   AuthenticatedCostsRoute: AuthenticatedCostsRoute,

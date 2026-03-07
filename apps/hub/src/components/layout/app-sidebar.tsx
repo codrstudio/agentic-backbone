@@ -8,6 +8,7 @@ import {
   Cpu,
   Bell,
   DollarSign,
+  TrendingUp,
   Settings,
 } from "lucide-react";
 import {
@@ -29,6 +30,7 @@ const navItems = [
   { label: "Agenda", icon: Calendar, to: "/cron" as const },
   { label: "Jobs", icon: Cpu, to: "/jobs" as const },
   { label: "Custos", icon: DollarSign, to: "/costs" as const },
+  { label: "Analytics", icon: TrendingUp, to: "/analytics" as const },
   { label: "Notificacoes", icon: Bell, to: "/notifications" as const },
   { label: "Configuracoes", icon: Settings, to: "/settings" as const },
 ] as const;
