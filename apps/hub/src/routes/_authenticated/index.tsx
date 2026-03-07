@@ -72,6 +72,7 @@ function DashboardPage() {
             subtitle="hoje"
             icon={DollarSign}
             status="ok"
+            href="/costs"
           />
           <StatCard
             title="Conversas"

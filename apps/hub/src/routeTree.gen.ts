@@ -16,6 +16,7 @@ import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authenticated/notifications'
 import { Route as AuthenticatedJobsRouteImport } from './routes/_authenticated/jobs'
 import { Route as AuthenticatedCronRouteImport } from './routes/_authenticated/cron'
+import { Route as AuthenticatedCostsRouteImport } from './routes/_authenticated/costs'
 import { Route as AuthenticatedConversationsRouteImport } from './routes/_authenticated/conversations'
 import { Route as AuthenticatedChannelsRouteImport } from './routes/_authenticated/channels'
 import { Route as AuthenticatedAgentsRouteImport } from './routes/_authenticated/agents'
@@ -53,6 +54,11 @@ const AuthenticatedNotificationsRoute =
 const AuthenticatedJobsRoute = AuthenticatedJobsRouteImport.update({
   id: '/jobs',
   path: '/jobs',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedCostsRoute = AuthenticatedCostsRouteImport.update({
+  id: '/costs',
+  path: '/costs',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedCronRoute = AuthenticatedCronRouteImport.update({
@@ -110,6 +116,7 @@ export interface FileRoutesByFullPath {
   '/agents': typeof AuthenticatedAgentsRouteWithChildren
   '/channels': typeof AuthenticatedChannelsRouteWithChildren
   '/conversations': typeof AuthenticatedConversationsRouteWithChildren
+  '/costs': typeof AuthenticatedCostsRoute
   '/cron': typeof AuthenticatedCronRoute
   '/jobs': typeof AuthenticatedJobsRouteWithChildren
   '/notifications': typeof AuthenticatedNotificationsRoute
@@ -125,6 +132,7 @@ export interface FileRoutesByTo {
   '/agents': typeof AuthenticatedAgentsRouteWithChildren
   '/channels': typeof AuthenticatedChannelsRouteWithChildren
   '/conversations': typeof AuthenticatedConversationsRouteWithChildren
+  '/costs': typeof AuthenticatedCostsRoute
   '/cron': typeof AuthenticatedCronRoute
   '/jobs': typeof AuthenticatedJobsRouteWithChildren
   '/notifications': typeof AuthenticatedNotificationsRoute
@@ -143,6 +151,7 @@ export interface FileRoutesById {
   '/_authenticated/agents': typeof AuthenticatedAgentsRouteWithChildren
   '/_authenticated/channels': typeof AuthenticatedChannelsRouteWithChildren
   '/_authenticated/conversations': typeof AuthenticatedConversationsRouteWithChildren
+  '/_authenticated/costs': typeof AuthenticatedCostsRoute
   '/_authenticated/cron': typeof AuthenticatedCronRoute
   '/_authenticated/jobs': typeof AuthenticatedJobsRouteWithChildren
   '/_authenticated/notifications': typeof AuthenticatedNotificationsRoute
@@ -162,6 +171,7 @@ export interface FileRouteTypes {
     | '/agents'
     | '/channels'
     | '/conversations'
+    | '/costs'
     | '/cron'
     | '/jobs'
     | '/notifications'
@@ -177,6 +187,7 @@ export interface FileRouteTypes {
     | '/agents'
     | '/channels'
     | '/conversations'
+    | '/costs'
     | '/cron'
     | '/jobs'
     | '/notifications'
@@ -194,6 +205,7 @@ export interface FileRouteTypes {
     | '/_authenticated/agents'
     | '/_authenticated/channels'
     | '/_authenticated/conversations'
+    | '/_authenticated/costs'
     | '/_authenticated/cron'
     | '/_authenticated/jobs'
     | '/_authenticated/notifications'
@@ -253,6 +265,13 @@ declare module '@tanstack/react-router' {
       path: '/jobs'
       fullPath: '/jobs'
       preLoaderRoute: typeof AuthenticatedJobsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/costs': {
+      id: '/_authenticated/costs'
+      path: '/costs'
+      fullPath: '/costs'
+      preLoaderRoute: typeof AuthenticatedCostsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/cron': {
@@ -376,6 +395,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedAgentsRoute: typeof AuthenticatedAgentsRouteWithChildren
   AuthenticatedChannelsRoute: typeof AuthenticatedChannelsRouteWithChildren
   AuthenticatedConversationsRoute: typeof AuthenticatedConversationsRouteWithChildren
+  AuthenticatedCostsRoute: typeof AuthenticatedCostsRoute
   AuthenticatedCronRoute: typeof AuthenticatedCronRoute
   AuthenticatedJobsRoute: typeof AuthenticatedJobsRouteWithChildren
   AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
@@ -387,6 +407,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAgentsRoute: AuthenticatedAgentsRouteWithChildren,
   AuthenticatedChannelsRoute: AuthenticatedChannelsRouteWithChildren,
   AuthenticatedConversationsRoute: AuthenticatedConversationsRouteWithChildren,
+  AuthenticatedCostsRoute: AuthenticatedCostsRoute,
   AuthenticatedCronRoute: AuthenticatedCronRoute,
   AuthenticatedJobsRoute: AuthenticatedJobsRouteWithChildren,
   AuthenticatedNotificationsRoute: AuthenticatedNotificationsRoute,
