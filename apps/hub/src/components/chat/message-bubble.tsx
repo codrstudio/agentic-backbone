@@ -4,12 +4,20 @@ import { Copy, Check, Activity } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { StreamingIndicator } from "./streaming-indicator";
+import { MessageFeedback } from "@/components/conversations/message-feedback";
+
+export interface MessageFeedback {
+  rating: "up" | "down";
+  reason: string | null;
+}
 
 export interface ChatMessage {
+  id?: string;
   role: "user" | "assistant";
   content: string;
   timestamp?: string;
   metadata?: Record<string, unknown>;
+  feedback?: MessageFeedback;
 }
 
 interface MessageBubbleProps {
@@ -17,9 +25,10 @@ interface MessageBubbleProps {
   isStreaming?: boolean;
   sessionId?: string;
   onTrace?: (sessionId: string) => void;
+  messageId?: string;
 }
 
-export function MessageBubble({ message, isStreaming, sessionId, onTrace }: MessageBubbleProps) {
+export function MessageBubble({ message, isStreaming, sessionId, onTrace, messageId }: MessageBubbleProps) {
   const [copied, setCopied] = useState(false);
   const isUser = message.role === "user";
 
@@ -70,6 +79,13 @@ export function MessageBubble({ message, isStreaming, sessionId, onTrace }: Mess
               >
                 <Activity className="size-3" />
               </Button>
+            )}
+            {!isUser && sessionId && messageId && (
+              <MessageFeedback
+                sessionId={sessionId}
+                messageId={messageId}
+                feedback={message.feedback}
+              />
             )}
             <Button
               variant="ghost"

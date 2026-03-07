@@ -104,7 +104,7 @@ function AnalyticsPage() {
           <Label className="text-xs">Agente</Label>
           <Select
             value={agentFilter}
-            onValueChange={(v) => updateSearch({ agent: v === "all" ? undefined : v })}
+            onValueChange={(v) => v && updateSearch({ agent: v === "all" ? undefined : v })}
           >
             <SelectTrigger className="w-[200px]">
               <SelectValue placeholder="Todos os agentes" />

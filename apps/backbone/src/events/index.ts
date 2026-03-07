@@ -71,6 +71,22 @@ export interface SessionTakeoverEvent {
   takenOverBy: string | null;
 }
 
+export interface ApprovalPendingEvent {
+  type: "approval:pending";
+  approvalId: number;
+  agentId: string;
+  sessionId?: string;
+  actionLabel: string;
+  expiresAt: string;
+}
+
+export interface SecurityAlertEvent {
+  ts: number;
+  agentId: string;
+  eventCount: number;
+  windowMinutes: number;
+}
+
 export interface BackboneEventMap {
   "heartbeat:status": HeartbeatStatusEvent;
   "channel:message": ChannelMessageEvent;
@@ -81,6 +97,8 @@ export interface BackboneEventMap {
   "job:status": JobStatusEvent;
   "notification:new": NotificationNewEvent;
   "session:takeover": SessionTakeoverEvent;
+  "approval:pending": ApprovalPendingEvent;
+  "security:alert": SecurityAlertEvent;
 }
 
 // --- Typed Event Bus ---

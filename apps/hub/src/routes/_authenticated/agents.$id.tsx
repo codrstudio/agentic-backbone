@@ -9,6 +9,8 @@ import {
   Clock,
   BookOpen,
   ChevronRight,
+  FlaskConical,
+  Star,
 } from "lucide-react";
 import {
   agentQueryOptions,
@@ -24,6 +26,8 @@ import { AgentConversations } from "@/components/agents/agent-conversations";
 import { MemoryStatusPanel } from "@/components/agents/memory-status-panel";
 import { AgentCronTab } from "@/components/agents/agent-cron-tab";
 import { KnowledgeTab } from "@/components/agents/knowledge-tab";
+import { EvalTab } from "@/components/agents/eval-tab";
+import { QualityTab } from "@/components/quality/quality-tab";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { useSSEEvent } from "@/hooks/use-sse";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -36,6 +40,8 @@ const tabs = [
   { value: "memory", label: "Memoria", icon: Brain },
   { value: "knowledge", label: "Knowledge", icon: BookOpen },
   { value: "cron", label: "Agenda", icon: Clock },
+  { value: "evaluation", label: "Avaliacao", icon: FlaskConical },
+  { value: "quality", label: "Qualidade", icon: Star },
 ] as const;
 
 type TabValue = (typeof tabs)[number]["value"];
@@ -43,6 +49,7 @@ type TabValue = (typeof tabs)[number]["value"];
 interface AgentSearchParams {
   tab?: TabValue;
   subtab?: string;
+  days?: number;
 }
 
 export const Route = createFileRoute("/_authenticated/agents/$id")({
@@ -51,13 +58,17 @@ export const Route = createFileRoute("/_authenticated/agents/$id")({
       ? (search.tab as TabValue)
       : undefined,
     subtab: typeof search.subtab === "string" ? search.subtab : undefined,
+    days:
+      typeof search.days === "number" && [7, 30, 90].includes(search.days as number)
+        ? (search.days as number)
+        : undefined,
   }),
   component: AgentDetailPage,
 });
 
 function AgentDetailPage() {
   const { id } = Route.useParams();
-  const { tab, subtab } = Route.useSearch();
+  const { tab, subtab, days } = Route.useSearch();
   const navigate = useNavigate();
 
   const activeTab = tab ?? "overview";
@@ -190,6 +201,12 @@ function AgentDetailPage() {
         </TabsContent>
         <TabsContent value="cron">
           <AgentCronTab agentId={id} />
+        </TabsContent>
+        <TabsContent value="evaluation">
+          <EvalTab agentId={id} />
+        </TabsContent>
+        <TabsContent value="quality">
+          <QualityTab agentId={id} days={days ?? 30} />
         </TabsContent>
       </Tabs>
     </div>

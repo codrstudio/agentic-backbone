@@ -49,11 +49,18 @@ export function conversationQueryOptions(id: string) {
   });
 }
 
+export interface MessageFeedback {
+  rating: "up" | "down";
+  reason: string | null;
+}
+
 export interface ConversationMessage {
+  id?: string;
   role: "user" | "assistant";
   content: string;
   timestamp?: string;
   metadata?: Record<string, unknown>;
+  feedback?: MessageFeedback;
 }
 
 export function conversationMessagesQueryOptions(id: string) {

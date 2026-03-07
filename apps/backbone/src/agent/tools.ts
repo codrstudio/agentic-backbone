@@ -4,6 +4,8 @@ import { createCronTools } from "../cron/tools/index.js";
 import { createMessageTools } from "../channels/tools/index.js";
 import { createEmitTool, createSysinfoTool } from "../tools/tools/index.js";
 import { connectorRegistry } from "../connectors/index.js";
+import { loadToolApprovalConfigs } from "../tools/loader.js";
+import { withApprovalGate } from "../tools/approval-interceptor.js";
 
 type AgentMode = "heartbeat" | "conversation" | "cron" | "memory";
 
@@ -37,6 +39,25 @@ export function composeAgentTools(
 
   Object.assign(tools, createEmitTool(agentId));
   Object.assign(tools, createSysinfoTool());
+
+  // Wrap tools that have requires_approval: true in their TOOL.md
+  const approvalConfigs = loadToolApprovalConfigs(agentId);
+  if (approvalConfigs.size > 0) {
+    for (const [toolName, config] of approvalConfigs) {
+      const toolDef = tools[toolName];
+      if (!toolDef || typeof toolDef.execute !== "function") continue;
+      const originalExecute = toolDef.execute as (args: unknown) => Promise<unknown>;
+      toolDef.execute = (args: unknown) =>
+        withApprovalGate(
+          agentId,
+          toolName,
+          config,
+          opts?.sessionId,
+          args,
+          () => originalExecute(args)
+        );
+    }
+  }
 
   return Object.keys(tools).length > 0 ? tools : undefined;
 }

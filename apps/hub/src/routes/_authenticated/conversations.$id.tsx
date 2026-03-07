@@ -50,6 +50,7 @@ import { streamMessage, type ChatStreamEvent } from "@/lib/chat-stream";
 import { useAuthStore } from "@/lib/auth";
 import { TakeoverButton } from "@/components/conversations/takeover-button";
 import { TakeoverBanner } from "@/components/conversations/takeover-banner";
+import { ApprovalInlineActions } from "@/components/approvals/approval-inline-actions";
 
 export const Route = createFileRoute("/_authenticated/conversations/$id")({
   component: ConversationChatPage,
@@ -147,10 +148,12 @@ function ConversationChatPage() {
 
   const historyMessages: ChatMessage[] = (rawMessages ?? []).map(
     (m: ConversationMessage) => ({
+      id: m.id,
       role: m.role,
       content: m.content,
       timestamp: m.timestamp,
       metadata: m.metadata,
+      feedback: m.feedback,
     }),
   );
 
@@ -420,6 +423,9 @@ function ConversationChatPage() {
           isPending={releaseMutation.isPending}
         />
       )}
+
+      {/* Inline approval requests for this session */}
+      <ApprovalInlineActions sessionId={id} />
 
       {/* Message area */}
       <MessageList

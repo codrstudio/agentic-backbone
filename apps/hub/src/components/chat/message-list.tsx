@@ -60,6 +60,7 @@ export function MessageList({ messages, streamingContent, sessionId }: MessageLi
                 key={i}
                 message={msg}
                 sessionId={sessionId}
+                messageId={msg.id}
                 onTrace={() => setTraceOpen(true)}
               />
             )
