@@ -126,7 +126,7 @@
     "id": "F-007",
     "name": "Lista de agentes + AgentCard",
     "description": "Substituir placeholder /agents: fetch agentes e stats, grid responsivo de AgentCards (1/2/3 cols), busca por nome, filtro ativo/inativo, toggle enabled via switch no card, click navega para /agents/:id. SSE heartbeat:status atualiza card em tempo real com icone pulsante.",
-    "status": "blocked",
+    "status": "passing",
     "priority": 7,
     "agent": "coder",
     "task": "vibe-code",
@@ -142,7 +142,8 @@
       "Filtro ativo/inativo funciona",
       "Grid responsivo: 1/2/3 colunas conforme breakpoint"
     ],
-    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-1/worktree/sprints/sprint-1/3-prps/PRP-02-dashboard-agentes.md"
+    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-1/worktree/sprints/sprint-1/3-prps/PRP-02-dashboard-agentes.md",
+    "completed_at": "2026-03-07T05:30:00Z"
   },
   {
     "id": "F-008",
@@ -307,7 +308,7 @@
     "id": "F-016",
     "name": "Lista de conversas",
     "description": "Substituir placeholder /conversations: fetch sessoes, lista vertical com badge agente, titulo, preview ultima msg, timestamp relativo. Busca por titulo, filtro por agente (select). Botao Nova Conversa (dialog escolher agente, POST /conversations, navega para chat).",
-    "status": "blocked",
+    "status": "pending",
     "priority": 16,
     "agent": "coder",
     "task": "vibe-code",
@@ -389,7 +390,7 @@
     "id": "F-020",
     "name": "Lista de canais + ChannelCard",
     "description": "Substituir placeholder /channels: fetch canais, grid de ChannelCards com nome, tipo (badge com icone), owner, listeners, status conexao (StatusBadge). Filtro por tipo. Botao Novo Canal. Click navega para /channels/:slug.",
-    "status": "blocked",
+    "status": "pending",
     "priority": 20,
     "agent": "coder",
     "task": "vibe-code",
@@ -530,7 +531,7 @@
     "id": "F-027",
     "name": "Lista de cron jobs",
     "description": "Substituir placeholder /cron: fetch jobs, tabela com colunas agente (badge), nome, agenda legivel (cronstrue pt-BR), status (badge), proxima execucao (cron-parser), ultima execucao. Filtro por agente e ativo/inativo. Botao play por linha para executar manualmente. Botao Novo Job.",
-    "status": "blocked",
+    "status": "pending",
     "priority": 27,
     "agent": "coder",
     "task": "vibe-code",

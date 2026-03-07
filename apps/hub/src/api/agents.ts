@@ -11,10 +11,11 @@ export interface Agent {
 }
 
 export interface AgentStats {
-  totalExecutions: number;
-  statusCounts: { ok: number; skipped: number; error: number };
+  totalRuns: number;
+  byStatus: { ok: number; skipped: number; error: number };
   totalCostUsd: number;
   avgDurationMs: number;
+  lastTimestamp?: string;
 }
 
 export function agentsQueryOptions() {
@@ -34,6 +35,10 @@ export function agentQueryOptions(id: string) {
 export function agentStatsQueryOptions(id: string) {
   return queryOptions({
     queryKey: ["agents", id, "stats"],
-    queryFn: () => request<AgentStats>(`/agents/${id}/stats`),
+    queryFn: () => request<AgentStats>(`/agents/${id}/heartbeat/stats`),
   });
+}
+
+export async function toggleAgentEnabled(id: string): Promise<void> {
+  await request(`/agents/${id}/heartbeat/toggle`, { method: "POST" });
 }

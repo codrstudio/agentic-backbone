@@ -7,6 +7,19 @@ export interface SystemEvent {
   data?: Record<string, unknown>;
 }
 
+type SSEListener = (event: SystemEvent) => void;
+
+const listeners = new Set<SSEListener>();
+
+export function subscribeSSE(listener: SSEListener): () => void {
+  listeners.add(listener);
+  return () => listeners.delete(listener);
+}
+
+function notifyListeners(event: SystemEvent) {
+  listeners.forEach((fn) => fn(event));
+}
+
 interface UseSSEOptions {
   enabled?: boolean;
 }
@@ -50,6 +63,7 @@ export function useSSE(options?: UseSSEOptions): UseSSEResult {
         try {
           const parsed = JSON.parse(ev.data) as SystemEvent;
           setLastEvent(parsed);
+          notifyListeners(parsed);
           invalidateByEvent(parsed);
         } catch {
           // ignore non-JSON messages
@@ -79,6 +93,19 @@ export function useSSE(options?: UseSSEOptions): UseSSEResult {
   }, [enabled, token]);
 
   return { connected, lastEvent };
+}
+
+export function useSSEEvent(eventType: string, handler: (event: SystemEvent) => void) {
+  const handlerRef = useRef(handler);
+  handlerRef.current = handler;
+
+  useEffect(() => {
+    return subscribeSSE((event) => {
+      if (event.type === eventType) {
+        handlerRef.current(event);
+      }
+    });
+  }, [eventType]);
 }
 
 function invalidateByEvent(event: SystemEvent) {
