@@ -16,6 +16,7 @@ import {
 } from "@/api/conversations";
 import { agentsQueryOptions } from "@/api/agents";
 import { MessageList } from "@/components/chat/message-list";
+import { MessageInput } from "@/components/chat/message-input";
 import type { ChatMessage } from "@/components/chat/message-bubble";
 import { streamMessage, type ChatStreamEvent } from "@/lib/chat-stream";
 
@@ -42,7 +43,6 @@ function ConversationChatPage() {
   );
   const [isStreaming, setIsStreaming] = useState(false);
   const abortRef = useRef<AbortController | null>(null);
-  const inputRef = useRef<HTMLTextAreaElement>(null);
   const [inputValue, setInputValue] = useState("");
 
   const agentLabel =
@@ -129,13 +129,6 @@ function ConversationChatPage() {
     abortRef.current?.abort();
   }
 
-  function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      handleSend(inputValue);
-    }
-  }
-
   if (convLoading || msgsLoading) {
     return (
       <div className="flex h-full flex-col gap-4">
@@ -202,44 +195,13 @@ function ConversationChatPage() {
       />
 
       {/* Input area */}
-      <div className="border-t px-4 py-3">
-        <div className="mx-auto flex max-w-3xl items-end gap-2">
-          <textarea
-            ref={inputRef}
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder="Digite sua mensagem..."
-            rows={1}
-            disabled={isStreaming}
-            className="max-h-32 min-h-10 flex-1 resize-none rounded-lg border bg-background px-3 py-2.5 text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:opacity-50"
-            onInput={(e) => {
-              const target = e.currentTarget;
-              target.style.height = "auto";
-              target.style.height = `${Math.min(target.scrollHeight, 128)}px`;
-            }}
-          />
-          {isStreaming ? (
-            <Button
-              variant="destructive"
-              size="sm"
-              className="shrink-0"
-              onClick={handleAbort}
-            >
-              Parar
-            </Button>
-          ) : (
-            <Button
-              size="sm"
-              className="shrink-0"
-              disabled={!inputValue.trim()}
-              onClick={() => handleSend(inputValue)}
-            >
-              Enviar
-            </Button>
-          )}
-        </div>
-      </div>
+      <MessageInput
+        value={inputValue}
+        onChange={setInputValue}
+        onSend={handleSend}
+        onAbort={handleAbort}
+        isStreaming={isStreaming}
+      />
     </div>
   );
 }
