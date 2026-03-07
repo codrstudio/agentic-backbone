@@ -12,6 +12,7 @@ import { composeAgentTools } from "../agent/tools.js";
 import { collectAgentResult } from "../utils/agent-stream.js";
 import { formatError } from "../utils/errors.js";
 import { emitNotification } from "../notifications/index.js";
+import { trackCost } from "../db/costs.js";
 
 const HEARTBEAT_OK = "HEARTBEAT_OK";
 const ACK_MAX_CHARS = 300;
@@ -163,6 +164,16 @@ async function tick(agentId: string): Promise<void> {
       durationMs: Date.now() - startMs,
     });
 
+    if (usageData) {
+      trackCost({
+        agentId,
+        operation: "heartbeat",
+        tokensIn: usageData.inputTokens,
+        tokensOut: usageData.outputTokens,
+        costUsd: usageData.totalCostUsd,
+      });
+    }
+
     const { shouldSkip, cleanText } = normalizeReply(fullText);
     const durationMs = Date.now() - startMs;
 
@@ -203,6 +214,7 @@ async function tick(agentId: string): Promise<void> {
     } else {
       deliverToSystemChannel(agentId, cleanText);
     }
+
   } catch (err) {
     const reason = formatError(err);
     const durationMs = Date.now() - startMs;

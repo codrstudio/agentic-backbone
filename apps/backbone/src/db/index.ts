@@ -96,4 +96,31 @@ db.exec(`
   );
 `);
 
+db.exec(`
+  CREATE TABLE IF NOT EXISTS cost_daily (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    date        TEXT NOT NULL,
+    agent_id    TEXT NOT NULL,
+    operation   TEXT NOT NULL,
+    tokens_in   INTEGER NOT NULL DEFAULT 0,
+    tokens_out  INTEGER NOT NULL DEFAULT 0,
+    cost_usd    REAL NOT NULL DEFAULT 0,
+    calls       INTEGER NOT NULL DEFAULT 0,
+    UNIQUE(date, agent_id, operation)
+  );
+  CREATE INDEX IF NOT EXISTS idx_cost_daily_date ON cost_daily(date);
+  CREATE INDEX IF NOT EXISTS idx_cost_daily_agent ON cost_daily(agent_id);
+`);
+
+db.exec(`
+  CREATE TABLE IF NOT EXISTS budget_alerts (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    scope       TEXT NOT NULL,
+    threshold   REAL NOT NULL,
+    period      TEXT NOT NULL,
+    enabled     INTEGER NOT NULL DEFAULT 1,
+    created_at  TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+`);
+
 export { db };

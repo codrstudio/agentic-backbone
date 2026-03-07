@@ -8,6 +8,7 @@ import { collectAgentResult } from "../utils/agent-stream.js";
 import type { CronJob } from "./types.js";
 import { formatError } from "../utils/errors.js";
 import { emitNotification } from "../notifications/index.js";
+import { trackCost } from "../db/costs.js";
 
 const EXECUTION_TIMEOUT_MS = 10 * 60 * 1000;
 
@@ -135,6 +136,16 @@ async function executeMessagePayload(
     outputTokens: usageData?.outputTokens,
     costUsd: usageData?.totalCostUsd,
   });
+
+  if (usageData) {
+    trackCost({
+      agentId: job.agentId,
+      operation: "cron",
+      tokensIn: usageData.inputTokens,
+      tokensOut: usageData.outputTokens,
+      costUsd: usageData.totalCostUsd,
+    });
+  }
 
   emitNotification({
     type: "cron_ok",

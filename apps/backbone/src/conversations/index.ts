@@ -12,6 +12,8 @@ import { flushMemory } from "../memory/flush.js";
 import { composeAgentTools } from "../agent/tools.js";
 import { getAgent } from "../agents/registry.js";
 import { triggerHook } from "../hooks/index.js";
+import { trackCost } from "../db/costs.js";
+import type { UsageData } from "../agent/index.js";
 
 export { readMessages };
 
@@ -197,6 +199,7 @@ export async function* sendMessage(
 
   let fullText = "";
   let sdkSessionId = session.sdk_session_id ?? undefined;
+  let usageData: UsageData | undefined;
   const agentStartMs = Date.now();
 
   await triggerHook({
@@ -226,6 +229,9 @@ export async function* sendMessage(
     if (event.type === "result" && event.content) {
       fullText = event.content;
     }
+    if (event.type === "usage" && event.usage) {
+      usageData = event.usage as UsageData;
+    }
 
     yield event;
   }
@@ -239,6 +245,16 @@ export async function* sendMessage(
     resultText: fullText,
     durationMs: Date.now() - agentStartMs,
   });
+
+  if (usageData) {
+    trackCost({
+      agentId,
+      operation: "conversation",
+      tokensIn: usageData.inputTokens,
+      tokensOut: usageData.outputTokens,
+      costUsd: usageData.totalCostUsd,
+    });
+  }
 
   // Persist assistant message
   if (fullText) {
