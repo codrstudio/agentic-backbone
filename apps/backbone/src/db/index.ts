@@ -237,4 +237,20 @@ db.exec(`
   CREATE INDEX IF NOT EXISTS idx_approval_session ON approval_requests(session_id);
 `);
 
+db.exec(`
+  CREATE TABLE IF NOT EXISTS message_feedback (
+    id           INTEGER PRIMARY KEY AUTOINCREMENT,
+    session_id   TEXT NOT NULL,
+    message_id   TEXT NOT NULL,
+    agent_id     TEXT NOT NULL,
+    rating       TEXT NOT NULL,
+    reason       TEXT,
+    user_id      TEXT,
+    created_at   TEXT NOT NULL DEFAULT (datetime('now')),
+    UNIQUE(session_id, message_id)
+  );
+  CREATE INDEX IF NOT EXISTS idx_feedback_agent ON message_feedback(agent_id, created_at);
+  CREATE INDEX IF NOT EXISTS idx_feedback_session ON message_feedback(session_id);
+`);
+
 export { db };
