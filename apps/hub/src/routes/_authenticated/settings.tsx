@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { PageHeader } from "@/components/shared/page-header";
 import { EmptyState } from "@/components/shared/empty-state";
 import { LlmPlanCard } from "@/components/settings/llm-plan-card";
+import { WebSearchSettings } from "@/components/settings/web-search-settings";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
 import { llmSettingsQueryOptions, activateLlmPlan } from "@/api/settings";
@@ -67,11 +68,7 @@ function SettingsPage() {
         </TabsContent>
 
         <TabsContent value="web-search">
-          <EmptyState
-            icon={<Search />}
-            title="Web Search"
-            description="Configuracao de provedor de busca em breve."
-          />
+          <WebSearchSettings />
         </TabsContent>
 
         <TabsContent value="users">

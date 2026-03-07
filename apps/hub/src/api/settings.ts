@@ -34,3 +34,23 @@ export function activateLlmPlan(active: string) {
     body: JSON.stringify({ active }),
   });
 }
+
+export type WebSearchProvider = "duckduckgo" | "brave" | "none";
+
+export interface WebSearchConfig {
+  provider: WebSearchProvider;
+}
+
+export function webSearchSettingsQueryOptions() {
+  return queryOptions({
+    queryKey: ["settings", "web-search"],
+    queryFn: () => request<WebSearchConfig>("/settings/web-search"),
+  });
+}
+
+export function updateWebSearchProvider(provider: WebSearchProvider) {
+  return request<WebSearchConfig>("/settings/web-search", {
+    method: "PATCH",
+    body: JSON.stringify({ provider }),
+  });
+}
