@@ -7,6 +7,7 @@ export interface UserPermissions {
 export interface UserConfig {
   slug: string;
   displayName: string;
+  email: string;
   permissions: UserPermissions;
 }
 
@@ -19,6 +20,7 @@ export const DEFAULT_PERMISSIONS: UserPermissions = {
 export const SYSTEM_USER: UserConfig = {
   slug: "system",
   displayName: "System",
+  email: "",
   permissions: {
     canCreateAgents: true,
     canCreateChannels: true,

@@ -27,6 +27,7 @@ function parseUserConfig(slug: string): UserConfig | null {
   return {
     slug: (metadata.slug as string) ?? slug,
     displayName: (metadata.displayName as string) ?? slug,
+    email: (metadata.email as string) ?? "",
     permissions: {
       canCreateAgents:
         metadata.canCreateAgents !== undefined
@@ -95,7 +96,8 @@ export function createUser(
   slug: string,
   displayName: string,
   password: string,
-  permissions?: Partial<UserPermissions>
+  permissions?: Partial<UserPermissions>,
+  email?: string
 ): UserConfig {
   const dir = userDir(slug);
   mkdirSync(dir, { recursive: true });
@@ -103,27 +105,30 @@ export function createUser(
 
   const perms = { ...DEFAULT_PERMISSIONS, ...permissions };
   const passwordHash = hashPassword(password);
+  const userEmail = email ?? "";
 
-  const frontmatter = [
+  const frontmatterLines = [
     "---",
     `slug: ${slug}`,
     `displayName: ${displayName}`,
+    `email: ${userEmail}`,
     `passwordHash: "${passwordHash}"`,
     `canCreateAgents: ${perms.canCreateAgents}`,
     `canCreateChannels: ${perms.canCreateChannels}`,
     `maxAgents: ${perms.maxAgents}`,
     "---",
-  ].join("\n");
+  ];
 
-  writeFileSync(join(dir, "USER.md"), `${frontmatter}\n\n# ${displayName}\n`);
+  writeFileSync(join(dir, "USER.md"), `${frontmatterLines.join("\n")}\n\n# ${displayName}\n`);
 
-  return { slug, displayName, permissions: perms };
+  return { slug, displayName, email: userEmail, permissions: perms };
 }
 
 export function updateUser(
   slug: string,
   updates: {
     displayName?: string;
+    email?: string;
     password?: string;
     permissions?: Partial<UserPermissions>;
   }
@@ -135,6 +140,7 @@ export function updateUser(
   if (!current) return null;
 
   const displayName = updates.displayName ?? current.displayName;
+  const email = updates.email ?? current.email;
   const perms = { ...current.permissions, ...updates.permissions };
 
   // Preserve existing passwordHash or compute new one
@@ -148,6 +154,7 @@ export function updateUser(
     "---",
     `slug: ${slug}`,
     `displayName: ${displayName}`,
+    `email: ${email}`,
   ];
   if (passwordHash) {
     frontmatterLines.push(`passwordHash: "${passwordHash}"`);
@@ -161,7 +168,7 @@ export function updateUser(
 
   writeFileSync(mdPath, `${frontmatterLines.join("\n")}\n\n# ${displayName}\n`);
 
-  return { slug, displayName, permissions: perms };
+  return { slug, displayName, email, permissions: perms };
 }
 
 export function deleteUser(slug: string): boolean {

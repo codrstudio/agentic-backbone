@@ -38,10 +38,11 @@ userRoutes.post("/users", async (c) => {
   const denied = requireSysuser(c);
   if (denied) return denied;
 
-  const { slug, displayName, password, permissions } = await c.req.json<{
+  const { slug, displayName, password, email, permissions } = await c.req.json<{
     slug: string;
     displayName: string;
     password: string;
+    email?: string;
     permissions?: {
       canCreateAgents?: boolean;
       canCreateChannels?: boolean;
@@ -56,7 +57,7 @@ userRoutes.post("/users", async (c) => {
     return c.json({ error: "user already exists" }, 409);
   }
 
-  const user = createUser(slug, displayName, password, permissions);
+  const user = createUser(slug, displayName, password, permissions, email);
   return c.json(user, 201);
 });
 
@@ -72,6 +73,7 @@ userRoutes.patch("/users/:slug", async (c) => {
 
   const body = await c.req.json<{
     displayName?: string;
+    email?: string;
     password?: string;
     permissions?: {
       canCreateAgents?: boolean;
@@ -80,10 +82,12 @@ userRoutes.patch("/users/:slug", async (c) => {
     };
   }>();
 
-  // Regular users can only update their own displayName
+  // Regular users can update their own displayName, email, and password
   if (auth.role !== "sysuser") {
-    const updates: { displayName?: string } = {};
+    const updates: { displayName?: string; email?: string; password?: string } = {};
     if (body.displayName) updates.displayName = body.displayName;
+    if (body.email !== undefined) updates.email = body.email;
+    if (body.password) updates.password = body.password;
     const updated = updateUser(slug, updates);
     if (!updated) return c.json({ error: "not found" }, 404);
     return c.json(updated);
