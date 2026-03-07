@@ -1,10 +1,21 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
-import { FileText, MessageSquare, Heart } from "lucide-react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { FileText, MessageSquare, Heart, Sparkles, Wrench } from "lucide-react";
 import { agentFileQueryOptions, saveAgentFile } from "@/api/agents";
+import {
+  allSkillsQueryOptions,
+  agentSkillsQueryOptions,
+  assignSkill,
+  unassignSkill,
+  allServicesQueryOptions,
+  agentServicesQueryOptions,
+  assignService,
+  unassignService,
+} from "@/api/skills";
 import { MarkdownEditor } from "@/components/shared/markdown-editor";
 import { HeartbeatConfig } from "@/components/agents/heartbeat-config";
+import { ResourceAssigner } from "@/components/shared/resource-assigner";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
@@ -12,9 +23,11 @@ import { cn } from "@/lib/utils";
 type SaveStatus = "idle" | "saving" | "saved" | "error";
 
 const subtabs = [
-  { value: "identity", label: "Identidade", icon: FileText, filename: "SOUL.md" },
-  { value: "conversation", label: "Conversa", icon: MessageSquare, filename: "CONVERSATION.md" },
-  { value: "heartbeat", label: "Heartbeat", icon: Heart, filename: "HEARTBEAT.md" },
+  { value: "identity", label: "Identidade", icon: FileText, kind: "file" as const, filename: "SOUL.md" },
+  { value: "conversation", label: "Conversa", icon: MessageSquare, kind: "file" as const, filename: "CONVERSATION.md" },
+  { value: "heartbeat", label: "Heartbeat", icon: Heart, kind: "file" as const, filename: "HEARTBEAT.md" },
+  { value: "skills", label: "Skills", icon: Sparkles, kind: "resource" as const },
+  { value: "tools", label: "Tools", icon: Wrench, kind: "resource" as const },
 ] as const;
 
 type SubtabValue = (typeof subtabs)[number]["value"];
@@ -62,18 +75,28 @@ export function AgentConfigTabs({ agentId, subtab }: AgentConfigTabsProps) {
         ))}
       </nav>
 
-      {/* Editor area */}
+      {/* Content area */}
       <div className="flex-1 min-w-0 space-y-6">
-        <FileEditor
-          key={`${agentId}-${activeConfig.filename}`}
-          agentId={agentId}
-          filename={activeConfig.filename}
-        />
-        {activeSubtab === "heartbeat" && (
+        {activeConfig.kind === "file" && (
           <>
-            <Separator />
-            <HeartbeatConfig agentId={agentId} />
+            <FileEditor
+              key={`${agentId}-${activeConfig.filename}`}
+              agentId={agentId}
+              filename={activeConfig.filename}
+            />
+            {activeSubtab === "heartbeat" && (
+              <>
+                <Separator />
+                <HeartbeatConfig agentId={agentId} />
+              </>
+            )}
           </>
+        )}
+        {activeSubtab === "skills" && (
+          <SkillsPanel agentId={agentId} />
+        )}
+        {activeSubtab === "tools" && (
+          <ToolsPanel agentId={agentId} />
         )}
       </div>
     </div>
@@ -143,6 +166,68 @@ function FileEditor({ agentId, filename }: { agentId: string; filename: string }
       onChange={handleChange}
       saveStatus={saveStatus}
       placeholder={`Escreva o conteudo de ${filename}...`}
+    />
+  );
+}
+
+function SkillsPanel({ agentId }: { agentId: string }) {
+  const queryClient = useQueryClient();
+  const { data: allSkills, isLoading: loadingAll } = useQuery(allSkillsQueryOptions());
+  const { data: agentSkills, isLoading: loadingAgent } = useQuery(agentSkillsQueryOptions(agentId));
+
+  const assignMutation = useMutation({
+    mutationFn: ({ slug, sourceScope }: { slug: string; sourceScope: string }) =>
+      assignSkill(agentId, slug, sourceScope),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["agents", agentId, "skills"] });
+    },
+  });
+
+  const unassignMutation = useMutation({
+    mutationFn: (slug: string) => unassignSkill(agentId, slug),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["agents", agentId, "skills"] });
+    },
+  });
+
+  return (
+    <ResourceAssigner
+      available={allSkills ?? []}
+      assigned={agentSkills ?? []}
+      onAssign={(slug, sourceScope) => assignMutation.mutate({ slug, sourceScope })}
+      onUnassign={(slug) => unassignMutation.mutate(slug)}
+      loading={loadingAll || loadingAgent}
+    />
+  );
+}
+
+function ToolsPanel({ agentId }: { agentId: string }) {
+  const queryClient = useQueryClient();
+  const { data: allServices, isLoading: loadingAll } = useQuery(allServicesQueryOptions());
+  const { data: agentServices, isLoading: loadingAgent } = useQuery(agentServicesQueryOptions(agentId));
+
+  const assignMutation = useMutation({
+    mutationFn: ({ slug, sourceScope }: { slug: string; sourceScope: string }) =>
+      assignService(agentId, slug, sourceScope),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["agents", agentId, "services"] });
+    },
+  });
+
+  const unassignMutation = useMutation({
+    mutationFn: (slug: string) => unassignService(agentId, slug),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["agents", agentId, "services"] });
+    },
+  });
+
+  return (
+    <ResourceAssigner
+      available={allServices ?? []}
+      assigned={agentServices ?? []}
+      onAssign={(slug, sourceScope) => assignMutation.mutate({ slug, sourceScope })}
+      onUnassign={(slug) => unassignMutation.mutate(slug)}
+      loading={loadingAll || loadingAgent}
     />
   );
 }

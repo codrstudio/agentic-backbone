@@ -276,7 +276,7 @@
     "id": "F-014",
     "name": "Gestao de skills e tools",
     "description": "Adicionar sub-tabs Skills e Tools na Configuracao. Criar components/shared/resource-assigner.tsx: lista de items com toggle de atribuicao, agrupamento por escopo (shared/system/agent), nome, descricao, badge de escopo. Fetch skills disponiveis e atribuidas, assign/unassign via POST.",
-    "status": "pending",
+    "status": "passing",
     "priority": 14,
     "agent": "coder",
     "task": "vibe-code",
@@ -289,7 +289,8 @@
       "Agrupamento por escopo funciona",
       "Cada item mostra nome, descricao e badge de escopo"
     ],
-    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-1/worktree/sprints/sprint-1/3-prps/PRP-03-gestao-agentes.md"
+    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-1/worktree/sprints/sprint-1/3-prps/PRP-03-gestao-agentes.md",
+    "completed_at": "2026-03-07T07:00:00Z"
   },
   {
     "id": "F-015",
