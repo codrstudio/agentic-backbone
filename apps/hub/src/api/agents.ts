@@ -157,6 +157,14 @@ export async function searchAgentMemory(
   });
 }
 
+export async function syncAgentMemory(id: string): Promise<void> {
+  await request(`/agents/${id}/memory/sync`, { method: "POST" });
+}
+
+export async function resetAgentMemory(id: string): Promise<void> {
+  await request(`/agents/${id}/memory/reset`, { method: "POST" });
+}
+
 export async function saveHeartbeatConfig(
   id: string,
   config: HeartbeatConfigData,

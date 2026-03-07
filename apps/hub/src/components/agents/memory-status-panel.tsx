@@ -1,12 +1,17 @@
-import { useQuery } from "@tanstack/react-query";
-import { FileText, Layers, Brain } from "lucide-react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { FileText, Layers, Brain, RefreshCw, Trash2 } from "lucide-react";
 import Markdown from "react-markdown";
+import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState } from "@/components/shared/empty-state";
+import { ConfirmDialog } from "@/components/shared/confirm-dialog";
 import {
   agentMemoryStatusQueryOptions,
   agentFileQueryOptions,
+  syncAgentMemory,
+  resetAgentMemory,
 } from "@/api/agents";
 import type { MemoryStatus } from "@/api/agents";
 import { MemorySearchBox } from "./memory-search-box";
@@ -41,11 +46,34 @@ function isContentEmpty(content: string): boolean {
 }
 
 export function MemoryStatusPanel({ agentId }: MemoryStatusPanelProps) {
+  const queryClient = useQueryClient();
   const { data: status, isLoading: statusLoading } = useQuery(
     agentMemoryStatusQueryOptions(agentId),
   );
   const { data: memoryFile, isLoading: fileLoading } = useQuery({
     ...agentFileQueryOptions(agentId, "MEMORY.md"),
+  });
+
+  const syncMutation = useMutation({
+    mutationFn: () => syncAgentMemory(agentId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["agents", agentId, "memory", "status"] });
+      toast.success("Memoria sincronizada");
+    },
+    onError: () => {
+      toast.error("Erro ao sincronizar memoria");
+    },
+  });
+
+  const resetMutation = useMutation({
+    mutationFn: () => resetAgentMemory(agentId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["agents", agentId, "memory"] });
+      toast.success("Memoria resetada");
+    },
+    onError: () => {
+      toast.error("Erro ao resetar memoria");
+    },
   });
 
   return (
@@ -57,7 +85,13 @@ export function MemoryStatusPanel({ agentId }: MemoryStatusPanelProps) {
           <Skeleton className="h-28" />
         </div>
       ) : status ? (
-        <StatusCards status={status} />
+        <StatusCards
+          status={status}
+          onSync={() => syncMutation.mutate()}
+          syncing={syncMutation.isPending}
+          onReset={() => resetMutation.mutate()}
+          resetting={resetMutation.isPending}
+        />
       ) : null}
 
       {/* MEMORY.md viewer */}
@@ -106,7 +140,15 @@ export function MemoryStatusPanel({ agentId }: MemoryStatusPanelProps) {
   );
 }
 
-function StatusCards({ status }: { status: MemoryStatus }) {
+interface StatusCardsProps {
+  status: MemoryStatus;
+  onSync: () => void;
+  syncing: boolean;
+  onReset: () => void;
+  resetting: boolean;
+}
+
+function StatusCards({ status, onSync, syncing, onReset, resetting }: StatusCardsProps) {
   return (
     <div className="space-y-4">
       <div className="grid gap-4 sm:grid-cols-2">
@@ -137,11 +179,39 @@ function StatusCards({ status }: { status: MemoryStatus }) {
         </Card>
       </div>
 
-      {status.lastSync && (
+      <div className="flex items-center justify-between">
         <p className="text-xs text-muted-foreground">
-          Ultima sincronizacao: {formatRelativeTime(status.lastSync)}
+          {status.lastSync
+            ? `Ultima sincronizacao: ${formatRelativeTime(status.lastSync)}`
+            : "Nunca sincronizado"}
         </p>
-      )}
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={onSync}
+            disabled={syncing || resetting}
+          >
+            <RefreshCw className={`size-4 mr-1 ${syncing ? "animate-spin" : ""}`} />
+            {syncing ? "Sincronizando..." : "Sincronizar"}
+          </Button>
+          <ConfirmDialog
+            title="Limpar Memoria"
+            description="Todos os fatos e chunks da memoria do agente serao removidos. O MEMORY.md sera mantido. Esta acao eh irreversivel."
+            onConfirm={onReset}
+            destructive
+          >
+            <Button
+              variant="destructive"
+              size="sm"
+              disabled={syncing || resetting}
+            >
+              <Trash2 className="size-4 mr-1" />
+              {resetting ? "Limpando..." : "Limpar Memoria"}
+            </Button>
+          </ConfirmDialog>
+        </div>
+      </div>
     </div>
   );
 }

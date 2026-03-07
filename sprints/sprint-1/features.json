@@ -529,7 +529,7 @@
     "id": "F-026",
     "name": "Controles de sincronizacao e reset",
     "description": "Botao Sincronizar no MemoryStatusPanel: POST /agents/:id/memory/sync, loading state, toast sucesso, invalida query status. Botao Limpar Memoria: ConfirmDialog com mensagem destrutiva, POST /agents/:id/memory/reset, invalida queries, toast sucesso. Botao variante destructive.",
-    "status": "pending",
+    "status": "passing",
     "priority": 26,
     "agent": "coder",
     "task": "vibe-code",
@@ -543,7 +543,8 @@
       "Reset limpa memoria e atualiza UI",
       "Toast de sucesso/erro exibido apos operacao"
     ],
-    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-1/worktree/sprints/sprint-1/3-prps/PRP-06-memoria-semantica.md"
+    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-1/worktree/sprints/sprint-1/3-prps/PRP-06-memoria-semantica.md",
+    "completed_at": "2026-03-07T12:00:00Z"
   },
   {
     "id": "F-027",
