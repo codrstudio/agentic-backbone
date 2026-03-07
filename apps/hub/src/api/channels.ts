@@ -23,3 +23,17 @@ export function channelQueryOptions(slug: string) {
     queryFn: () => request<Channel>(`/channels/${slug}`),
   });
 }
+
+export async function updateChannel(
+  slug: string,
+  data: Partial<Pick<Channel, "description" | "owner" | "metadata">>,
+): Promise<Channel> {
+  return request<Channel>(`/channels/${slug}`, {
+    method: "PATCH",
+    body: JSON.stringify(data),
+  });
+}
+
+export async function deleteChannel(slug: string): Promise<void> {
+  await request(`/channels/${slug}`, { method: "DELETE" });
+}

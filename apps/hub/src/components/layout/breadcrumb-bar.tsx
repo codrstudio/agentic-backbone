@@ -17,6 +17,7 @@ const dynamicRoutePatterns: { pattern: RegExp; parent: string; label?: string }[
   { pattern: /^\/agents\/new$/, parent: "Agentes", label: "Novo Agente" },
   { pattern: /^\/agents\/[^/]+$/, parent: "Agentes" },
   { pattern: /^\/conversations\/[^/]+$/, parent: "Conversas" },
+  { pattern: /^\/channels\/[^/]+$/, parent: "Canais" },
 ];
 
 export function BreadcrumbBar() {
