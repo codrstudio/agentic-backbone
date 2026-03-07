@@ -75,6 +75,7 @@ export interface ApprovalPendingEvent {
   type: "approval:pending";
   approvalId: number;
   agentId: string;
+  sessionId?: string;
   actionLabel: string;
   expiresAt: string;
 }

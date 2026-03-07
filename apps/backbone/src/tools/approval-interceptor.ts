@@ -60,6 +60,7 @@ export function withApprovalGate(
     type: "approval:pending",
     approvalId,
     agentId,
+    sessionId: sessionId ?? undefined,
     actionLabel: config.approvalLabel,
     expiresAt: expiresAt.toISOString(),
   });
