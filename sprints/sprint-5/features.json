@@ -174,7 +174,7 @@
     "id": "F-105",
     "name": "WhatsApp Cloud: routes (webhook Meta) + channel-adapter",
     "description": "Criar routes.ts com GET /connectors/whatsapp-cloud/:adapterId/webhook (verificacao hub.challenge) e POST (recepcao de eventos). Validar X-Hub-Signature-256 com app_secret timing-safe; retornar 401 se invalido. Extrair mensagens do payload Meta (entry[].changes[].value.messages[]). Criar channel-adapter.ts seguindo padrao do evolution: sessao por numero de telefone, executa agente, envia resposta via sendText, chama markAsRead se auto_reply_read: true.",
-    "status": "blocked",
+    "status": "passing",
     "priority": 9,
     "agent": "coder",
     "task": "vibe-code",
@@ -190,13 +190,14 @@
       "Rotas nao conflitam com rotas do conector evolution",
       "`npm run typecheck` passa sem erros"
     ],
-    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-5/worktree/sprints/sprint-5/3-prps/PRP-27-whatsapp-cloud-api.md"
+    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-5/worktree/sprints/sprint-5/3-prps/PRP-27-whatsapp-cloud-api.md",
+    "completed_at": "2026-03-07T23:36:00.864619+00:00"
   },
   {
     "id": "F-106",
     "name": "WhatsApp Cloud: tools send_whatsapp_text, send_whatsapp_template, get_whatsapp_media",
     "description": "Criar tools/send-text.ts (send_whatsapp_text: {to, body} -> {ok, messageId}), tools/send-template.ts (send_whatsapp_template: {to, templateName, languageCode?} -> {ok, messageId}), tools/get-media.ts (get_whatsapp_media: {mediaId} -> {url, mimeType}). Criar tools/index.ts exportando createWhatsAppCloudTools(slugs). Seguir o padrao one-tool-per-file do projeto.",
-    "status": "blocked",
+    "status": "pending",
     "priority": 10,
     "agent": "coder",
     "task": "vibe-code",
@@ -216,7 +217,7 @@
     "id": "F-107",
     "name": "WhatsApp Cloud: GUI Hub — URL do webhook no detalhe do adapter",
     "description": "Na GUI de adapters existente (/adapters), quando connector === 'whatsapp-cloud', adicionar bloco informativo exibindo: 'Webhook URL: {backboneUrl}/connectors/whatsapp-cloud/{adapterId}/webhook' com instrucao para configurar no Meta Business Manager e botao 'Copiar URL'. Campos access_token, app_secret mascarados com maskSensitiveFields de utils/sensitive.ts. Nenhuma nova pagina necessaria, apenas adicionar bloco ao componente de detalhe existente.",
-    "status": "blocked",
+    "status": "pending",
     "priority": 11,
     "agent": "coder",
     "task": "vibe-code",
