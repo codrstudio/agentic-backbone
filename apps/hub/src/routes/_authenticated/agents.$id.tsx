@@ -9,6 +9,7 @@ import {
   Clock,
   BookOpen,
   ChevronRight,
+  FlaskConical,
 } from "lucide-react";
 import {
   agentQueryOptions,
@@ -24,6 +25,7 @@ import { AgentConversations } from "@/components/agents/agent-conversations";
 import { MemoryStatusPanel } from "@/components/agents/memory-status-panel";
 import { AgentCronTab } from "@/components/agents/agent-cron-tab";
 import { KnowledgeTab } from "@/components/agents/knowledge-tab";
+import { EvalTab } from "@/components/agents/eval-tab";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { useSSEEvent } from "@/hooks/use-sse";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -36,6 +38,7 @@ const tabs = [
   { value: "memory", label: "Memoria", icon: Brain },
   { value: "knowledge", label: "Knowledge", icon: BookOpen },
   { value: "cron", label: "Agenda", icon: Clock },
+  { value: "evaluation", label: "Avaliacao", icon: FlaskConical },
 ] as const;
 
 type TabValue = (typeof tabs)[number]["value"];
@@ -190,6 +193,9 @@ function AgentDetailPage() {
         </TabsContent>
         <TabsContent value="cron">
           <AgentCronTab agentId={id} />
+        </TabsContent>
+        <TabsContent value="evaluation">
+          <EvalTab agentId={id} />
         </TabsContent>
       </Tabs>
     </div>
