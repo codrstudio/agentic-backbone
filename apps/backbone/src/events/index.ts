@@ -122,6 +122,29 @@ export interface CircuitBreakerKillSwitchEvent {
   actor: string;
 }
 
+export interface FleetAgentStatusEvent {
+  ts: number;
+  agentId: string;
+  status: "active" | "paused" | "alert" | "killed" | "error";
+  health: {
+    heartbeatSuccessRate24h: number;
+    lastHeartbeat: string | null;
+    lastHeartbeatResult: string | null;
+    consecutiveFails: number;
+  };
+  consumption: {
+    tokensToday: number;
+    costToday: number;
+  };
+}
+
+export interface FleetAlertEvent {
+  ts: number;
+  agentId: string;
+  alertType: "consecutive_fails" | "circuit_breaker_trip" | "kill_switch";
+  message: string;
+}
+
 export interface BackboneEventMap {
   "heartbeat:status": HeartbeatStatusEvent;
   "channel:message": ChannelMessageEvent;
@@ -139,6 +162,8 @@ export interface BackboneEventMap {
   "circuit_breaker:tripped": CircuitBreakerTrippedEvent;
   "circuit_breaker:resumed": CircuitBreakerResumedEvent;
   "circuit_breaker:kill_switch": CircuitBreakerKillSwitchEvent;
+  "fleet:agent_status": FleetAgentStatusEvent;
+  "fleet:alert": FleetAlertEvent;
 }
 
 // --- Typed Event Bus ---
