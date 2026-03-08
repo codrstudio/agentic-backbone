@@ -16,6 +16,7 @@ import { trackCost } from "../db/costs.js";
 import { trackHeartbeat } from "../db/analytics.js";
 import { checkExceeded, getQuotas, recordUsage, pauseAgent } from "../quotas/quota-manager.js";
 import { estimateTokens } from "../settings/llm.js";
+import { circuitBreaker } from "../circuit-breaker/index.js";
 
 const HEARTBEAT_OK = "HEARTBEAT_OK";
 const ACK_MAX_CHARS = 300;
@@ -142,6 +143,14 @@ async function tick(agentId: string): Promise<void> {
     }
   }
 
+  // Guard: circuit-breaker
+  const cbCheck = circuitBreaker.canExecute(agentId);
+  if (!cbCheck.allowed) {
+    circuitBreaker.recordBlocked(agentId, cbCheck.reason ?? "unknown", { mode: "heartbeat" });
+    logHeartbeat({ agentId, status: "skipped", reason: "circuit-breaker-blocked" });
+    return;
+  }
+
   // Guard: empty instructions
   const assembled = await assemblePrompt(agentId, "heartbeat");
   if (!assembled) {
@@ -211,6 +220,8 @@ async function tick(agentId: string): Promise<void> {
       recordUsage(agentId, usageData.inputTokens, usageData.outputTokens, "heartbeat");
     }
 
+    circuitBreaker.recordOutcome(agentId, true);
+
     const { shouldSkip, cleanText } = normalizeReply(fullText);
     const durationMs = Date.now() - startMs;
 
@@ -265,6 +276,7 @@ async function tick(agentId: string): Promise<void> {
     console.error(`[heartbeat:${agentId}] failed:`, err);
     emitHeartbeatResult(agentId, "failed", { reason, durationMs });
     trackHeartbeat({ agentId, status: "error", durationMs });
+    circuitBreaker.recordOutcome(agentId, false);
 
     emitNotification({
       type: "heartbeat_error",

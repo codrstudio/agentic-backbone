@@ -12,6 +12,7 @@ import { trackCost } from "../db/costs.js";
 import { trackCron } from "../db/analytics.js";
 import { estimateTokens } from "../settings/llm.js";
 import { getAgent } from "../agents/registry.js";
+import { circuitBreaker } from "../circuit-breaker/index.js";
 
 const EXECUTION_TIMEOUT_MS = 10 * 60 * 1000;
 
@@ -25,6 +26,16 @@ export interface CronExecutionResult {
 
 export async function executeCronJob(job: CronJob): Promise<CronExecutionResult> {
   const startMs = Date.now();
+
+  // Guard: circuit-breaker
+  const cbCheck = circuitBreaker.canExecute(job.agentId);
+  if (!cbCheck.allowed) {
+    circuitBreaker.recordBlocked(job.agentId, cbCheck.reason ?? "unknown", {
+      mode: "cron",
+      jobSlug: job.slug,
+    });
+    return { status: "skipped", error: `circuit-breaker: ${cbCheck.reason}`, durationMs: 0 };
+  }
 
   try {
     if (job.def.payload.kind === "heartbeat") {
@@ -54,6 +65,7 @@ export async function executeCronJob(job: CronJob): Promise<CronExecutionResult>
     });
 
     trackCron({ agentId: job.agentId, status: "error", durationMs });
+    circuitBreaker.recordOutcome(job.agentId, false);
     return { status: "error", error, durationMs };
   }
 }
@@ -168,6 +180,7 @@ async function executeMessagePayload(
   }
 
   trackCron({ agentId: job.agentId, status: "ok", durationMs });
+  circuitBreaker.recordOutcome(job.agentId, true);
 
   emitNotification({
     type: "cron_ok",
