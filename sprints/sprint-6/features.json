@@ -272,7 +272,7 @@
     "id": "F-128",
     "name": "Rating: Hub — Botoes 👍/👎 no Chat + Pagina /agents/:id/ratings",
     "description": "Adicionar botoes de rating (👍/👎) abaixo de cada mensagem do agente no componente de chat do Hub. Ao clicar 👎: dropdown com categorias (wrong_info, off_topic, too_long, rude, other) + campo de texto livre opcional. Estado visual: icone preenchido apos rating, possibilidade de alterar. Criar pagina /agents/:id/ratings com: gauge de taxa de aprovacao, grafico de linha de aprovacao ao longo do tempo (30 dias), grafico de pizza de categorias de falha, tabela de ratings recentes com link para conversa, botao 'Exportar como Golden Set', filtros por periodo/canal/rating. Badge na pagina /agents/:id com taxa de aprovacao e link para ratings.",
-    "status": "pending",
+    "status": "passing",
     "priority": 14,
     "agent": "coder",
     "task": "vibe-code",
@@ -287,13 +287,14 @@
       "Badge de taxa de aprovacao aparece na pagina do agente com cor correta",
       "`npm run build:hub` e `npm run typecheck` passam sem erros"
     ],
-    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-6/worktree/sprints/sprint-6/3-prps/PRP-36-feedback-loop-rating.md"
+    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-6/worktree/sprints/sprint-6/3-prps/PRP-36-feedback-loop-rating.md",
+    "completed_at": "2026-03-08T07:20:46.327Z"
   },
   {
     "id": "F-126",
     "name": "MCP: Hub — Configuracao de adapters MCP + Aba MCP Tools + Settings MCP Server",
     "description": "Formulario no Hub para criar adapters MCP (tipo stdio: command/args/env; tipo http: URL/API key). Botao 'Testar conexao' que lista tools disponiveis. Aba 'MCP Tools' na pagina do agente com lista de adapters, ferramentas e historico de chamadas (ultimas 20). Secao 'MCP Server' em /settings com toggle de habilitacao, agentes acessiveis, exigir JWT, instrucoes de conexao e botao 'Copiar config para Claude Desktop'.",
-    "status": "blocked",
+    "status": "pending",
     "priority": 15,
     "agent": "coder",
     "task": "vibe-code",
