@@ -413,7 +413,7 @@
     "id": "F-123",
     "name": "Config Versioning DB: tabela config_versions + version-manager + trigger automatico",
     "description": "Criar tabela config_versions (agent_id, file_name, version_num, file_path, size_bytes, change_note, eval_run_id, created_at, created_by; index agent_id+file_name). Modelo em disco: context/agents/{owner}.{slug}/.versions/{filename}/v{NNN}_{timestamp}.md. Criar src/versions/version-manager.ts com: createVersion(agentId, fileName, currentContent, opts), nextVersionNum, pruneVersions (limit 50). Estender PATCH /agents/:id/files/:filename (ou equivalente existente) para chamar createVersion() antes de sobrescrever.",
-    "status": "pending",
+    "status": "passing",
     "priority": 20,
     "agent": "coder",
     "task": "vibe-code",
@@ -426,7 +426,8 @@
       "version_num sequencial por (agentId, fileName)",
       "`npm run typecheck` passa sem erros"
     ],
-    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-5/worktree/sprints/sprint-5/3-prps/PRP-32-config-versioning.md"
+    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-5/worktree/sprints/sprint-5/3-prps/PRP-32-config-versioning.md",
+    "completed_at": "2026-03-07T23:00:00Z"
   },
   {
     "id": "F-124",
