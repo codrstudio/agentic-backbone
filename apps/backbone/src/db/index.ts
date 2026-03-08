@@ -486,6 +486,14 @@ db.exec(`
   CREATE INDEX IF NOT EXISTS idx_ratings_rated_at ON message_ratings(rated_at);
 `);
 
+// Idempotent migration: add model routing columns to heartbeat_log
+try { db.exec(`ALTER TABLE heartbeat_log ADD COLUMN model_used TEXT`); } catch {}
+try { db.exec(`ALTER TABLE heartbeat_log ADD COLUMN routing_rule TEXT`); } catch {}
+
+// Idempotent migration: add model routing columns to cron_run_log
+try { db.exec(`ALTER TABLE cron_run_log ADD COLUMN model_used TEXT`); } catch {}
+try { db.exec(`ALTER TABLE cron_run_log ADD COLUMN routing_rule TEXT`); } catch {}
+
 db.exec(`
   CREATE TABLE IF NOT EXISTS mcp_tool_calls (
     id          TEXT PRIMARY KEY,
