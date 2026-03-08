@@ -88,7 +88,7 @@
     "id": "F-148",
     "name": "Circuit-breaker: Hub — seção na página do agente + badges na lista",
     "description": "Na página /agents/:id: seção circuit-breaker com botão kill-switch (vermelho, confirmação), indicador visual de status (verde/amarelo/vermelho), contadores em tempo real (falhas consecutivas, ações/hora, ações/dia com progress bars), formulário de configuração editável, tabela das últimas 20 eventos. Na lista /agents: badge de escudo (verde/amarelo/vermelho) por agente, destaque visual para kill-switch ativo. Atualização via SSE /system/events (circuit_breaker:*) sem polling.",
-    "status": "pending",
+    "status": "passing",
     "priority": 5,
     "agent": "coder",
     "task": "vibe-code",
@@ -103,7 +103,8 @@
       "Formulário de configuração salva e aplica mudanças",
       "`npm run build` e `npm run typecheck` passam sem erros"
     ],
-    "prp_path": "sprints/sprint-7/3-prps/PRP-42-kill-switch-circuit-breaker.md"
+    "prp_path": "sprints/sprint-7/3-prps/PRP-42-kill-switch-circuit-breaker.md",
+    "completed_at": "2026-03-08T15:13:30Z"
   },
   {
     "id": "F-149",
