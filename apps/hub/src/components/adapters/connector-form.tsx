@@ -13,7 +13,7 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 
-export type ConnectorType = "mysql" | "postgres" | "evolution" | "twilio" | "http" | "whatsapp-cloud" | "mcp";
+export type ConnectorType = "mysql" | "postgres" | "evolution" | "twilio" | "http" | "whatsapp-cloud" | "mcp" | "email";
 
 // MCP-specific options (transport config, not credentials)
 export interface McpOptions {
@@ -55,6 +55,28 @@ export interface ConnectorCredential {
   verify_token?: string;
   // MCP
   api_key?: string;
+  // Email
+  imap_host?: string;
+  imap_port?: number;
+  imap_user?: string;
+  imap_pass?: string;
+  smtp_host?: string;
+  smtp_port?: number;
+  smtp_secure?: boolean;
+  smtp_user?: string;
+  smtp_pass?: string;
+}
+
+export interface EmailOptions {
+  agent_id?: string;
+  mailbox?: string;
+  poll_interval_seconds?: number;
+  mark_seen?: boolean;
+  reply_prefix?: string;
+  from_name?: string;
+  sender_whitelist?: string;
+  subject_filter?: string;
+  auto_reply?: boolean;
 }
 
 // Sentinel value used when a masked password is not changed
@@ -327,6 +349,210 @@ export function ConnectorForm({ connector, credential, maskedFields, onChange, o
           value={credential.timeoutMs ?? 5000}
           onChange={(e) => set("timeoutMs", Number(e.target.value))}
         />
+      </div>
+    </div>
+  );
+}
+
+// ---- Email Connector Form ----
+
+export function EmailConnectorForm({
+  credential,
+  maskedFields,
+  onChange,
+  onUnmask,
+  options,
+  onOptionsChange,
+}: {
+  credential: ConnectorCredential;
+  maskedFields: Set<string>;
+  onChange: (cred: ConnectorCredential) => void;
+  onUnmask: (field: string) => void;
+  options: EmailOptions;
+  onOptionsChange: (opts: EmailOptions) => void;
+}) {
+  function set(key: keyof ConnectorCredential, value: string | number | boolean) {
+    onChange({ ...credential, [key]: value });
+  }
+
+  function setOpt<K extends keyof EmailOptions>(key: K, value: EmailOptions[K]) {
+    onOptionsChange({ ...options, [key]: value });
+  }
+
+  function isMasked(field: string) {
+    return maskedFields.has(field);
+  }
+
+  return (
+    <div className="space-y-5">
+      {/* IMAP Section */}
+      <div className="space-y-3">
+        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Recebimento (IMAP)</p>
+        <div className="space-y-1.5">
+          <Label htmlFor="em-imap-host">Servidor IMAP</Label>
+          <Input
+            id="em-imap-host"
+            value={credential.imap_host ?? ""}
+            onChange={(e) => set("imap_host", e.target.value)}
+            placeholder="imap.gmail.com"
+          />
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="em-imap-port">Porta IMAP</Label>
+          <Input
+            id="em-imap-port"
+            type="number"
+            value={credential.imap_port ?? 993}
+            onChange={(e) => set("imap_port", Number(e.target.value))}
+            placeholder="993"
+          />
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="em-imap-user">Usuário IMAP</Label>
+          <Input
+            id="em-imap-user"
+            value={credential.imap_user ?? ""}
+            onChange={(e) => set("imap_user", e.target.value)}
+            placeholder="${EMAIL_USER}"
+          />
+        </div>
+        <PasswordField
+          id="em-imap-pass"
+          label="Senha IMAP"
+          value={credential.imap_pass ?? ""}
+          masked={isMasked("imap_pass")}
+          onChange={(v) => set("imap_pass", v)}
+          onClear={() => onUnmask("imap_pass")}
+        />
+      </div>
+
+      {/* SMTP Section */}
+      <div className="space-y-3 border-t pt-4">
+        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Envio (SMTP)</p>
+        <div className="space-y-1.5">
+          <Label htmlFor="em-smtp-host">Servidor SMTP</Label>
+          <Input
+            id="em-smtp-host"
+            value={credential.smtp_host ?? ""}
+            onChange={(e) => set("smtp_host", e.target.value)}
+            placeholder="smtp.gmail.com"
+          />
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="em-smtp-port">Porta SMTP</Label>
+          <Input
+            id="em-smtp-port"
+            type="number"
+            value={credential.smtp_port ?? 587}
+            onChange={(e) => set("smtp_port", Number(e.target.value))}
+            placeholder="587"
+          />
+        </div>
+        <div className="flex items-center gap-2">
+          <Switch
+            id="em-smtp-secure"
+            checked={credential.smtp_secure ?? false}
+            onCheckedChange={(v) => set("smtp_secure", v)}
+          />
+          <Label htmlFor="em-smtp-secure">SSL/TLS (STARTTLS desabilitado)</Label>
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="em-smtp-user">Usuário SMTP</Label>
+          <Input
+            id="em-smtp-user"
+            value={credential.smtp_user ?? ""}
+            onChange={(e) => set("smtp_user", e.target.value)}
+            placeholder="${EMAIL_USER}"
+          />
+        </div>
+        <PasswordField
+          id="em-smtp-pass"
+          label="Senha SMTP"
+          value={credential.smtp_pass ?? ""}
+          masked={isMasked("smtp_pass")}
+          onChange={(v) => set("smtp_pass", v)}
+          onClear={() => onUnmask("smtp_pass")}
+        />
+      </div>
+
+      {/* Options Section */}
+      <div className="space-y-3 border-t pt-4">
+        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Opcoes</p>
+        <div className="space-y-1.5">
+          <Label htmlFor="em-mailbox">Caixa de entrada (mailbox)</Label>
+          <Input
+            id="em-mailbox"
+            value={options.mailbox ?? "INBOX"}
+            onChange={(e) => setOpt("mailbox", e.target.value)}
+            placeholder="INBOX"
+          />
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="em-poll-interval">Intervalo de polling (segundos)</Label>
+          <Input
+            id="em-poll-interval"
+            type="number"
+            value={options.poll_interval_seconds ?? 60}
+            onChange={(e) => setOpt("poll_interval_seconds", Number(e.target.value))}
+            placeholder="60"
+          />
+        </div>
+        <div className="flex items-center gap-2">
+          <Switch
+            id="em-mark-seen"
+            checked={options.mark_seen ?? true}
+            onCheckedChange={(v) => setOpt("mark_seen", v)}
+          />
+          <Label htmlFor="em-mark-seen">Marcar como lido apos processar</Label>
+        </div>
+        <div className="flex items-center gap-2">
+          <Switch
+            id="em-auto-reply"
+            checked={options.auto_reply ?? true}
+            onCheckedChange={(v) => setOpt("auto_reply", v)}
+          />
+          <Label htmlFor="em-auto-reply">Resposta automatica via SMTP</Label>
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="em-reply-prefix">Prefixo de resposta</Label>
+          <Input
+            id="em-reply-prefix"
+            value={options.reply_prefix ?? ""}
+            onChange={(e) => setOpt("reply_prefix", e.target.value)}
+            placeholder="[Auto] "
+          />
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="em-from-name">Nome do remetente</Label>
+          <Input
+            id="em-from-name"
+            value={options.from_name ?? ""}
+            onChange={(e) => setOpt("from_name", e.target.value)}
+            placeholder="Assistente IA"
+          />
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="em-whitelist">Whitelist de remetentes (um por linha)</Label>
+          <Textarea
+            id="em-whitelist"
+            value={options.sender_whitelist ?? ""}
+            onChange={(e) => setOpt("sender_whitelist", e.target.value)}
+            placeholder={"exemplo@empresa.com\nsuporte@cliente.com"}
+            rows={3}
+            className="font-mono text-xs"
+          />
+          <p className="text-xs text-muted-foreground">Vazio = aceitar emails de qualquer remetente</p>
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="em-subject-filter">Filtro de assunto (regex, opcional)</Label>
+          <Input
+            id="em-subject-filter"
+            value={options.subject_filter ?? ""}
+            onChange={(e) => setOpt("subject_filter", e.target.value)}
+            placeholder="^Suporte:"
+            className="font-mono text-sm"
+          />
+        </div>
       </div>
     </div>
   );

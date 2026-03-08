@@ -337,7 +337,7 @@
     "id": "F-135",
     "name": "Email: Hub — Formulario de Adapter Email + Card de Status",
     "description": "Formulario de criacao de adapter Email no Hub com secoes: Recebimento (IMAP host/porta/usuario/senha), Envio (SMTP host/porta/STARTTLS toggle/usuario/senha), Opcoes (mailbox, poll interval, mark_seen, reply_prefix, from_name, auto_reply toggle, whitelist de remetentes, filtro de assunto regex). Botao 'Testar conexao' que exibe resultado IMAP + SMTP com latencia. Campos sensiveis suportam ${ENV_VAR} e sao mascarados (usando utils/sensitive.ts). Card de status apos criacao com indicador de polling e contagem de emails processados. Card Email na pagina /agents/:id/channels com status de polling, ultima execucao, emails (24h) e link para conversas de email.",
-    "status": "pending",
+    "status": "passing",
     "priority": 17,
     "agent": "coder",
     "task": "vibe-code",
@@ -352,7 +352,8 @@
       "Card de status em /agents/:id/channels exibe status de polling",
       "`npm run build:hub` e `npm run typecheck` passam sem erros"
     ],
-    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-6/worktree/sprints/sprint-6/3-prps/PRP-38-email-connector.md"
+    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-6/worktree/sprints/sprint-6/3-prps/PRP-38-email-connector.md",
+    "completed_at": "2026-03-08T13:30:00Z"
   },
   {
     "id": "F-137",
