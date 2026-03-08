@@ -251,7 +251,7 @@
     "id": "F-125",
     "name": "MCP: Servidor MCP do Backbone (endpoint SSE para clientes externos)",
     "description": "Criar `src/mcp-server/` com implementacao do servidor MCP via @modelcontextprotocol/sdk. Endpoint GET /mcp/sse (JWT via query param ou header). Tools expostas: list_agents, send_message, get_agent_status, get_agent_memory. Configuracao em `context/system/mcp-server.json` (enabled, allowed_agents, require_auth). Endpoints GET/PUT /settings/mcp-server.",
-    "status": "pending",
+    "status": "passing",
     "priority": 13,
     "agent": "coder",
     "task": "vibe-code",
@@ -265,7 +265,8 @@
       "`allowed_agents` filtra agentes acessiveis corretamente",
       "`npm run typecheck` passa sem erros"
     ],
-    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-6/worktree/sprints/sprint-6/3-prps/PRP-35-mcp-support.md"
+    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-6/worktree/sprints/sprint-6/3-prps/PRP-35-mcp-support.md",
+    "completed_at": "2026-03-08T07:01:20Z"
   },
   {
     "id": "F-128",
