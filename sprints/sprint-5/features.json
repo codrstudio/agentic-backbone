@@ -478,7 +478,7 @@
     "id": "F-120",
     "name": "Agent Sandbox: endpoints de rascunhos + modelo de filesystem",
     "description": "Criar modelo de filesystem context/agents/{owner}.{slug}/drafts/{draftId}/ com AGENT.md, SOUL.md (e outros .md existentes) + draft.json (id, agentId, label, createdAt, updatedAt, status). Criar apps/backbone/src/routes/drafts.ts com: GET/POST /agents/:agentId/drafts, GET/PATCH/DELETE /drafts/:draftId, POST /drafts/:draftId/publish (cria versao F-123, copia arquivos, hot reload, retorna {publishedAt, versionId}), POST /drafts/:draftId/chat (SSE, runAgent com contexto do rascunho, sem persistir sessao em SQLite), POST /drafts/:draftId/compare (executa em paralelo prod+rascunho, retorna ambas respostas). Criar apps/hub/src/api/drafts.ts com draftsQueryOptions.",
-    "status": "pending",
+    "status": "passing",
     "priority": 23,
     "agent": "coder",
     "task": "vibe-code",
@@ -496,13 +496,14 @@
       "Multiplos rascunhos coexistem para o mesmo agente",
       "`npm run typecheck` passa sem erros"
     ],
-    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-5/worktree/sprints/sprint-5/3-prps/PRP-31-agent-sandbox.md"
+    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-5/worktree/sprints/sprint-5/3-prps/PRP-31-agent-sandbox.md",
+    "completed_at": "2026-03-08T00:47:49Z"
   },
   {
     "id": "F-121",
     "name": "Agent Sandbox: telas Hub — aba Sandbox e editor de rascunho",
     "description": "Nova aba 'Sandbox' na pagina do agente com SandboxTab: lista de rascunhos (label, criado em, ultima atualizacao), botao 'Criar rascunho' com input de label, por rascunho botoes Editar/Comparar/Publicar (com confirmacao)/Descartar. DraftEditor em /agents/:id/drafts/:draftId: tabs por arquivo (SOUL.md, AGENT.md, etc. apenas os existentes), textarea editavel, botao Salvar (PATCH), botao 'Testar no chat' (abre DraftChatPanel como painel lateral com SSE), botao Publicar com dialog de confirmacao. DraftChatPanel: input + stream SSE.",
-    "status": "blocked",
+    "status": "pending",
     "priority": 24,
     "agent": "coder",
     "task": "vibe-code",
@@ -525,7 +526,7 @@
     "id": "F-122",
     "name": "Agent Sandbox: view de comparacao side-by-side",
     "description": "Nova rota /agents/:id/drafts/:draftId/compare com DraftCompareView: campo de input para mensagem de teste, botao 'Executar comparacao' (POST /compare), layout 2 colunas 'Producao' | 'Rascunho {label}', cada coluna exibe resposta completa do agente, diferenca de palavras destacada visualmente em amarelo (diff simples de palavras entre as duas respostas).",
-    "status": "blocked",
+    "status": "pending",
     "priority": 25,
     "agent": "coder",
     "task": "vibe-code",
