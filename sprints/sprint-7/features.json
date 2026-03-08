@@ -325,7 +325,7 @@
     "id": "F-159",
     "name": "OTel: API endpoints settings/otel",
     "description": "Implementar endpoints: GET /settings/otel (config atual), PUT /settings/otel (atualizar â€” reinicializa SDK sem restart), POST /settings/otel/test (envia span de teste ao endpoint e verifica aceitaÃ§Ã£o â€” retorna success, message, latencyMs), GET /settings/otel/status (connected, spansExported, errors, lastExportAt). Auth JWT obrigatÃ³rio. ValidaÃ§Ã£o via Zod.",
-    "status": "pending",
+    "status": "passing",
     "priority": 16,
     "agent": "coder",
     "task": "vibe-code",
@@ -339,13 +339,14 @@
       "GET /settings/otel/status retorna mÃ©tricas do exportador",
       "`npm run typecheck` passa sem erros"
     ],
-    "prp_path": "sprints/sprint-7/3-prps/PRP-45-opentelemetry-export.md"
+    "prp_path": "sprints/sprint-7/3-prps/PRP-45-opentelemetry-export.md",
+    "completed_at": "2026-03-08T16:37:49Z"
   },
   {
     "id": "F-160",
     "name": "OTel: Hub â€” pÃ¡gina /settings/otel com presets",
     "description": "PÃ¡gina /settings/otel: toggle habilitar exportaÃ§Ã£o, campo endpoint URL (placeholder localhost:4318), key-value editor de headers (password), slider sampling rate 0-100%, multi-select filtro por agente, multi-select filtro por tipo operaÃ§Ã£o, botÃ£o Testar ConexÃ£o (feedback visual sucesso/erro + latÃªncia), status card (spans exportados, erros, Ãºltimo export). Presets (botÃµes que preenchem endpoint+headers): Grafana Cloud, Datadog (DD-API-KEY), New Relic (Api-Key), Langfuse, Local Jaeger.",
-    "status": "blocked",
+    "status": "pending",
     "priority": 17,
     "agent": "coder",
     "task": "vibe-code",

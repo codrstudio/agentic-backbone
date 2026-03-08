@@ -2,6 +2,8 @@ import { NodeSDK } from "@opentelemetry/sdk-node";
 import { OTLPTraceExporter } from "@opentelemetry/exporter-trace-otlp-http";
 import { Resource } from "@opentelemetry/resources";
 import { trace, type Tracer } from "@opentelemetry/api";
+import type { ReadableSpan, SpanExporter } from "@opentelemetry/sdk-trace-base";
+import type { ExportResult } from "@opentelemetry/core";
 import { getOTelConfig, setOTelConfig } from "./config.js";
 import type { OTelConfig } from "./schemas.js";
 
@@ -12,9 +14,72 @@ export { getOTelConfig, setOTelConfig } from "./config.js";
 const SERVICE_NAME = "agentic-backbone";
 const SERVICE_VERSION = "0.0.1";
 
+// --- Exporter stats ---
+
+export interface ExporterStats {
+  connected: boolean;
+  spansExported: number;
+  errors: number;
+  lastExportAt: string | null;
+}
+
+let exporterStats: ExporterStats = {
+  connected: false,
+  spansExported: 0,
+  errors: 0,
+  lastExportAt: null,
+};
+
+export function getExporterStats(): ExporterStats {
+  return { ...exporterStats };
+}
+
+function resetExporterStats(): void {
+  exporterStats = {
+    connected: false,
+    spansExported: 0,
+    errors: 0,
+    lastExportAt: null,
+  };
+}
+
+// --- Stats-tracking exporter wrapper ---
+
+class StatsTrackingExporter implements SpanExporter {
+  private inner: SpanExporter;
+
+  constructor(inner: SpanExporter) {
+    this.inner = inner;
+  }
+
+  export(spans: ReadableSpan[], resultCallback: (result: ExportResult) => void): void {
+    this.inner.export(spans, (result) => {
+      if (result.code === 0 /* SUCCESS */) {
+        exporterStats.spansExported += spans.length;
+        exporterStats.lastExportAt = new Date().toISOString();
+        exporterStats.connected = true;
+      } else {
+        exporterStats.errors++;
+        exporterStats.connected = false;
+      }
+      resultCallback(result);
+    });
+  }
+
+  async shutdown(): Promise<void> {
+    return this.inner.shutdown();
+  }
+
+  forceFlush?(): Promise<void> {
+    return (this.inner as any).forceFlush?.() ?? Promise.resolve();
+  }
+}
+
+// ---
+
 let sdk: NodeSDK | null = null;
 
-function buildResource(config: OTelConfig): Resource {
+function buildResource(_config: OTelConfig): Resource {
   return new Resource({
     "service.name": SERVICE_NAME,
     "service.version": SERVICE_VERSION,
@@ -33,10 +98,14 @@ export function initTelemetry(config?: OTelConfig): void {
     sdk = null;
   }
 
-  const exporter = new OTLPTraceExporter({
+  resetExporterStats();
+
+  const rawExporter = new OTLPTraceExporter({
     url: cfg.endpoint,
     headers: cfg.headers,
   });
+
+  const exporter = new StatsTrackingExporter(rawExporter);
 
   sdk = new NodeSDK({
     traceExporter: exporter,
