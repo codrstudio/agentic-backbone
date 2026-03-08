@@ -17,6 +17,7 @@ import {
   Inbox,
   UserCircle,
   GitBranch,
+  Star,
 } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -50,6 +51,7 @@ const navItemsAfter = [
   { label: "Jobs", icon: Cpu, to: "/jobs" as const },
   { label: "Custos", icon: DollarSign, to: "/costs" as const },
   { label: "Analytics", icon: TrendingUp, to: "/analytics" as const },
+  { label: "Ratings", icon: Star, to: "/ratings" as const },
   { label: "Notificacoes", icon: Bell, to: "/notifications" as const },
   { label: "Configuracoes", icon: Settings, to: "/settings" as const },
 ] as const;

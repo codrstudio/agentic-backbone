@@ -14,6 +14,7 @@ import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
 import { Route as AuthenticatedWorkflowsRouteImport } from './routes/_authenticated/workflows'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
+import { Route as AuthenticatedRatingsRouteImport } from './routes/_authenticated/ratings'
 import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authenticated/notifications'
 import { Route as AuthenticatedJobsRouteImport } from './routes/_authenticated/jobs'
 import { Route as AuthenticatedCronRouteImport } from './routes/_authenticated/cron'
@@ -60,6 +61,11 @@ const AuthenticatedWorkflowsRoute = AuthenticatedWorkflowsRouteImport.update({
 const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedRatingsRoute = AuthenticatedRatingsRouteImport.update({
+  id: '/ratings',
+  path: '/ratings',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedNotificationsRoute =
@@ -202,6 +208,7 @@ export interface FileRoutesByFullPath {
   '/cron': typeof AuthenticatedCronRoute
   '/jobs': typeof AuthenticatedJobsRouteWithChildren
   '/notifications': typeof AuthenticatedNotificationsRoute
+  '/ratings': typeof AuthenticatedRatingsRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/workflows': typeof AuthenticatedWorkflowsRouteWithChildren
   '/agents/$id': typeof AuthenticatedAgentsIdRouteWithChildren
@@ -230,6 +237,7 @@ export interface FileRoutesByTo {
   '/cron': typeof AuthenticatedCronRoute
   '/jobs': typeof AuthenticatedJobsRouteWithChildren
   '/notifications': typeof AuthenticatedNotificationsRoute
+  '/ratings': typeof AuthenticatedRatingsRoute
   '/settings': typeof AuthenticatedSettingsRoute
   '/workflows': typeof AuthenticatedWorkflowsRouteWithChildren
   '/': typeof AuthenticatedIndexRoute
@@ -261,6 +269,7 @@ export interface FileRoutesById {
   '/_authenticated/cron': typeof AuthenticatedCronRoute
   '/_authenticated/jobs': typeof AuthenticatedJobsRouteWithChildren
   '/_authenticated/notifications': typeof AuthenticatedNotificationsRoute
+  '/_authenticated/ratings': typeof AuthenticatedRatingsRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/workflows': typeof AuthenticatedWorkflowsRouteWithChildren
   '/_authenticated/': typeof AuthenticatedIndexRoute
@@ -293,6 +302,7 @@ export interface FileRouteTypes {
     | '/cron'
     | '/jobs'
     | '/notifications'
+    | '/ratings'
     | '/settings'
     | '/workflows'
     | '/agents/$id'
@@ -321,6 +331,7 @@ export interface FileRouteTypes {
     | '/cron'
     | '/jobs'
     | '/notifications'
+    | '/ratings'
     | '/settings'
     | '/workflows'
     | '/'
@@ -351,6 +362,7 @@ export interface FileRouteTypes {
     | '/_authenticated/cron'
     | '/_authenticated/jobs'
     | '/_authenticated/notifications'
+    | '/_authenticated/ratings'
     | '/_authenticated/settings'
     | '/_authenticated/workflows'
     | '/_authenticated/'
@@ -410,6 +422,13 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/settings'
       preLoaderRoute: typeof AuthenticatedSettingsRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/ratings': {
+      id: '/_authenticated/ratings'
+      path: '/ratings'
+      fullPath: '/ratings'
+      preLoaderRoute: typeof AuthenticatedRatingsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/notifications': {
@@ -685,6 +704,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedCronRoute: typeof AuthenticatedCronRoute
   AuthenticatedJobsRoute: typeof AuthenticatedJobsRouteWithChildren
   AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
+  AuthenticatedRatingsRoute: typeof AuthenticatedRatingsRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedWorkflowsRoute: typeof AuthenticatedWorkflowsRouteWithChildren
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
@@ -704,6 +724,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedCronRoute: AuthenticatedCronRoute,
   AuthenticatedJobsRoute: AuthenticatedJobsRouteWithChildren,
   AuthenticatedNotificationsRoute: AuthenticatedNotificationsRoute,
+  AuthenticatedRatingsRoute: AuthenticatedRatingsRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedWorkflowsRoute: AuthenticatedWorkflowsRouteWithChildren,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,

@@ -86,6 +86,42 @@ export function agentRatingsListQueryOptions(agentId: string, params?: RatingsLi
   });
 }
 
+export interface GlobalRatingAgent {
+  agentId: string;
+  total: number;
+  upCount: number;
+  downCount: number;
+  approvalRate: number;
+  trend: "up" | "down" | "stable";
+  alert: boolean;
+  lastRatedAt: string;
+}
+
+export interface GlobalRatingsDashboard {
+  period: { from: string; to: string };
+  globalTotal: number;
+  globalApprovalRate: number;
+  agents: GlobalRatingAgent[];
+}
+
+export interface GlobalRatingsParams {
+  from?: string;
+  to?: string;
+  channelType?: string;
+}
+
+export function globalRatingsQueryOptions(params?: GlobalRatingsParams) {
+  const search = new URLSearchParams();
+  if (params?.from) search.set("from", params.from);
+  if (params?.to) search.set("to", params.to);
+  if (params?.channelType) search.set("channelType", params.channelType);
+  const qs = search.toString();
+  return queryOptions({
+    queryKey: ["ratings", "global", params ?? {}],
+    queryFn: () => request<GlobalRatingsDashboard>(`/ratings${qs ? `?${qs}` : ""}`),
+  });
+}
+
 export async function exportGoldenSet(
   agentId: string,
   params?: { rating?: "up" | "down"; from?: string; to?: string; limit?: number },
