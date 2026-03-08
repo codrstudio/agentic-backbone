@@ -43,7 +43,7 @@
     "id": "F-146",
     "name": "Circuit-breaker: API endpoints",
     "description": "Implementar endpoints em `src/routes/`: GET /agents/:id/circuit-breaker (estado atual), PUT /agents/:id/circuit-breaker/config (atualizar configuração), POST /agents/:id/circuit-breaker/kill (ativar kill-switch), POST /agents/:id/circuit-breaker/resume (desativar/resume), GET /agents/:id/circuit-breaker/events (histórico paginado), GET /system/circuit-breaker (estado de todos os agentes). Validação via Zod schemas. Auth JWT obrigatório.",
-    "status": "pending",
+    "status": "passing",
     "priority": 3,
     "agent": "coder",
     "task": "vibe-code",
@@ -58,7 +58,8 @@
       "GET /system/circuit-breaker retorna estados de todos os agentes",
       "`npm run typecheck` passa sem erros"
     ],
-    "prp_path": "sprints/sprint-7/3-prps/PRP-42-kill-switch-circuit-breaker.md"
+    "prp_path": "sprints/sprint-7/3-prps/PRP-42-kill-switch-circuit-breaker.md",
+    "completed_at": "2026-03-08T14:56:06.100Z"
   },
   {
     "id": "F-147",
