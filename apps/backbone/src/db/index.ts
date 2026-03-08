@@ -579,4 +579,46 @@ db.exec(`
   CREATE INDEX IF NOT EXISTS idx_cb_events_type    ON circuit_breaker_events(event_type);
 `);
 
+db.exec(`
+  CREATE TABLE IF NOT EXISTS compliance_classification (
+    agent_id           TEXT PRIMARY KEY,
+    risk_level         TEXT NOT NULL DEFAULT 'minimal',
+    risk_justification TEXT,
+    classified_by      TEXT NOT NULL,
+    classified_at      TEXT NOT NULL DEFAULT (datetime('now')),
+    reviewed_at        TEXT,
+    review_due_at      TEXT
+  );
+
+  CREATE TABLE IF NOT EXISTS compliance_checklist (
+    id         TEXT PRIMARY KEY,
+    agent_id   TEXT NOT NULL,
+    item_key   TEXT NOT NULL,
+    item_label TEXT NOT NULL,
+    category   TEXT NOT NULL,
+    status     TEXT NOT NULL DEFAULT 'pending',
+    evidence   TEXT,
+    updated_by TEXT,
+    updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+    UNIQUE(agent_id, item_key)
+  );
+
+  CREATE INDEX IF NOT EXISTS idx_compliance_checklist_agent ON compliance_checklist(agent_id);
+
+  CREATE TABLE IF NOT EXISTS compliance_reports (
+    id           TEXT PRIMARY KEY,
+    agent_id     TEXT,
+    report_type  TEXT NOT NULL,
+    title        TEXT NOT NULL,
+    content      TEXT NOT NULL,
+    generated_by TEXT NOT NULL,
+    generated_at TEXT NOT NULL DEFAULT (datetime('now')),
+    period_from  TEXT,
+    period_to    TEXT
+  );
+
+  CREATE INDEX IF NOT EXISTS idx_compliance_reports_agent ON compliance_reports(agent_id);
+  CREATE INDEX IF NOT EXISTS idx_compliance_reports_type  ON compliance_reports(report_type);
+`);
+
 export { db };
