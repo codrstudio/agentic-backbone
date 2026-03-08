@@ -25,13 +25,13 @@ import { Route as AuthenticatedAnalyticsRouteImport } from './routes/_authentica
 import { Route as AuthenticatedAgentsRouteImport } from './routes/_authenticated/agents'
 import { Route as AuthenticatedAccountRouteImport } from './routes/_authenticated/account'
 import { Route as AuthenticatedSecurityIndexRouteImport } from './routes/_authenticated/security/index'
-import { Route as AuthenticatedComplianceIndexRouteImport } from './routes/_authenticated/compliance/index'
-import { Route as AuthenticatedFleetIndexRouteImport } from './routes/_authenticated/fleet/index'
-import { Route as AuthenticatedSettingsOtelRouteImport } from './routes/_authenticated/settings_.otel'
 import { Route as AuthenticatedInboxIndexRouteImport } from './routes/_authenticated/inbox/index'
+import { Route as AuthenticatedFleetIndexRouteImport } from './routes/_authenticated/fleet/index'
+import { Route as AuthenticatedComplianceIndexRouteImport } from './routes/_authenticated/compliance/index'
 import { Route as AuthenticatedApprovalsIndexRouteImport } from './routes/_authenticated/approvals/index'
 import { Route as AuthenticatedAdaptersIndexRouteImport } from './routes/_authenticated/adapters/index'
 import { Route as AuthenticatedWorkflowsIdRouteImport } from './routes/_authenticated/workflows.$id'
+import { Route as AuthenticatedSettingsOtelRouteImport } from './routes/_authenticated/settings_.otel'
 import { Route as AuthenticatedJobsIdRouteImport } from './routes/_authenticated/jobs.$id'
 import { Route as AuthenticatedConversationsIdRouteImport } from './routes/_authenticated/conversations.$id'
 import { Route as AuthenticatedChannelsSlugRouteImport } from './routes/_authenticated/channels.$slug'
@@ -125,29 +125,22 @@ const AuthenticatedSecurityIndexRoute =
     path: '/security/',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedInboxIndexRoute = AuthenticatedInboxIndexRouteImport.update({
+  id: '/inbox/',
+  path: '/inbox/',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedFleetIndexRoute = AuthenticatedFleetIndexRouteImport.update({
+  id: '/fleet/',
+  path: '/fleet/',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedComplianceIndexRoute =
   AuthenticatedComplianceIndexRouteImport.update({
     id: '/compliance/',
     path: '/compliance/',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
-const AuthenticatedFleetIndexRoute =
-  AuthenticatedFleetIndexRouteImport.update({
-    id: '/fleet/',
-    path: '/fleet/',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedSettingsOtelRoute =
-  AuthenticatedSettingsOtelRouteImport.update({
-    id: '/_authenticated/settings_/otel',
-    path: '/settings/otel',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedInboxIndexRoute = AuthenticatedInboxIndexRouteImport.update({
-  id: '/inbox/',
-  path: '/inbox/',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
 const AuthenticatedApprovalsIndexRoute =
   AuthenticatedApprovalsIndexRouteImport.update({
     id: '/approvals/',
@@ -165,6 +158,12 @@ const AuthenticatedWorkflowsIdRoute =
     id: '/$id',
     path: '/$id',
     getParentRoute: () => AuthenticatedWorkflowsRoute,
+  } as any)
+const AuthenticatedSettingsOtelRoute =
+  AuthenticatedSettingsOtelRouteImport.update({
+    id: '/settings_/otel',
+    path: '/settings/otel',
+    getParentRoute: () => AuthenticatedRoute,
   } as any)
 const AuthenticatedJobsIdRoute = AuthenticatedJobsIdRouteImport.update({
   id: '/$id',
@@ -244,14 +243,14 @@ export interface FileRoutesByFullPath {
   '/channels/$slug': typeof AuthenticatedChannelsSlugRoute
   '/conversations/$id': typeof AuthenticatedConversationsIdRoute
   '/jobs/$id': typeof AuthenticatedJobsIdRoute
+  '/settings/otel': typeof AuthenticatedSettingsOtelRoute
   '/workflows/$id': typeof AuthenticatedWorkflowsIdRoute
   '/adapters/': typeof AuthenticatedAdaptersIndexRoute
   '/approvals/': typeof AuthenticatedApprovalsIndexRoute
-  '/inbox/': typeof AuthenticatedInboxIndexRoute
-  '/security/': typeof AuthenticatedSecurityIndexRoute
   '/compliance/': typeof AuthenticatedComplianceIndexRoute
   '/fleet/': typeof AuthenticatedFleetIndexRoute
-  '/settings/otel': typeof AuthenticatedSettingsOtelRoute
+  '/inbox/': typeof AuthenticatedInboxIndexRoute
+  '/security/': typeof AuthenticatedSecurityIndexRoute
   '/agents/$id/ratings': typeof AuthenticatedAgentsIdRatingsRoute
   '/agents/$id/benchmarks/$runId': typeof AuthenticatedAgentsIdBenchmarksRunIdRoute
   '/agents/$id/drafts/$draftId': typeof AuthenticatedAgentsIdDraftsDraftIdRouteWithChildren
@@ -278,14 +277,14 @@ export interface FileRoutesByTo {
   '/channels/$slug': typeof AuthenticatedChannelsSlugRoute
   '/conversations/$id': typeof AuthenticatedConversationsIdRoute
   '/jobs/$id': typeof AuthenticatedJobsIdRoute
+  '/settings/otel': typeof AuthenticatedSettingsOtelRoute
   '/workflows/$id': typeof AuthenticatedWorkflowsIdRoute
   '/adapters': typeof AuthenticatedAdaptersIndexRoute
   '/approvals': typeof AuthenticatedApprovalsIndexRoute
-  '/inbox': typeof AuthenticatedInboxIndexRoute
-  '/security': typeof AuthenticatedSecurityIndexRoute
   '/compliance': typeof AuthenticatedComplianceIndexRoute
   '/fleet': typeof AuthenticatedFleetIndexRoute
-  '/settings/otel': typeof AuthenticatedSettingsOtelRoute
+  '/inbox': typeof AuthenticatedInboxIndexRoute
+  '/security': typeof AuthenticatedSecurityIndexRoute
   '/agents/$id/ratings': typeof AuthenticatedAgentsIdRatingsRoute
   '/agents/$id/benchmarks/$runId': typeof AuthenticatedAgentsIdBenchmarksRunIdRoute
   '/agents/$id/drafts/$draftId': typeof AuthenticatedAgentsIdDraftsDraftIdRouteWithChildren
@@ -314,14 +313,14 @@ export interface FileRoutesById {
   '/_authenticated/channels/$slug': typeof AuthenticatedChannelsSlugRoute
   '/_authenticated/conversations/$id': typeof AuthenticatedConversationsIdRoute
   '/_authenticated/jobs/$id': typeof AuthenticatedJobsIdRoute
+  '/_authenticated/settings_/otel': typeof AuthenticatedSettingsOtelRoute
   '/_authenticated/workflows/$id': typeof AuthenticatedWorkflowsIdRoute
   '/_authenticated/adapters/': typeof AuthenticatedAdaptersIndexRoute
   '/_authenticated/approvals/': typeof AuthenticatedApprovalsIndexRoute
-  '/_authenticated/inbox/': typeof AuthenticatedInboxIndexRoute
-  '/_authenticated/security/': typeof AuthenticatedSecurityIndexRoute
   '/_authenticated/compliance/': typeof AuthenticatedComplianceIndexRoute
   '/_authenticated/fleet/': typeof AuthenticatedFleetIndexRoute
-  '/_authenticated/settings_/otel': typeof AuthenticatedSettingsOtelRoute
+  '/_authenticated/inbox/': typeof AuthenticatedInboxIndexRoute
+  '/_authenticated/security/': typeof AuthenticatedSecurityIndexRoute
   '/_authenticated/agents/$id/ratings': typeof AuthenticatedAgentsIdRatingsRoute
   '/_authenticated/agents/$id/benchmarks/$runId': typeof AuthenticatedAgentsIdBenchmarksRunIdRoute
   '/_authenticated/agents/$id/drafts/$draftId': typeof AuthenticatedAgentsIdDraftsDraftIdRouteWithChildren
@@ -350,14 +349,14 @@ export interface FileRouteTypes {
     | '/channels/$slug'
     | '/conversations/$id'
     | '/jobs/$id'
+    | '/settings/otel'
     | '/workflows/$id'
     | '/adapters/'
     | '/approvals/'
-    | '/inbox/'
-    | '/security/'
     | '/compliance/'
     | '/fleet/'
-    | '/settings/otel'
+    | '/inbox/'
+    | '/security/'
     | '/agents/$id/ratings'
     | '/agents/$id/benchmarks/$runId'
     | '/agents/$id/drafts/$draftId'
@@ -384,14 +383,14 @@ export interface FileRouteTypes {
     | '/channels/$slug'
     | '/conversations/$id'
     | '/jobs/$id'
+    | '/settings/otel'
     | '/workflows/$id'
     | '/adapters'
     | '/approvals'
-    | '/inbox'
-    | '/security'
     | '/compliance'
     | '/fleet'
-    | '/settings/otel'
+    | '/inbox'
+    | '/security'
     | '/agents/$id/ratings'
     | '/agents/$id/benchmarks/$runId'
     | '/agents/$id/drafts/$draftId'
@@ -419,14 +418,14 @@ export interface FileRouteTypes {
     | '/_authenticated/channels/$slug'
     | '/_authenticated/conversations/$id'
     | '/_authenticated/jobs/$id'
+    | '/_authenticated/settings_/otel'
     | '/_authenticated/workflows/$id'
     | '/_authenticated/adapters/'
     | '/_authenticated/approvals/'
-    | '/_authenticated/inbox/'
-    | '/_authenticated/security/'
     | '/_authenticated/compliance/'
     | '/_authenticated/fleet/'
-    | '/_authenticated/settings_/otel'
+    | '/_authenticated/inbox/'
+    | '/_authenticated/security/'
     | '/_authenticated/agents/$id/ratings'
     | '/_authenticated/agents/$id/benchmarks/$runId'
     | '/_authenticated/agents/$id/drafts/$draftId'
@@ -553,11 +552,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSecurityIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/compliance/': {
-      id: '/_authenticated/compliance/'
-      path: '/compliance'
-      fullPath: '/compliance/'
-      preLoaderRoute: typeof AuthenticatedComplianceIndexRouteImport
+    '/_authenticated/inbox/': {
+      id: '/_authenticated/inbox/'
+      path: '/inbox'
+      fullPath: '/inbox/'
+      preLoaderRoute: typeof AuthenticatedInboxIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/fleet/': {
@@ -567,18 +566,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedFleetIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/settings_/otel': {
-      id: '/_authenticated/settings_/otel'
-      path: '/settings/otel'
-      fullPath: '/settings/otel'
-      preLoaderRoute: typeof AuthenticatedSettingsOtelRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/inbox/': {
-      id: '/_authenticated/inbox/'
-      path: '/inbox'
-      fullPath: '/inbox/'
-      preLoaderRoute: typeof AuthenticatedInboxIndexRouteImport
+    '/_authenticated/compliance/': {
+      id: '/_authenticated/compliance/'
+      path: '/compliance'
+      fullPath: '/compliance/'
+      preLoaderRoute: typeof AuthenticatedComplianceIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/approvals/': {
@@ -601,6 +593,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/workflows/$id'
       preLoaderRoute: typeof AuthenticatedWorkflowsIdRouteImport
       parentRoute: typeof AuthenticatedWorkflowsRoute
+    }
+    '/_authenticated/settings_/otel': {
+      id: '/_authenticated/settings_/otel'
+      path: '/settings/otel'
+      fullPath: '/settings/otel'
+      preLoaderRoute: typeof AuthenticatedSettingsOtelRouteImport
+      parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/jobs/$id': {
       id: '/_authenticated/jobs/$id'
@@ -791,13 +790,13 @@ interface AuthenticatedRouteChildren {
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedWorkflowsRoute: typeof AuthenticatedWorkflowsRouteWithChildren
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
+  AuthenticatedSettingsOtelRoute: typeof AuthenticatedSettingsOtelRoute
   AuthenticatedAdaptersIndexRoute: typeof AuthenticatedAdaptersIndexRoute
   AuthenticatedApprovalsIndexRoute: typeof AuthenticatedApprovalsIndexRoute
-  AuthenticatedInboxIndexRoute: typeof AuthenticatedInboxIndexRoute
-  AuthenticatedSecurityIndexRoute: typeof AuthenticatedSecurityIndexRoute
   AuthenticatedComplianceIndexRoute: typeof AuthenticatedComplianceIndexRoute
   AuthenticatedFleetIndexRoute: typeof AuthenticatedFleetIndexRoute
-  AuthenticatedSettingsOtelRoute: typeof AuthenticatedSettingsOtelRoute
+  AuthenticatedInboxIndexRoute: typeof AuthenticatedInboxIndexRoute
+  AuthenticatedSecurityIndexRoute: typeof AuthenticatedSecurityIndexRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
@@ -814,13 +813,13 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedWorkflowsRoute: AuthenticatedWorkflowsRouteWithChildren,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
+  AuthenticatedSettingsOtelRoute: AuthenticatedSettingsOtelRoute,
   AuthenticatedAdaptersIndexRoute: AuthenticatedAdaptersIndexRoute,
   AuthenticatedApprovalsIndexRoute: AuthenticatedApprovalsIndexRoute,
-  AuthenticatedInboxIndexRoute: AuthenticatedInboxIndexRoute,
-  AuthenticatedSecurityIndexRoute: AuthenticatedSecurityIndexRoute,
   AuthenticatedComplianceIndexRoute: AuthenticatedComplianceIndexRoute,
   AuthenticatedFleetIndexRoute: AuthenticatedFleetIndexRoute,
-  AuthenticatedSettingsOtelRoute: AuthenticatedSettingsOtelRoute,
+  AuthenticatedInboxIndexRoute: AuthenticatedInboxIndexRoute,
+  AuthenticatedSecurityIndexRoute: AuthenticatedSecurityIndexRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(

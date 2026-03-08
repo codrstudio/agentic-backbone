@@ -100,6 +100,32 @@ export function getUserWithPasswordHash(
   return { config, passwordHash };
 }
 
+export function getUserByEmail(
+  email: string
+): { slug: string; config: UserConfig; passwordHash: string } | null {
+  const dir = usersDir();
+  if (!existsSync(dir)) return null;
+
+  for (const slug of readdirSync(dir)) {
+    const credPath = credentialPath(slug);
+    if (!existsSync(credPath)) continue;
+
+    const credResult = CredentialYmlSchema.safeParse(readYaml(credPath));
+    if (!credResult.success) continue;
+    if (credResult.data.email !== email) continue;
+
+    const passwordHash = credResult.data.password;
+    if (!passwordHash) continue;
+
+    const config = parseUserConfig(slug);
+    if (!config) continue;
+
+    return { slug, config, passwordHash };
+  }
+
+  return null;
+}
+
 export function createUser(
   slug: string,
   displayName: string,

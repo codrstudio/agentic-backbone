@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { sign } from "hono/jwt";
-import { getUserWithPasswordHash, getUser } from "../users/manager.js";
+import { getUserWithPasswordHash, getUser, getUserByEmail } from "../users/manager.js";
 import { verifyPassword } from "../users/password.js";
 
 export const authPublicRoutes = new Hono();
@@ -18,6 +18,7 @@ authPublicRoutes.post("/auth/login", async (c) => {
   }
 
   let role: "sysuser" | "user";
+  let sub: string;
 
   if (username === process.env.SYSUSER) {
     // Sysuser login — validate against env var
@@ -25,9 +26,10 @@ authPublicRoutes.post("/auth/login", async (c) => {
       return c.json({ error: "invalid credentials" }, 401);
     }
     role = "sysuser";
+    sub = username;
   } else {
-    // Regular user login — validate against filesystem
-    const record = getUserWithPasswordHash(username);
+    // Regular user login — lookup by email
+    const record = getUserByEmail(username);
     if (!record) {
       return c.json({ error: "invalid credentials" }, 401);
     }
@@ -35,11 +37,12 @@ authPublicRoutes.post("/auth/login", async (c) => {
       return c.json({ error: "invalid credentials" }, 401);
     }
     role = "user";
+    sub = record.slug;
   }
 
   const now = Math.floor(Date.now() / 1000);
   const payload = {
-    sub: username,
+    sub,
     role,
     iat: now,
     exp: now + 60 * 60 * 24, // 24h

@@ -146,6 +146,16 @@ async function bootstrap() {
     startHeartbeat();
     startCron();
     startWatchers();
+
+    // Warm-up: re-encrypt any files created before watcher started
+    setTimeout(() => {
+      try {
+        encryptAllYamlFiles(CONTEXT_DIR);
+      } catch (err) {
+        console.error("[backbone] encryption warm-up failed:", err);
+      }
+    }, 500);
+
     startJobSweeper();
     startSecurityAnomalyJob();
 

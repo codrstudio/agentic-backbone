@@ -11,7 +11,7 @@ import {
 import { join } from "node:path";
 import yaml from "js-yaml";
 import { db } from "../db/index.js";
-import { systemDir, agentDir } from "../context/paths.js";
+import { userDir, agentDir } from "../context/paths.js";
 import { listAgents } from "../agents/registry.js";
 
 export const workflowRoutes = new Hono();
@@ -53,7 +53,7 @@ export interface Workflow {
 // ── Storage ─────────────────────────────────────────────────────────────────
 
 function workflowsStorageDir(): string {
-  return join(systemDir(), "workflows");
+  return join(userDir("system"), "workflows");
 }
 
 function workflowPath(workflowId: string): string {

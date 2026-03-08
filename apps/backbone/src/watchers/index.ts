@@ -137,9 +137,12 @@ function handleYmlChange(path: string): void {
 
   setTimeout(() => {
     try {
-      encryptYamlFile(path);
-    } catch {
-      // ignore — file may be in-flight
+      const encrypted = encryptYamlFile(path);
+      if (encrypted) {
+        console.log(`[watchers] auto-encrypted: ${path}`);
+      }
+    } catch (err) {
+      console.warn(`[watchers] encryption failed for ${path}:`, err);
     }
   }, DEBOUNCE_MS + 100);
 }

@@ -1,6 +1,6 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { systemDir } from "../context/paths.js";
+import { userDir } from "../context/paths.js";
 
 export interface McpServerConfig {
   enabled: boolean;
@@ -15,7 +15,7 @@ const DEFAULT_CONFIG: McpServerConfig = {
 };
 
 function configPath(): string {
-  return join(systemDir(), "mcp-server.json");
+  return join(userDir("system"), "mcp-server.json");
 }
 
 export function loadMcpServerConfig(): McpServerConfig {
@@ -38,7 +38,7 @@ export function loadMcpServerConfig(): McpServerConfig {
 
 export function saveMcpServerConfig(config: McpServerConfig): void {
   const path = configPath();
-  const dir = systemDir();
+  const dir = userDir("system");
   if (!existsSync(dir)) {
     mkdirSync(dir, { recursive: true });
   }
