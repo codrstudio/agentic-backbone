@@ -467,6 +467,26 @@ db.exec(`
 `);
 
 db.exec(`
+  CREATE TABLE IF NOT EXISTS message_ratings (
+    id            TEXT PRIMARY KEY,
+    session_id    TEXT NOT NULL,
+    message_index INTEGER NOT NULL,
+    agent_id      TEXT NOT NULL,
+    channel_type  TEXT NOT NULL,
+    rating        TEXT NOT NULL,
+    reason        TEXT,
+    reason_cat    TEXT,
+    user_ref      TEXT,
+    rated_at      TEXT NOT NULL DEFAULT (datetime('now')),
+    UNIQUE(session_id, message_index)
+  );
+  CREATE INDEX IF NOT EXISTS idx_ratings_agent ON message_ratings(agent_id);
+  CREATE INDEX IF NOT EXISTS idx_ratings_session ON message_ratings(session_id);
+  CREATE INDEX IF NOT EXISTS idx_ratings_rating ON message_ratings(rating);
+  CREATE INDEX IF NOT EXISTS idx_ratings_rated_at ON message_ratings(rated_at);
+`);
+
+db.exec(`
   CREATE TABLE IF NOT EXISTS mcp_tool_calls (
     id          TEXT PRIMARY KEY,
     agent_id    TEXT NOT NULL,
