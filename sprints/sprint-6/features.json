@@ -209,7 +209,7 @@
     "id": "F-140",
     "name": "Benchmarking: API Endpoints",
     "description": "Implementar endpoints: GET /agents/:id/benchmarks (listar runs com paginacao), POST /agents/:id/benchmarks (trigger manual com evalSetId e compareWithVersion opcionais, response 202 com benchmarkId), GET /agents/:id/benchmarks/:runId (detalhes completos da run), GET /agents/:id/benchmarks/:runId/cases (casos individuais com score_before/after/delta/judge_reasoning), GET /agents/:id/benchmarks/trend (tendencia de score por versao, query param limit default 10).",
-    "status": "pending",
+    "status": "passing",
     "priority": 11,
     "agent": "coder",
     "task": "vibe-code",
@@ -223,7 +223,8 @@
       "GET /agents/:id/benchmarks/:runId/cases retorna casos com judge_reasoning",
       "`npm run typecheck` passa sem erros"
     ],
-    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-6/worktree/sprints/sprint-6/3-prps/PRP-40-agent-performance-benchmarking.md"
+    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-6/worktree/sprints/sprint-6/3-prps/PRP-40-agent-performance-benchmarking.md",
+    "completed_at": "2026-03-08T06:33:59.990Z"
   },
   {
     "id": "F-143",
@@ -311,7 +312,7 @@
     "id": "F-132",
     "name": "Model Routing: Hub — Editor Visual de Regras + Dashboard de Economia",
     "description": "Secao 'Model Routing' em /settings com: toggle habilitar routing, lista de regras globais (nome, condicoes resumidas, modelo, prioridade), botao 'Adicionar regra' com modal de editor (form visual por tipo de condicao), botao 'Simular' com painel de resultado. Secao 'Routing' em /agents/:id/settings com toggle de override e editor de regras especificas do agente. Aba de analytics em /agents/:id com gauge de economia estimada (USD), grafico de pizza de distribuicao por modelo, grafico de barras de regras mais acionadas.",
-    "status": "blocked",
+    "status": "pending",
     "priority": 16,
     "agent": "coder",
     "task": "vibe-code",
