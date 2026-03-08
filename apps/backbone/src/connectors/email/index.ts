@@ -6,6 +6,11 @@ import {
   stopAllEmailPolling,
   pollingStatus,
 } from "./channel-adapter.js";
+import {
+  createEmailSendReplyTool,
+  createEmailGetThreadTool,
+  createEmailCreateDraftTool,
+} from "./tools/index.js";
 
 export const emailConnector: ConnectorDef = {
   slug: "email",
@@ -18,9 +23,14 @@ export const emailConnector: ConnectorDef = {
     return createEmailClient(cred, opts);
   },
 
-  createTools(_adapters) {
-    // Tools are defined in F-134; not part of F-133
-    return null;
+  createTools(adapters) {
+    if (adapters.length === 0) return null;
+    const slugs = adapters.map((a) => a.slug) as [string, ...string[]];
+    return {
+      ...createEmailSendReplyTool(slugs),
+      ...createEmailGetThreadTool(slugs),
+      ...createEmailCreateDraftTool(slugs),
+    };
   },
 
   async start(ctx: ConnectorContext) {

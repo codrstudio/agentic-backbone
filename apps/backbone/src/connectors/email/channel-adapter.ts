@@ -11,6 +11,8 @@ interface EmailPollingState {
   processedMessageIds: string[];
   /** messageId → backbone session_id */
   threadMap: Record<string, string>;
+  /** messageId → stored email metadata (for get_email_thread tool) */
+  emailIndex: Record<string, { from: string; date: string | null; subject: string; body: string }>;
   lastPollAt: string | null;
   processedToday: number;
   lastDayReset: string | null;
@@ -23,7 +25,7 @@ function stateFilePath(adapterId: string): string {
   return join(DATA_DIR, `${adapterId}.json`);
 }
 
-function loadState(adapterId: string): EmailPollingState {
+export function loadState(adapterId: string): EmailPollingState {
   mkdirSync(DATA_DIR, { recursive: true });
   const path = stateFilePath(adapterId);
   if (existsSync(path)) {
@@ -37,6 +39,7 @@ function loadState(adapterId: string): EmailPollingState {
     adapterId,
     processedMessageIds: [],
     threadMap: {},
+    emailIndex: {},
     lastPollAt: null,
     processedToday: 0,
     lastDayReset: null,
@@ -111,6 +114,15 @@ async function processEmail(
 
   // Map this message's ID → session for future thread continuation
   state.threadMap[email.messageId] = activeSession.session_id;
+
+  // Index email metadata for get_email_thread tool
+  if (!state.emailIndex) state.emailIndex = {};
+  state.emailIndex[email.messageId] = {
+    from: email.from,
+    date: email.date ? email.date.toISOString() : null,
+    subject: email.subject,
+    body: email.bodyText,
+  };
 
   // Build XML prompt
   const prompt = buildEmailPrompt(email);

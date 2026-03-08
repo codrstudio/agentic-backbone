@@ -166,7 +166,7 @@
     "id": "F-134",
     "name": "Email: Tools (send-reply, get-thread, create-draft) + API Endpoints de Status",
     "description": "Implementar tools em `src/connectors/email/tools/`: send-reply (envia email com threading correto), get-thread (busca thread por Message-ID), create-draft (cria rascunho sem enviar). Implementar endpoints: POST /adapters/email/:adapterId/test (testa conectividade IMAP e SMTP separados com latencia), GET /adapters/email/:adapterId/status (status do polling, ultima execucao, emails processados hoje, last error).",
-    "status": "pending",
+    "status": "passing",
     "priority": 9,
     "agent": "coder",
     "task": "vibe-code",
@@ -181,7 +181,8 @@
       "GET /adapters/email/:adapterId/status retorna contagem de emails processados hoje",
       "`npm run typecheck` passa sem erros"
     ],
-    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-6/worktree/sprints/sprint-6/3-prps/PRP-38-email-connector.md"
+    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-6/worktree/sprints/sprint-6/3-prps/PRP-38-email-connector.md",
+    "completed_at": "2026-03-08T06:24:01.712159+00:00"
   },
   {
     "id": "F-131",
@@ -247,7 +248,7 @@
     "id": "F-125",
     "name": "MCP: Servidor MCP do Backbone (endpoint SSE para clientes externos)",
     "description": "Criar `src/mcp-server/` com implementacao do servidor MCP via @modelcontextprotocol/sdk. Endpoint GET /mcp/sse (JWT via query param ou header). Tools expostas: list_agents, send_message, get_agent_status, get_agent_memory. Configuracao em `context/system/mcp-server.json` (enabled, allowed_agents, require_auth). Endpoints GET/PUT /settings/mcp-server.",
-    "status": "blocked",
+    "status": "pending",
     "priority": 13,
     "agent": "coder",
     "task": "vibe-code",
