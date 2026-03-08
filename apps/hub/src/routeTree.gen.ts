@@ -27,6 +27,7 @@ import { Route as AuthenticatedAccountRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedSecurityIndexRouteImport } from './routes/_authenticated/security/index'
 import { Route as AuthenticatedComplianceIndexRouteImport } from './routes/_authenticated/compliance/index'
 import { Route as AuthenticatedFleetIndexRouteImport } from './routes/_authenticated/fleet/index'
+import { Route as AuthenticatedSettingsOtelRouteImport } from './routes/_authenticated/settings_.otel'
 import { Route as AuthenticatedInboxIndexRouteImport } from './routes/_authenticated/inbox/index'
 import { Route as AuthenticatedApprovalsIndexRouteImport } from './routes/_authenticated/approvals/index'
 import { Route as AuthenticatedAdaptersIndexRouteImport } from './routes/_authenticated/adapters/index'
@@ -134,6 +135,12 @@ const AuthenticatedFleetIndexRoute =
   AuthenticatedFleetIndexRouteImport.update({
     id: '/fleet/',
     path: '/fleet/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedSettingsOtelRoute =
+  AuthenticatedSettingsOtelRouteImport.update({
+    id: '/_authenticated/settings_/otel',
+    path: '/settings/otel',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
 const AuthenticatedInboxIndexRoute = AuthenticatedInboxIndexRouteImport.update({
@@ -244,6 +251,7 @@ export interface FileRoutesByFullPath {
   '/security/': typeof AuthenticatedSecurityIndexRoute
   '/compliance/': typeof AuthenticatedComplianceIndexRoute
   '/fleet/': typeof AuthenticatedFleetIndexRoute
+  '/settings/otel': typeof AuthenticatedSettingsOtelRoute
   '/agents/$id/ratings': typeof AuthenticatedAgentsIdRatingsRoute
   '/agents/$id/benchmarks/$runId': typeof AuthenticatedAgentsIdBenchmarksRunIdRoute
   '/agents/$id/drafts/$draftId': typeof AuthenticatedAgentsIdDraftsDraftIdRouteWithChildren
@@ -277,6 +285,7 @@ export interface FileRoutesByTo {
   '/security': typeof AuthenticatedSecurityIndexRoute
   '/compliance': typeof AuthenticatedComplianceIndexRoute
   '/fleet': typeof AuthenticatedFleetIndexRoute
+  '/settings/otel': typeof AuthenticatedSettingsOtelRoute
   '/agents/$id/ratings': typeof AuthenticatedAgentsIdRatingsRoute
   '/agents/$id/benchmarks/$runId': typeof AuthenticatedAgentsIdBenchmarksRunIdRoute
   '/agents/$id/drafts/$draftId': typeof AuthenticatedAgentsIdDraftsDraftIdRouteWithChildren
@@ -312,6 +321,7 @@ export interface FileRoutesById {
   '/_authenticated/security/': typeof AuthenticatedSecurityIndexRoute
   '/_authenticated/compliance/': typeof AuthenticatedComplianceIndexRoute
   '/_authenticated/fleet/': typeof AuthenticatedFleetIndexRoute
+  '/_authenticated/settings_/otel': typeof AuthenticatedSettingsOtelRoute
   '/_authenticated/agents/$id/ratings': typeof AuthenticatedAgentsIdRatingsRoute
   '/_authenticated/agents/$id/benchmarks/$runId': typeof AuthenticatedAgentsIdBenchmarksRunIdRoute
   '/_authenticated/agents/$id/drafts/$draftId': typeof AuthenticatedAgentsIdDraftsDraftIdRouteWithChildren
@@ -347,6 +357,7 @@ export interface FileRouteTypes {
     | '/security/'
     | '/compliance/'
     | '/fleet/'
+    | '/settings/otel'
     | '/agents/$id/ratings'
     | '/agents/$id/benchmarks/$runId'
     | '/agents/$id/drafts/$draftId'
@@ -380,6 +391,7 @@ export interface FileRouteTypes {
     | '/security'
     | '/compliance'
     | '/fleet'
+    | '/settings/otel'
     | '/agents/$id/ratings'
     | '/agents/$id/benchmarks/$runId'
     | '/agents/$id/drafts/$draftId'
@@ -414,6 +426,7 @@ export interface FileRouteTypes {
     | '/_authenticated/security/'
     | '/_authenticated/compliance/'
     | '/_authenticated/fleet/'
+    | '/_authenticated/settings_/otel'
     | '/_authenticated/agents/$id/ratings'
     | '/_authenticated/agents/$id/benchmarks/$runId'
     | '/_authenticated/agents/$id/drafts/$draftId'
@@ -552,6 +565,13 @@ declare module '@tanstack/react-router' {
       path: '/fleet'
       fullPath: '/fleet/'
       preLoaderRoute: typeof AuthenticatedFleetIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/settings_/otel': {
+      id: '/_authenticated/settings_/otel'
+      path: '/settings/otel'
+      fullPath: '/settings/otel'
+      preLoaderRoute: typeof AuthenticatedSettingsOtelRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/inbox/': {
@@ -777,6 +797,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedSecurityIndexRoute: typeof AuthenticatedSecurityIndexRoute
   AuthenticatedComplianceIndexRoute: typeof AuthenticatedComplianceIndexRoute
   AuthenticatedFleetIndexRoute: typeof AuthenticatedFleetIndexRoute
+  AuthenticatedSettingsOtelRoute: typeof AuthenticatedSettingsOtelRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
@@ -799,6 +820,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedSecurityIndexRoute: AuthenticatedSecurityIndexRoute,
   AuthenticatedComplianceIndexRoute: AuthenticatedComplianceIndexRoute,
   AuthenticatedFleetIndexRoute: AuthenticatedFleetIndexRoute,
+  AuthenticatedSettingsOtelRoute: AuthenticatedSettingsOtelRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(

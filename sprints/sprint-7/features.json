@@ -346,7 +346,7 @@
     "id": "F-160",
     "name": "OTel: Hub â€” pÃ¡gina /settings/otel com presets",
     "description": "PÃ¡gina /settings/otel: toggle habilitar exportaÃ§Ã£o, campo endpoint URL (placeholder localhost:4318), key-value editor de headers (password), slider sampling rate 0-100%, multi-select filtro por agente, multi-select filtro por tipo operaÃ§Ã£o, botÃ£o Testar ConexÃ£o (feedback visual sucesso/erro + latÃªncia), status card (spans exportados, erros, Ãºltimo export). Presets (botÃµes que preenchem endpoint+headers): Grafana Cloud, Datadog (DD-API-KEY), New Relic (Api-Key), Langfuse, Local Jaeger.",
-    "status": "pending",
+    "status": "passing",
     "priority": 17,
     "agent": "coder",
     "task": "vibe-code",
@@ -360,7 +360,8 @@
       "Filtros por agente e tipo de operaÃ§Ã£o salvam corretamente",
       "`npm run build` e `npm run typecheck` passam sem erros"
     ],
-    "prp_path": "sprints/sprint-7/3-prps/PRP-45-opentelemetry-export.md"
+    "prp_path": "sprints/sprint-7/3-prps/PRP-45-opentelemetry-export.md",
+    "completed_at": "2026-03-08T16:54:38Z"
   },
   {
     "id": "F-161",

@@ -20,6 +20,7 @@ import {
   GitBranch,
   Star,
   Network,
+  Telescope,
 } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -100,6 +101,7 @@ export function AppSidebar() {
   const isSecurityActive = !!matchRoute({ to: "/security", fuzzy: true });
   const isComplianceActive = !!matchRoute({ to: "/compliance", fuzzy: true });
   const isFleetActive = !!matchRoute({ to: "/fleet", fuzzy: true });
+  const isOtelActive = !!matchRoute({ to: "/settings/otel", fuzzy: true });
 
   return (
     <Sidebar>
@@ -218,6 +220,15 @@ export function AppSidebar() {
                 >
                   <Network />
                   <span>Fleet</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  isActive={isOtelActive}
+                  render={<Link to="/settings/otel" />}
+                >
+                  <Telescope />
+                  <span>OpenTelemetry</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>
