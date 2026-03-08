@@ -549,7 +549,7 @@
     "id": "F-116",
     "name": "Conector Slack: estrutura completa (client, routes, channel-adapter, tool)",
     "description": "Criar src/connectors/slack/ com index.ts (ConnectorDef), client.ts (Slack Web API via @slack/web-api), schemas.ts (credential: bot_token, signing_secret, app_token?; options: listen_events, channel_whitelist), routes.ts (POST /connectors/slack/:adapterId/events: validar X-Slack-Signature HMAC, responder url_verification challenge, filtrar por listen_events e channel_whitelist, extrair user/channel/text), channel-adapter.ts (sessao por user+channel, resposta via chat.postMessage), tools/send-message.ts (send_slack_message: {channel, text, thread_ts?} -> {ok, ts}), tools/index.ts. Dependencia npm: @slack/web-api.",
-    "status": "pending",
+    "status": "passing",
     "priority": 26,
     "agent": "coder",
     "task": "vibe-code",
@@ -562,7 +562,8 @@
       "Conector coexiste com conectores existentes sem conflito",
       "`npm run typecheck` passa sem erros"
     ],
-    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-5/worktree/sprints/sprint-5/3-prps/PRP-30-canais-enterprise.md"
+    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-5/worktree/sprints/sprint-5/3-prps/PRP-30-canais-enterprise.md",
+    "completed_at": "2026-03-07T22:50:00Z"
   },
   {
     "id": "F-117",
