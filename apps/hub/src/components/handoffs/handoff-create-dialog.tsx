@@ -85,7 +85,7 @@ export function HandoffCreateDialog({
         <div className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="hc-member">Agente membro *</Label>
-            <Select value={memberId} onValueChange={setMemberId}>
+            <Select value={memberId} onValueChange={(v) => v && setMemberId(v)}>
               <SelectTrigger id="hc-member">
                 <SelectValue placeholder="Selecione um agente" />
               </SelectTrigger>

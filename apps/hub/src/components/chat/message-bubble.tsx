@@ -63,11 +63,11 @@ export function MessageBubble({ message, isStreaming, sessionId, onTrace, messag
           </div>
         )}
 
-        {!isUser && message.metadata?.agentId && (
+        {!isUser && Boolean(message.metadata?.agentId) && (
           <div className="mt-1.5">
             <Badge variant="outline" className="gap-1 text-[10px] px-1.5 py-0">
               <Bot className="size-2.5" />
-              {message.metadata.agentId as string}
+              {message.metadata?.agentId as string}
             </Badge>
           </div>
         )}

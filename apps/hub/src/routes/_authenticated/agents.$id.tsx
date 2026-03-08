@@ -14,6 +14,7 @@ import {
   Webhook,
   GitMerge,
   Gauge,
+  History,
 } from "lucide-react";
 import {
   agentQueryOptions,
@@ -34,6 +35,7 @@ import { QualityTab } from "@/components/quality/quality-tab";
 import { WebhooksTab } from "@/components/webhooks/webhooks-tab";
 import { HandoffsTab } from "@/components/handoffs/handoffs-tab";
 import { QuotasTab } from "@/components/quotas/quotas-tab";
+import { VersionsTab } from "@/components/versions/versions-tab";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { useSSEEvent } from "@/hooks/use-sse";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -51,6 +53,7 @@ const tabs = [
   { value: "webhooks", label: "Webhooks", icon: Webhook },
   { value: "handoffs", label: "Handoffs", icon: GitMerge },
   { value: "quotas", label: "Quotas", icon: Gauge },
+  { value: "versions", label: "Versoes", icon: History },
 ] as const;
 
 type TabValue = (typeof tabs)[number]["value"];
@@ -225,6 +228,9 @@ function AgentDetailPage() {
         </TabsContent>
         <TabsContent value="quotas">
           <QuotasTab agentId={id} />
+        </TabsContent>
+        <TabsContent value="versions">
+          <VersionsTab agentId={id} />
         </TabsContent>
       </Tabs>
     </div>

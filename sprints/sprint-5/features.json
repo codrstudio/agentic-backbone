@@ -455,7 +455,7 @@
     "id": "F-125",
     "name": "Config Versioning: telas Hub — aba Versoes, diff visual, rollback",
     "description": "Nova aba 'Versoes' na pagina do agente. VersionsTab: select de arquivo (SOUL.md, AGENT.md, etc.), lista de versoes com numero/data/autor/tamanho/nota/badge Atual, botoes Ver conteudo/Ver diff/Restaurar por versao. DiffModal: diff visual linha a linha (verde=adicionado, vermelho=removido, cinza=inalterado), botao Restaurar no rodape. RollbackDialog: confirmacao descritiva com numero de versao e data. Editor existente de agente: campo opcional 'Nota sobre esta mudanca' ao salvar (enviado no change_note da versao).",
-    "status": "blocked",
+    "status": "passing",
     "priority": 22,
     "agent": "coder",
     "task": "vibe-code",
@@ -471,13 +471,14 @@
       "Campo 'Nota sobre esta mudanca' ao salvar arquivo e persistido no change_note",
       "`npm run build:hub` e `npm run typecheck` passam sem erros"
     ],
-    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-5/worktree/sprints/sprint-5/3-prps/PRP-32-config-versioning.md"
+    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-5/worktree/sprints/sprint-5/3-prps/PRP-32-config-versioning.md",
+    "completed_at": "2026-03-08T00:41:21Z"
   },
   {
     "id": "F-120",
     "name": "Agent Sandbox: endpoints de rascunhos + modelo de filesystem",
     "description": "Criar modelo de filesystem context/agents/{owner}.{slug}/drafts/{draftId}/ com AGENT.md, SOUL.md (e outros .md existentes) + draft.json (id, agentId, label, createdAt, updatedAt, status). Criar apps/backbone/src/routes/drafts.ts com: GET/POST /agents/:agentId/drafts, GET/PATCH/DELETE /drafts/:draftId, POST /drafts/:draftId/publish (cria versao F-123, copia arquivos, hot reload, retorna {publishedAt, versionId}), POST /drafts/:draftId/chat (SSE, runAgent com contexto do rascunho, sem persistir sessao em SQLite), POST /drafts/:draftId/compare (executa em paralelo prod+rascunho, retorna ambas respostas). Criar apps/hub/src/api/drafts.ts com draftsQueryOptions.",
-    "status": "blocked",
+    "status": "pending",
     "priority": 23,
     "agent": "coder",
     "task": "vibe-code",
