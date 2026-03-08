@@ -369,7 +369,7 @@
     "id": "F-114",
     "name": "Rate Limiting: endpoints de gestao de quotas + API Hub",
     "description": "Criar apps/backbone/src/routes/quotas.ts com: GET /agents/:agentId/quota (config + consumo atual em JSON com pctUsed calculado), PUT (atualizar config no DB), DELETE (remover override DB), POST /quota/reset (zerar janela atual). Response do GET inclui config, usage.hourly e usage.daily com pctUsed. Montar rotas no index.ts. Criar apps/hub/src/api/quotas.ts com quotaQueryOptions.",
-    "status": "pending",
+    "status": "passing",
     "priority": 18,
     "agent": "coder",
     "task": "vibe-code",
@@ -383,7 +383,8 @@
       "POST /quota/reset zera consumo da janela atual",
       "`npm run typecheck` passa sem erros"
     ],
-    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-5/worktree/sprints/sprint-5/3-prps/PRP-29-rate-limiting-quotas.md"
+    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-5/worktree/sprints/sprint-5/3-prps/PRP-29-rate-limiting-quotas.md",
+    "completed_at": "2026-03-08T00:13:50.019Z"
   },
   {
     "id": "F-115",
