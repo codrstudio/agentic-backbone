@@ -164,7 +164,12 @@ function invalidateByEvent(event: SystemEvent) {
         queryClient.invalidateQueries({ queryKey: ["circuit-breaker", agentId] });
       }
       queryClient.invalidateQueries({ queryKey: ["circuit-breaker", "system"] });
+      queryClient.invalidateQueries({ queryKey: ["fleet"] });
       break;
     }
+    case "fleet:agent_status":
+    case "fleet:alert":
+      queryClient.invalidateQueries({ queryKey: ["fleet"] });
+      break;
   }
 }

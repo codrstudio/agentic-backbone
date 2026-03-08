@@ -26,6 +26,7 @@ import { Route as AuthenticatedAgentsRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedAccountRouteImport } from './routes/_authenticated/account'
 import { Route as AuthenticatedSecurityIndexRouteImport } from './routes/_authenticated/security/index'
 import { Route as AuthenticatedComplianceIndexRouteImport } from './routes/_authenticated/compliance/index'
+import { Route as AuthenticatedFleetIndexRouteImport } from './routes/_authenticated/fleet/index'
 import { Route as AuthenticatedInboxIndexRouteImport } from './routes/_authenticated/inbox/index'
 import { Route as AuthenticatedApprovalsIndexRouteImport } from './routes/_authenticated/approvals/index'
 import { Route as AuthenticatedAdaptersIndexRouteImport } from './routes/_authenticated/adapters/index'
@@ -127,6 +128,12 @@ const AuthenticatedComplianceIndexRoute =
   AuthenticatedComplianceIndexRouteImport.update({
     id: '/compliance/',
     path: '/compliance/',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedFleetIndexRoute =
+  AuthenticatedFleetIndexRouteImport.update({
+    id: '/fleet/',
+    path: '/fleet/',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
 const AuthenticatedInboxIndexRoute = AuthenticatedInboxIndexRouteImport.update({
@@ -236,6 +243,7 @@ export interface FileRoutesByFullPath {
   '/inbox/': typeof AuthenticatedInboxIndexRoute
   '/security/': typeof AuthenticatedSecurityIndexRoute
   '/compliance/': typeof AuthenticatedComplianceIndexRoute
+  '/fleet/': typeof AuthenticatedFleetIndexRoute
   '/agents/$id/ratings': typeof AuthenticatedAgentsIdRatingsRoute
   '/agents/$id/benchmarks/$runId': typeof AuthenticatedAgentsIdBenchmarksRunIdRoute
   '/agents/$id/drafts/$draftId': typeof AuthenticatedAgentsIdDraftsDraftIdRouteWithChildren
@@ -268,6 +276,7 @@ export interface FileRoutesByTo {
   '/inbox': typeof AuthenticatedInboxIndexRoute
   '/security': typeof AuthenticatedSecurityIndexRoute
   '/compliance': typeof AuthenticatedComplianceIndexRoute
+  '/fleet': typeof AuthenticatedFleetIndexRoute
   '/agents/$id/ratings': typeof AuthenticatedAgentsIdRatingsRoute
   '/agents/$id/benchmarks/$runId': typeof AuthenticatedAgentsIdBenchmarksRunIdRoute
   '/agents/$id/drafts/$draftId': typeof AuthenticatedAgentsIdDraftsDraftIdRouteWithChildren
@@ -302,6 +311,7 @@ export interface FileRoutesById {
   '/_authenticated/inbox/': typeof AuthenticatedInboxIndexRoute
   '/_authenticated/security/': typeof AuthenticatedSecurityIndexRoute
   '/_authenticated/compliance/': typeof AuthenticatedComplianceIndexRoute
+  '/_authenticated/fleet/': typeof AuthenticatedFleetIndexRoute
   '/_authenticated/agents/$id/ratings': typeof AuthenticatedAgentsIdRatingsRoute
   '/_authenticated/agents/$id/benchmarks/$runId': typeof AuthenticatedAgentsIdBenchmarksRunIdRoute
   '/_authenticated/agents/$id/drafts/$draftId': typeof AuthenticatedAgentsIdDraftsDraftIdRouteWithChildren
@@ -336,6 +346,7 @@ export interface FileRouteTypes {
     | '/inbox/'
     | '/security/'
     | '/compliance/'
+    | '/fleet/'
     | '/agents/$id/ratings'
     | '/agents/$id/benchmarks/$runId'
     | '/agents/$id/drafts/$draftId'
@@ -368,6 +379,7 @@ export interface FileRouteTypes {
     | '/inbox'
     | '/security'
     | '/compliance'
+    | '/fleet'
     | '/agents/$id/ratings'
     | '/agents/$id/benchmarks/$runId'
     | '/agents/$id/drafts/$draftId'
@@ -401,6 +413,7 @@ export interface FileRouteTypes {
     | '/_authenticated/inbox/'
     | '/_authenticated/security/'
     | '/_authenticated/compliance/'
+    | '/_authenticated/fleet/'
     | '/_authenticated/agents/$id/ratings'
     | '/_authenticated/agents/$id/benchmarks/$runId'
     | '/_authenticated/agents/$id/drafts/$draftId'
@@ -532,6 +545,13 @@ declare module '@tanstack/react-router' {
       path: '/compliance'
       fullPath: '/compliance/'
       preLoaderRoute: typeof AuthenticatedComplianceIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/fleet/': {
+      id: '/_authenticated/fleet/'
+      path: '/fleet'
+      fullPath: '/fleet/'
+      preLoaderRoute: typeof AuthenticatedFleetIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/inbox/': {
@@ -756,6 +776,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedInboxIndexRoute: typeof AuthenticatedInboxIndexRoute
   AuthenticatedSecurityIndexRoute: typeof AuthenticatedSecurityIndexRoute
   AuthenticatedComplianceIndexRoute: typeof AuthenticatedComplianceIndexRoute
+  AuthenticatedFleetIndexRoute: typeof AuthenticatedFleetIndexRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
@@ -777,6 +798,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedInboxIndexRoute: AuthenticatedInboxIndexRoute,
   AuthenticatedSecurityIndexRoute: AuthenticatedSecurityIndexRoute,
   AuthenticatedComplianceIndexRoute: AuthenticatedComplianceIndexRoute,
+  AuthenticatedFleetIndexRoute: AuthenticatedFleetIndexRoute,
 }
 
 const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(

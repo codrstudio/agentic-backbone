@@ -19,6 +19,7 @@ import {
   UserCircle,
   GitBranch,
   Star,
+  Network,
 } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -98,6 +99,7 @@ export function AppSidebar() {
   const isAdaptersActive = !!matchRoute({ to: "/adapters", fuzzy: true });
   const isSecurityActive = !!matchRoute({ to: "/security", fuzzy: true });
   const isComplianceActive = !!matchRoute({ to: "/compliance", fuzzy: true });
+  const isFleetActive = !!matchRoute({ to: "/fleet", fuzzy: true });
 
   return (
     <Sidebar>
@@ -207,6 +209,15 @@ export function AppSidebar() {
                 >
                   <ClipboardCheck />
                   <span>Conformidade</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  isActive={isFleetActive}
+                  render={<Link to="/fleet" />}
+                >
+                  <Network />
+                  <span>Fleet</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>

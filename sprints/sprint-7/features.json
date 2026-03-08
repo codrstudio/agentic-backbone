@@ -260,7 +260,7 @@
     "id": "F-156",
     "name": "Fleet: Hub — página /fleet com grid, filtros e operações em lote",
     "description": "Página /fleet: header com 4 cards de resumo (Total, Ativos, Problemas, Custo Hoje), barra de filtros (Owner, Status, busca por nome), botões de ordenação. Grid desktop: tabela densa com checkbox, nome, owner, status badge, saúde %, tokens, custo, último heartbeat, alertas, ações dropdown. Cards mobile: card por agente com info compacta. Seleção multi-agent habilita barra de ações em lote (Enable, Disable, Kill, Trigger Heartbeat). SSE: conecta /system/events, atualiza ao receber fleet:* e circuit_breaker:*. Status badges: Ativo (verde), Pausado (cinza), Alerta (amarelo), Parado (vermelho), Erro (laranja).",
-    "status": "blocked",
+    "status": "passing",
     "priority": 13,
     "agent": "coder",
     "task": "vibe-code",
@@ -276,7 +276,8 @@
       "Layout responsivo: tabela no desktop, cards no mobile",
       "`npm run build` e `npm run typecheck` passam sem erros"
     ],
-    "prp_path": "sprints/sprint-7/3-prps/PRP-44-fleet-management-dashboard.md"
+    "prp_path": "sprints/sprint-7/3-prps/PRP-44-fleet-management-dashboard.md",
+    "completed_at": "2026-03-08T16:30:00Z"
   },
   {
     "id": "F-157",
