@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
+import { Route as AuthenticatedWorkflowsRouteImport } from './routes/_authenticated/workflows'
 import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
 import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authenticated/notifications'
 import { Route as AuthenticatedJobsRouteImport } from './routes/_authenticated/jobs'
@@ -26,6 +27,7 @@ import { Route as AuthenticatedSecurityIndexRouteImport } from './routes/_authen
 import { Route as AuthenticatedInboxIndexRouteImport } from './routes/_authenticated/inbox/index'
 import { Route as AuthenticatedApprovalsIndexRouteImport } from './routes/_authenticated/approvals/index'
 import { Route as AuthenticatedAdaptersIndexRouteImport } from './routes/_authenticated/adapters/index'
+import { Route as AuthenticatedWorkflowsIdRouteImport } from './routes/_authenticated/workflows.$id'
 import { Route as AuthenticatedJobsIdRouteImport } from './routes/_authenticated/jobs.$id'
 import { Route as AuthenticatedConversationsIdRouteImport } from './routes/_authenticated/conversations.$id'
 import { Route as AuthenticatedChannelsSlugRouteImport } from './routes/_authenticated/channels.$slug'
@@ -48,6 +50,11 @@ const AuthenticatedRoute = AuthenticatedRouteImport.update({
 const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedWorkflowsRoute = AuthenticatedWorkflowsRouteImport.update({
+  id: '/workflows',
+  path: '/workflows',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
@@ -125,6 +132,12 @@ const AuthenticatedAdaptersIndexRoute =
     path: '/adapters/',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedWorkflowsIdRoute =
+  AuthenticatedWorkflowsIdRouteImport.update({
+    id: '/$id',
+    path: '/$id',
+    getParentRoute: () => AuthenticatedWorkflowsRoute,
+  } as any)
 const AuthenticatedJobsIdRoute = AuthenticatedJobsIdRouteImport.update({
   id: '/$id',
   path: '/$id',
@@ -190,11 +203,13 @@ export interface FileRoutesByFullPath {
   '/jobs': typeof AuthenticatedJobsRouteWithChildren
   '/notifications': typeof AuthenticatedNotificationsRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/workflows': typeof AuthenticatedWorkflowsRouteWithChildren
   '/agents/$id': typeof AuthenticatedAgentsIdRouteWithChildren
   '/agents/new': typeof AuthenticatedAgentsNewRoute
   '/channels/$slug': typeof AuthenticatedChannelsSlugRoute
   '/conversations/$id': typeof AuthenticatedConversationsIdRoute
   '/jobs/$id': typeof AuthenticatedJobsIdRoute
+  '/workflows/$id': typeof AuthenticatedWorkflowsIdRoute
   '/adapters/': typeof AuthenticatedAdaptersIndexRoute
   '/approvals/': typeof AuthenticatedApprovalsIndexRoute
   '/inbox/': typeof AuthenticatedInboxIndexRoute
@@ -216,12 +231,14 @@ export interface FileRoutesByTo {
   '/jobs': typeof AuthenticatedJobsRouteWithChildren
   '/notifications': typeof AuthenticatedNotificationsRoute
   '/settings': typeof AuthenticatedSettingsRoute
+  '/workflows': typeof AuthenticatedWorkflowsRouteWithChildren
   '/': typeof AuthenticatedIndexRoute
   '/agents/$id': typeof AuthenticatedAgentsIdRouteWithChildren
   '/agents/new': typeof AuthenticatedAgentsNewRoute
   '/channels/$slug': typeof AuthenticatedChannelsSlugRoute
   '/conversations/$id': typeof AuthenticatedConversationsIdRoute
   '/jobs/$id': typeof AuthenticatedJobsIdRoute
+  '/workflows/$id': typeof AuthenticatedWorkflowsIdRoute
   '/adapters': typeof AuthenticatedAdaptersIndexRoute
   '/approvals': typeof AuthenticatedApprovalsIndexRoute
   '/inbox': typeof AuthenticatedInboxIndexRoute
@@ -245,12 +262,14 @@ export interface FileRoutesById {
   '/_authenticated/jobs': typeof AuthenticatedJobsRouteWithChildren
   '/_authenticated/notifications': typeof AuthenticatedNotificationsRoute
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
+  '/_authenticated/workflows': typeof AuthenticatedWorkflowsRouteWithChildren
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/_authenticated/agents/$id': typeof AuthenticatedAgentsIdRouteWithChildren
   '/_authenticated/agents/new': typeof AuthenticatedAgentsNewRoute
   '/_authenticated/channels/$slug': typeof AuthenticatedChannelsSlugRoute
   '/_authenticated/conversations/$id': typeof AuthenticatedConversationsIdRoute
   '/_authenticated/jobs/$id': typeof AuthenticatedJobsIdRoute
+  '/_authenticated/workflows/$id': typeof AuthenticatedWorkflowsIdRoute
   '/_authenticated/adapters/': typeof AuthenticatedAdaptersIndexRoute
   '/_authenticated/approvals/': typeof AuthenticatedApprovalsIndexRoute
   '/_authenticated/inbox/': typeof AuthenticatedInboxIndexRoute
@@ -275,11 +294,13 @@ export interface FileRouteTypes {
     | '/jobs'
     | '/notifications'
     | '/settings'
+    | '/workflows'
     | '/agents/$id'
     | '/agents/new'
     | '/channels/$slug'
     | '/conversations/$id'
     | '/jobs/$id'
+    | '/workflows/$id'
     | '/adapters/'
     | '/approvals/'
     | '/inbox/'
@@ -301,12 +322,14 @@ export interface FileRouteTypes {
     | '/jobs'
     | '/notifications'
     | '/settings'
+    | '/workflows'
     | '/'
     | '/agents/$id'
     | '/agents/new'
     | '/channels/$slug'
     | '/conversations/$id'
     | '/jobs/$id'
+    | '/workflows/$id'
     | '/adapters'
     | '/approvals'
     | '/inbox'
@@ -329,12 +352,14 @@ export interface FileRouteTypes {
     | '/_authenticated/jobs'
     | '/_authenticated/notifications'
     | '/_authenticated/settings'
+    | '/_authenticated/workflows'
     | '/_authenticated/'
     | '/_authenticated/agents/$id'
     | '/_authenticated/agents/new'
     | '/_authenticated/channels/$slug'
     | '/_authenticated/conversations/$id'
     | '/_authenticated/jobs/$id'
+    | '/_authenticated/workflows/$id'
     | '/_authenticated/adapters/'
     | '/_authenticated/approvals/'
     | '/_authenticated/inbox/'
@@ -371,6 +396,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof AuthenticatedIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/workflows': {
+      id: '/_authenticated/workflows'
+      path: '/workflows'
+      fullPath: '/workflows'
+      preLoaderRoute: typeof AuthenticatedWorkflowsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/settings': {
@@ -470,6 +502,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/adapters/'
       preLoaderRoute: typeof AuthenticatedAdaptersIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/workflows/$id': {
+      id: '/_authenticated/workflows/$id'
+      path: '/$id'
+      fullPath: '/workflows/$id'
+      preLoaderRoute: typeof AuthenticatedWorkflowsIdRouteImport
+      parentRoute: typeof AuthenticatedWorkflowsRoute
     }
     '/_authenticated/jobs/$id': {
       id: '/_authenticated/jobs/$id'
@@ -622,6 +661,20 @@ const AuthenticatedJobsRouteChildren: AuthenticatedJobsRouteChildren = {
 const AuthenticatedJobsRouteWithChildren =
   AuthenticatedJobsRoute._addFileChildren(AuthenticatedJobsRouteChildren)
 
+interface AuthenticatedWorkflowsRouteChildren {
+  AuthenticatedWorkflowsIdRoute: typeof AuthenticatedWorkflowsIdRoute
+}
+
+const AuthenticatedWorkflowsRouteChildren: AuthenticatedWorkflowsRouteChildren =
+  {
+    AuthenticatedWorkflowsIdRoute: AuthenticatedWorkflowsIdRoute,
+  }
+
+const AuthenticatedWorkflowsRouteWithChildren =
+  AuthenticatedWorkflowsRoute._addFileChildren(
+    AuthenticatedWorkflowsRouteChildren,
+  )
+
 interface AuthenticatedRouteChildren {
   AuthenticatedAccountRoute: typeof AuthenticatedAccountRoute
   AuthenticatedAgentsRoute: typeof AuthenticatedAgentsRouteWithChildren
@@ -633,6 +686,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedJobsRoute: typeof AuthenticatedJobsRouteWithChildren
   AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
+  AuthenticatedWorkflowsRoute: typeof AuthenticatedWorkflowsRouteWithChildren
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
   AuthenticatedAdaptersIndexRoute: typeof AuthenticatedAdaptersIndexRoute
   AuthenticatedApprovalsIndexRoute: typeof AuthenticatedApprovalsIndexRoute
@@ -651,6 +705,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedJobsRoute: AuthenticatedJobsRouteWithChildren,
   AuthenticatedNotificationsRoute: AuthenticatedNotificationsRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
+  AuthenticatedWorkflowsRoute: AuthenticatedWorkflowsRouteWithChildren,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
   AuthenticatedAdaptersIndexRoute: AuthenticatedAdaptersIndexRoute,
   AuthenticatedApprovalsIndexRoute: AuthenticatedApprovalsIndexRoute,

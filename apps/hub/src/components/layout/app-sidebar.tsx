@@ -16,6 +16,7 @@ import {
   Plug,
   Inbox,
   UserCircle,
+  GitBranch,
 } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -42,6 +43,7 @@ const navItemsBefore = [
 
 const navItemsAfter = [
   { label: "Agentes", icon: Bot, to: "/agents" as const },
+  { label: "Workflows", icon: GitBranch, to: "/workflows" as const },
   { label: "Conversas", icon: MessageSquare, to: "/conversations" as const },
   { label: "Canais", icon: Radio, to: "/channels" as const },
   { label: "Agenda", icon: Calendar, to: "/cron" as const },
