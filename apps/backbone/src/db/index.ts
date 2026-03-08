@@ -450,4 +450,20 @@ db.exec(`
   CREATE UNIQUE INDEX IF NOT EXISTS idx_quota_usage_agent_window ON agent_quota_usage(agent_id, window_type, window_start);
 `);
 
+db.exec(`
+  CREATE TABLE IF NOT EXISTS config_versions (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    agent_id    TEXT NOT NULL,
+    file_name   TEXT NOT NULL,
+    version_num INTEGER NOT NULL,
+    file_path   TEXT NOT NULL,
+    size_bytes  INTEGER,
+    change_note TEXT,
+    eval_run_id INTEGER,
+    created_at  TEXT NOT NULL DEFAULT (datetime('now')),
+    created_by  TEXT
+  );
+  CREATE INDEX IF NOT EXISTS idx_versions_agent_file ON config_versions(agent_id, file_name);
+`);
+
 export { db };
