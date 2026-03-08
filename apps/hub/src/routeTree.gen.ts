@@ -37,6 +37,7 @@ import { Route as AuthenticatedAgentsIdRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedAgentsIdRatingsRouteImport } from './routes/_authenticated/agents.$id.ratings'
 import { Route as AuthenticatedAgentsIdEvalRunsRunIdRouteImport } from './routes/_authenticated/agents.$id.eval-runs.$runId'
 import { Route as AuthenticatedAgentsIdDraftsDraftIdRouteImport } from './routes/_authenticated/agents.$id.drafts.$draftId'
+import { Route as AuthenticatedAgentsIdBenchmarksRunIdRouteImport } from './routes/_authenticated/agents.$id.benchmarks.$runId'
 import { Route as AuthenticatedAgentsIdDraftsDraftIdCompareRouteImport } from './routes/_authenticated/agents.$id.drafts.$draftId.compare'
 
 const LoginRoute = LoginRouteImport.update({
@@ -189,6 +190,12 @@ const AuthenticatedAgentsIdDraftsDraftIdRoute =
     path: '/drafts/$draftId',
     getParentRoute: () => AuthenticatedAgentsIdRoute,
   } as any)
+const AuthenticatedAgentsIdBenchmarksRunIdRoute =
+  AuthenticatedAgentsIdBenchmarksRunIdRouteImport.update({
+    id: '/benchmarks/$runId',
+    path: '/benchmarks/$runId',
+    getParentRoute: () => AuthenticatedAgentsIdRoute,
+  } as any)
 const AuthenticatedAgentsIdDraftsDraftIdCompareRoute =
   AuthenticatedAgentsIdDraftsDraftIdCompareRouteImport.update({
     id: '/compare',
@@ -222,6 +229,7 @@ export interface FileRoutesByFullPath {
   '/inbox/': typeof AuthenticatedInboxIndexRoute
   '/security/': typeof AuthenticatedSecurityIndexRoute
   '/agents/$id/ratings': typeof AuthenticatedAgentsIdRatingsRoute
+  '/agents/$id/benchmarks/$runId': typeof AuthenticatedAgentsIdBenchmarksRunIdRoute
   '/agents/$id/drafts/$draftId': typeof AuthenticatedAgentsIdDraftsDraftIdRouteWithChildren
   '/agents/$id/eval-runs/$runId': typeof AuthenticatedAgentsIdEvalRunsRunIdRoute
   '/agents/$id/drafts/$draftId/compare': typeof AuthenticatedAgentsIdDraftsDraftIdCompareRoute
@@ -252,6 +260,7 @@ export interface FileRoutesByTo {
   '/inbox': typeof AuthenticatedInboxIndexRoute
   '/security': typeof AuthenticatedSecurityIndexRoute
   '/agents/$id/ratings': typeof AuthenticatedAgentsIdRatingsRoute
+  '/agents/$id/benchmarks/$runId': typeof AuthenticatedAgentsIdBenchmarksRunIdRoute
   '/agents/$id/drafts/$draftId': typeof AuthenticatedAgentsIdDraftsDraftIdRouteWithChildren
   '/agents/$id/eval-runs/$runId': typeof AuthenticatedAgentsIdEvalRunsRunIdRoute
   '/agents/$id/drafts/$draftId/compare': typeof AuthenticatedAgentsIdDraftsDraftIdCompareRoute
@@ -284,6 +293,7 @@ export interface FileRoutesById {
   '/_authenticated/inbox/': typeof AuthenticatedInboxIndexRoute
   '/_authenticated/security/': typeof AuthenticatedSecurityIndexRoute
   '/_authenticated/agents/$id/ratings': typeof AuthenticatedAgentsIdRatingsRoute
+  '/_authenticated/agents/$id/benchmarks/$runId': typeof AuthenticatedAgentsIdBenchmarksRunIdRoute
   '/_authenticated/agents/$id/drafts/$draftId': typeof AuthenticatedAgentsIdDraftsDraftIdRouteWithChildren
   '/_authenticated/agents/$id/eval-runs/$runId': typeof AuthenticatedAgentsIdEvalRunsRunIdRoute
   '/_authenticated/agents/$id/drafts/$draftId/compare': typeof AuthenticatedAgentsIdDraftsDraftIdCompareRoute
@@ -316,6 +326,7 @@ export interface FileRouteTypes {
     | '/inbox/'
     | '/security/'
     | '/agents/$id/ratings'
+    | '/agents/$id/benchmarks/$runId'
     | '/agents/$id/drafts/$draftId'
     | '/agents/$id/eval-runs/$runId'
     | '/agents/$id/drafts/$draftId/compare'
@@ -346,6 +357,7 @@ export interface FileRouteTypes {
     | '/inbox'
     | '/security'
     | '/agents/$id/ratings'
+    | '/agents/$id/benchmarks/$runId'
     | '/agents/$id/drafts/$draftId'
     | '/agents/$id/eval-runs/$runId'
     | '/agents/$id/drafts/$draftId/compare'
@@ -377,6 +389,7 @@ export interface FileRouteTypes {
     | '/_authenticated/inbox/'
     | '/_authenticated/security/'
     | '/_authenticated/agents/$id/ratings'
+    | '/_authenticated/agents/$id/benchmarks/$runId'
     | '/_authenticated/agents/$id/drafts/$draftId'
     | '/_authenticated/agents/$id/eval-runs/$runId'
     | '/_authenticated/agents/$id/drafts/$draftId/compare'
@@ -585,6 +598,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAgentsIdDraftsDraftIdRouteImport
       parentRoute: typeof AuthenticatedAgentsIdRoute
     }
+    '/_authenticated/agents/$id/benchmarks/$runId': {
+      id: '/_authenticated/agents/$id/benchmarks/$runId'
+      path: '/benchmarks/$runId'
+      fullPath: '/agents/$id/benchmarks/$runId'
+      preLoaderRoute: typeof AuthenticatedAgentsIdBenchmarksRunIdRouteImport
+      parentRoute: typeof AuthenticatedAgentsIdRoute
+    }
     '/_authenticated/agents/$id/drafts/$draftId/compare': {
       id: '/_authenticated/agents/$id/drafts/$draftId/compare'
       path: '/compare'
@@ -612,12 +632,15 @@ const AuthenticatedAgentsIdDraftsDraftIdRouteWithChildren =
 
 interface AuthenticatedAgentsIdRouteChildren {
   AuthenticatedAgentsIdRatingsRoute: typeof AuthenticatedAgentsIdRatingsRoute
+  AuthenticatedAgentsIdBenchmarksRunIdRoute: typeof AuthenticatedAgentsIdBenchmarksRunIdRoute
   AuthenticatedAgentsIdDraftsDraftIdRoute: typeof AuthenticatedAgentsIdDraftsDraftIdRouteWithChildren
   AuthenticatedAgentsIdEvalRunsRunIdRoute: typeof AuthenticatedAgentsIdEvalRunsRunIdRoute
 }
 
 const AuthenticatedAgentsIdRouteChildren: AuthenticatedAgentsIdRouteChildren = {
   AuthenticatedAgentsIdRatingsRoute: AuthenticatedAgentsIdRatingsRoute,
+  AuthenticatedAgentsIdBenchmarksRunIdRoute:
+    AuthenticatedAgentsIdBenchmarksRunIdRoute,
   AuthenticatedAgentsIdDraftsDraftIdRoute:
     AuthenticatedAgentsIdDraftsDraftIdRouteWithChildren,
   AuthenticatedAgentsIdEvalRunsRunIdRoute:

@@ -19,6 +19,9 @@ import {
   Plug,
   GitBranch,
   Mail,
+  BarChart3,
+  TrendingDown,
+  TrendingUp,
 } from "lucide-react";
 import {
   agentQueryOptions,
@@ -27,6 +30,7 @@ import {
 } from "@/api/agents";
 import type { HeartbeatLogEntry } from "@/api/agents";
 import { agentRatingsSummaryQueryOptions } from "@/api/ratings";
+import { benchmarkLatestQueryOptions } from "@/api/benchmarks";
 import { cn } from "@/lib/utils";
 import { AgentMetrics } from "@/components/agents/agent-metrics";
 import { HeartbeatTimeline } from "@/components/agents/heartbeat-timeline";
@@ -46,6 +50,7 @@ import { SandboxTab } from "@/components/sandbox/sandbox-tab";
 import { McpToolsTab } from "@/components/mcp/mcp-tools-tab";
 import { RoutingAnalyticsTab } from "@/components/routing/routing-analytics-tab";
 import { EmailChannelsTab } from "@/components/email/email-channels-tab";
+import { BenchmarkTab } from "@/components/agents/benchmark-tab";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { useSSEEvent } from "@/hooks/use-sse";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -68,6 +73,7 @@ const tabs = [
   { value: "mcp-tools", label: "MCP Tools", icon: Plug },
   { value: "routing", label: "Routing", icon: GitBranch },
   { value: "channels", label: "Canais", icon: Mail },
+  { value: "benchmarks", label: "Benchmarks", icon: BarChart3 },
 ] as const;
 
 type TabValue = (typeof tabs)[number]["value"];
@@ -106,6 +112,7 @@ function AgentDetailPage() {
     agentHeartbeatHistoryQueryOptions(id),
   );
   const { data: ratingsSummary } = useQuery(agentRatingsSummaryQueryOptions(id));
+  const { data: latestBenchmark } = useQuery(benchmarkLatestQueryOptions(id));
 
   const [sseEntries, setSseEntries] = useState<HeartbeatLogEntry[]>([]);
 
@@ -200,6 +207,42 @@ function AgentDetailPage() {
               {Math.round(ratingsSummary.approvalRate * 100)}% aprovacao
             </Link>
           )}
+          {/* Benchmark health badge */}
+          {latestBenchmark == null ? (
+            <button
+              onClick={() => handleTabChange("benchmarks")}
+              className="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400 hover:opacity-80 transition-opacity"
+            >
+              <BarChart3 className="size-3" />
+              Sem benchmark
+            </button>
+          ) : latestBenchmark.regression ? (
+            <Link
+              to="/agents/$id/benchmarks/$runId"
+              params={{ id, runId: latestBenchmark.id }}
+              className="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 hover:opacity-80 transition-opacity"
+            >
+              <TrendingDown className="size-3" />
+              Regressao detectada
+            </Link>
+          ) : latestBenchmark.delta != null && latestBenchmark.delta > 0.005 ? (
+            <Link
+              to="/agents/$id/benchmarks/$runId"
+              params={{ id, runId: latestBenchmark.id }}
+              className="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 hover:opacity-80 transition-opacity"
+            >
+              <TrendingUp className="size-3" />
+              Score melhorou
+            </Link>
+          ) : (
+            <button
+              onClick={() => handleTabChange("benchmarks")}
+              className="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400 hover:opacity-80 transition-opacity"
+            >
+              <BarChart3 className="size-3" />
+              Sem benchmark
+            </button>
+          )}
         </div>
       </div>
 
@@ -274,6 +317,9 @@ function AgentDetailPage() {
         </TabsContent>
         <TabsContent value="channels">
           <EmailChannelsTab agentId={id} />
+        </TabsContent>
+        <TabsContent value="benchmarks">
+          <BenchmarkTab agentId={id} />
         </TabsContent>
       </Tabs>
     </div>
