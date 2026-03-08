@@ -41,7 +41,7 @@
     "id": "F-130",
     "name": "Model Routing: Migracao DB + resolveModel() com RoutingContext",
     "description": "Adicionar colunas `model_used TEXT` e `routing_rule TEXT` em `heartbeat_log` e `cron_run_log` via ALTER TABLE no startup. Estender `src/settings/llm.ts`: interface RoutingContext (mode, estimatedPromptTokens, toolsCount, channelType, tags) e interface RoutingRule. Atualizar `resolveModel()` para aceitar RoutingContext e agentRoutingRules opcionais — compativel com chamadas existentes. Logica: combinar regras globais (routing.rules em llm.json) + regras do agente (frontmatter AGENT.md), ordenar por prioridade decrescente, retornar model da primeira regra satisfeita, fallback para plan[role]. Funcao auxiliar estimateTokens(text): chars/4. Propagacao em runAgent(): registrar model_used e routing_rule nos logs.",
-    "status": "failing",
+    "status": "passing",
     "priority": 3,
     "agent": "coder",
     "task": "vibe-code",
@@ -55,7 +55,8 @@
       "Estimativa de tokens funciona sem dependencias externas",
       "`npm run typecheck` passa sem erros"
     ],
-    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-6/worktree/sprints/sprint-6/3-prps/PRP-37-model-routing-inteligente.md"
+    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-6/worktree/sprints/sprint-6/3-prps/PRP-37-model-routing-inteligente.md",
+    "completed_at": "2026-03-08T05:25:48.126Z"
   },
   {
     "id": "F-133",
@@ -261,7 +262,7 @@
     "id": "F-128",
     "name": "Rating: Hub — Botoes 👍/👎 no Chat + Pagina /agents/:id/ratings",
     "description": "Adicionar botoes de rating (👍/👎) abaixo de cada mensagem do agente no componente de chat do Hub. Ao clicar 👎: dropdown com categorias (wrong_info, off_topic, too_long, rude, other) + campo de texto livre opcional. Estado visual: icone preenchido apos rating, possibilidade de alterar. Criar pagina /agents/:id/ratings com: gauge de taxa de aprovacao, grafico de linha de aprovacao ao longo do tempo (30 dias), grafico de pizza de categorias de falha, tabela de ratings recentes com link para conversa, botao 'Exportar como Golden Set', filtros por periodo/canal/rating. Badge na pagina /agents/:id com taxa de aprovacao e link para ratings.",
-    "status": "blocked",
+    "status": "pending",
     "priority": 14,
     "agent": "coder",
     "task": "vibe-code",
