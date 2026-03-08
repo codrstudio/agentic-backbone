@@ -23,6 +23,7 @@ import {
   TrendingDown,
   TrendingUp,
   Network,
+  ShieldAlert,
 } from "lucide-react";
 import {
   agentQueryOptions,
@@ -53,6 +54,7 @@ import { RoutingAnalyticsTab } from "@/components/routing/routing-analytics-tab"
 import { EmailChannelsTab } from "@/components/email/email-channels-tab";
 import { BenchmarkTab } from "@/components/agents/benchmark-tab";
 import { WorkflowsTab } from "@/components/agents/workflows-tab";
+import { CircuitBreakerTab } from "@/components/agents/circuit-breaker-tab";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { useSSEEvent } from "@/hooks/use-sse";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -77,6 +79,7 @@ const tabs = [
   { value: "channels", label: "Canais", icon: Mail },
   { value: "benchmarks", label: "Benchmarks", icon: BarChart3 },
   { value: "workflows", label: "Workflows", icon: Network },
+  { value: "circuit-breaker", label: "Circuit-breaker", icon: ShieldAlert },
 ] as const;
 
 type TabValue = (typeof tabs)[number]["value"];
@@ -326,6 +329,9 @@ function AgentDetailPage() {
         </TabsContent>
         <TabsContent value="workflows">
           <WorkflowsTab agentId={id} />
+        </TabsContent>
+        <TabsContent value="circuit-breaker">
+          <CircuitBreakerTab agentId={id} />
         </TabsContent>
       </Tabs>
     </div>
