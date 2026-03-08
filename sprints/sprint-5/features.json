@@ -503,7 +503,7 @@
     "id": "F-121",
     "name": "Agent Sandbox: telas Hub — aba Sandbox e editor de rascunho",
     "description": "Nova aba 'Sandbox' na pagina do agente com SandboxTab: lista de rascunhos (label, criado em, ultima atualizacao), botao 'Criar rascunho' com input de label, por rascunho botoes Editar/Comparar/Publicar (com confirmacao)/Descartar. DraftEditor em /agents/:id/drafts/:draftId: tabs por arquivo (SOUL.md, AGENT.md, etc. apenas os existentes), textarea editavel, botao Salvar (PATCH), botao 'Testar no chat' (abre DraftChatPanel como painel lateral com SSE), botao Publicar com dialog de confirmacao. DraftChatPanel: input + stream SSE.",
-    "status": "pending",
+    "status": "passing",
     "priority": 24,
     "agent": "coder",
     "task": "vibe-code",
@@ -520,13 +520,14 @@
       "Descartar rascunho remove da lista apos confirmacao",
       "`npm run build:hub` e `npm run typecheck` passam sem erros"
     ],
-    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-5/worktree/sprints/sprint-5/3-prps/PRP-31-agent-sandbox.md"
+    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-5/worktree/sprints/sprint-5/3-prps/PRP-31-agent-sandbox.md",
+    "completed_at": "2026-03-08T00:55:43Z"
   },
   {
     "id": "F-122",
     "name": "Agent Sandbox: view de comparacao side-by-side",
     "description": "Nova rota /agents/:id/drafts/:draftId/compare com DraftCompareView: campo de input para mensagem de teste, botao 'Executar comparacao' (POST /compare), layout 2 colunas 'Producao' | 'Rascunho {label}', cada coluna exibe resposta completa do agente, diferenca de palavras destacada visualmente em amarelo (diff simples de palavras entre as duas respostas).",
-    "status": "pending",
+    "status": "blocked",
     "priority": 25,
     "agent": "coder",
     "task": "vibe-code",
