@@ -433,7 +433,7 @@
     "id": "F-124",
     "name": "Config Versioning: endpoints list/get/diff/rollback + API Hub",
     "description": "Criar apps/backbone/src/routes/versions.ts com: GET /agents/:agentId/versions (todos os arquivos), GET /versions/:filename (lista versoes em ordem decrescente), GET /versions/:filename/:versionNum (conteudo), GET /versions/:filename/:versionNum/diff (diff linha a linha vs. anterior, sem lib externa: split por newline + comparacao LCS simples, retorna array de {type: unchanged|added|removed, line, content}), POST /versions/:filename/:versionNum/rollback (cria versao de seguranca, copia arquivo, hot reload). Montar no index.ts. Criar apps/hub/src/api/versions.ts com versionsQueryOptions.",
-    "status": "blocked",
+    "status": "passing",
     "priority": 21,
     "agent": "coder",
     "task": "vibe-code",
@@ -448,7 +448,8 @@
       "Rollback dispara hot reload do agente (watcher escuta mudancas em AGENT.md)",
       "`npm run typecheck` passa sem erros"
     ],
-    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-5/worktree/sprints/sprint-5/3-prps/PRP-32-config-versioning.md"
+    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-5/worktree/sprints/sprint-5/3-prps/PRP-32-config-versioning.md",
+    "completed_at": "2026-03-08T00:28:11Z"
   },
   {
     "id": "F-125",
