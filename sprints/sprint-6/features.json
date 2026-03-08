@@ -384,7 +384,7 @@
     "id": "F-129",
     "name": "Rating: Dashboard Global /ratings + Rating via WhatsApp",
     "description": "Criar pagina /ratings no Hub com tabela comparativa de todos os agentes (taxa de aprovacao, total ratings, tendencia), destaque de agentes com aprovacao <70% nas ultimas 24h, filtros por canal e periodo. Implementar rating via WhatsApp: apos cada resposta do agente, enviar 'Essa resposta foi util? Responda SIM ou NAO'. Se NAO: solicitar motivo opcional. Registrar resposta como rating up/down associado a sessao e mensagem correspondente.",
-    "status": "pending",
+    "status": "passing",
     "priority": 19,
     "agent": "coder",
     "task": "vibe-code",
@@ -399,7 +399,8 @@
       "Resposta SIM/NAO via WhatsApp registrada como rating up/down na sessao correta",
       "`npm run build:hub` e `npm run typecheck` passam sem erros"
     ],
-    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-6/worktree/sprints/sprint-6/3-prps/PRP-36-feedback-loop-rating.md"
+    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-6/worktree/sprints/sprint-6/3-prps/PRP-36-feedback-loop-rating.md",
+    "completed_at": "2026-03-08T13:29:33Z"
   },
   {
     "id": "F-141",
@@ -426,7 +427,7 @@
     "id": "F-138",
     "name": "Workflow Builder: Hub — Painel de Simulacao + Secao Workflows no Agente",
     "description": "Adicionar painel lateral de simulacao no canvas: input de texto, select de canal, botao 'Simular', resultado com caminho percorrido (nos destacados no canvas), condicao que passou e agente selecionado com reasoning textual. Adicionar secao 'Workflows' na pagina /agents/:id listando workflows em que o agente participa, com link para o canvas de cada workflow e papel do agente (entrada/intermediario/destino).",
-    "status": "blocked",
+    "status": "pending",
     "priority": 21,
     "agent": "coder",
     "task": "vibe-code",
