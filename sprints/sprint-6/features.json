@@ -316,7 +316,7 @@
     "id": "F-132",
     "name": "Model Routing: Hub — Editor Visual de Regras + Dashboard de Economia",
     "description": "Secao 'Model Routing' em /settings com: toggle habilitar routing, lista de regras globais (nome, condicoes resumidas, modelo, prioridade), botao 'Adicionar regra' com modal de editor (form visual por tipo de condicao), botao 'Simular' com painel de resultado. Secao 'Routing' em /agents/:id/settings com toggle de override e editor de regras especificas do agente. Aba de analytics em /agents/:id com gauge de economia estimada (USD), grafico de pizza de distribuicao por modelo, grafico de barras de regras mais acionadas.",
-    "status": "pending",
+    "status": "passing",
     "priority": 16,
     "agent": "coder",
     "task": "vibe-code",
@@ -330,7 +330,8 @@
       "Override de agente salvo via Hub reflete em resolveModel() nas execucoes seguintes",
       "`npm run build:hub` e `npm run typecheck` passam sem erros"
     ],
-    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-6/worktree/sprints/sprint-6/3-prps/PRP-37-model-routing-inteligente.md"
+    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-6/worktree/sprints/sprint-6/3-prps/PRP-37-model-routing-inteligente.md",
+    "completed_at": "2026-03-08T13:00:00Z"
   },
   {
     "id": "F-135",

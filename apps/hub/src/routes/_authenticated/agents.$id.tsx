@@ -17,6 +17,7 @@ import {
   History,
   Layers,
   Plug,
+  GitBranch,
 } from "lucide-react";
 import {
   agentQueryOptions,
@@ -42,6 +43,7 @@ import { QuotasTab } from "@/components/quotas/quotas-tab";
 import { VersionsTab } from "@/components/versions/versions-tab";
 import { SandboxTab } from "@/components/sandbox/sandbox-tab";
 import { McpToolsTab } from "@/components/mcp/mcp-tools-tab";
+import { RoutingAnalyticsTab } from "@/components/routing/routing-analytics-tab";
 import { StatusBadge } from "@/components/shared/status-badge";
 import { useSSEEvent } from "@/hooks/use-sse";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -62,6 +64,7 @@ const tabs = [
   { value: "versions", label: "Versoes", icon: History },
   { value: "sandbox", label: "Sandbox", icon: Layers },
   { value: "mcp-tools", label: "MCP Tools", icon: Plug },
+  { value: "routing", label: "Routing", icon: GitBranch },
 ] as const;
 
 type TabValue = (typeof tabs)[number]["value"];
@@ -262,6 +265,9 @@ function AgentDetailPage() {
         </TabsContent>
         <TabsContent value="mcp-tools">
           <McpToolsTab agentId={id} />
+        </TabsContent>
+        <TabsContent value="routing">
+          <RoutingAnalyticsTab agentId={id} />
         </TabsContent>
       </Tabs>
     </div>
