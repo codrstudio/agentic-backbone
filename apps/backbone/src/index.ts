@@ -24,6 +24,7 @@ import { listAgents } from "./agents/registry.js";
 import { listChannels } from "./channels/registry.js";
 import { initHooks, wireEventBusToHooks, triggerHook } from "./hooks/index.js";
 import { startJobSweeper, stopJobSweeper, shutdownAllJobs } from "./jobs/engine.js";
+import { startSecurityAnomalyJob, stopSecurityAnomalyJob } from "./security/anomaly.js";
 import { connectorRegistry } from "./connectors/index.js";
 import { eventBus } from "./events/index.js";
 import { initChannelAdapters, channelAdapterRegistry } from "./channels/delivery/index.js";
@@ -135,6 +136,7 @@ async function bootstrap() {
     startCron();
     startWatchers();
     startJobSweeper();
+    startSecurityAnomalyJob();
 
     triggerHook({
       ts: Date.now(),
@@ -173,6 +175,7 @@ async function onShutdown(signal: string) {
     stopCron();
     stopWatchers();
     stopJobSweeper();
+    stopSecurityAnomalyJob();
     shutdownAllJobs();
     await channelAdapterRegistry.shutdownAll();
     await connectorRegistry.stopAll();

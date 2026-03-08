@@ -5,14 +5,21 @@ import {
   readFileSync,
 } from "node:fs";
 import { join } from "node:path";
+import { randomBytes } from "node:crypto";
 import { agentDir } from "../context/paths.js";
 import { readYaml, writeYaml } from "../context/readers.js";
 import { SessionYmlSchema } from "../context/schemas.js";
 
 export interface PersistentMessage {
+  id?: string;
   ts: string;
   role: "user" | "assistant" | "system";
   content: string;
+  metadata?: Record<string, unknown>;
+}
+
+function generateMessageId(): string {
+  return `msg_${Date.now()}_${randomBytes(4).toString("hex")}`;
 }
 
 // --- Paths ---
@@ -55,7 +62,8 @@ export function appendMessage(
   mkdirSync(dir, { recursive: true });
 
   const jsonlPath = join(dir, "messages.jsonl");
-  const line = JSON.stringify(message) + "\n";
+  const msgWithId: PersistentMessage = message.id ? message : { ...message, id: generateMessageId() };
+  const line = JSON.stringify(msgWithId) + "\n";
   appendFileSync(jsonlPath, line);
 }
 

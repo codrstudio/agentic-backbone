@@ -8,10 +8,15 @@ import {
   updateSession,
   deleteSession,
   readMessages,
+  setTakeover,
+  releaseTakeover,
 } from "../conversations/index.js";
+import { eventBus } from "../events/index.js";
+import { emitNotification } from "../notifications/index.js";
 import { getAuthUser } from "./auth-helpers.js";
 import { getAgent } from "../agents/registry.js";
 import { parseBody } from "./helpers.js";
+import { db } from "../db/index.js";
 
 export const conversationRoutes = new Hono();
 
@@ -73,7 +78,24 @@ conversationRoutes.get("/conversations/:sessionId/messages", (c) => {
   const denied = assertSessionOwnership(c, session);
   if (denied) return denied;
   const messages = readMessages(session.agent_id, sessionId);
-  return c.json(messages);
+
+  // Load feedback for this session and attach to messages
+  const feedbackRows = db
+    .prepare(
+      `SELECT message_id, rating, reason FROM message_feedback WHERE session_id = ?`
+    )
+    .all(sessionId) as { message_id: string; rating: string; reason: string | null }[];
+  const feedbackByMessageId = new Map(feedbackRows.map((r) => [r.message_id, { rating: r.rating, reason: r.reason }]));
+
+  const messagesWithFeedback = messages.map((m) => {
+    const msg = m as { id?: string; ts: string; role: string; content: string; metadata?: Record<string, unknown> };
+    if (msg.id && feedbackByMessageId.has(msg.id)) {
+      return { ...msg, feedback: feedbackByMessageId.get(msg.id) };
+    }
+    return msg;
+  });
+
+  return c.json(messagesWithFeedback);
 });
 
 // --- Update Conversation ---
@@ -101,6 +123,68 @@ conversationRoutes.delete("/conversations/:sessionId", (c) => {
   const deleted = deleteSession(sessionId);
   if (!deleted) return c.json({ error: "not found" }, 404);
   return c.json({ status: "deleted" });
+});
+
+// --- Takeover ---
+
+conversationRoutes.post("/conversations/:sessionId/takeover", (c) => {
+  const sessionId = c.req.param("sessionId");
+  const session = getSession(sessionId);
+  if (!session) return c.json({ error: "not found" }, 404);
+
+  const auth = getAuthUser(c);
+  const updated = setTakeover(sessionId, auth.user);
+  if (!updated) return c.json({ error: "not found" }, 404);
+
+  eventBus.emit("session:takeover", {
+    ts: Date.now(),
+    sessionId,
+    action: "takeover",
+    takenOverBy: auth.user,
+  });
+
+  emitNotification({
+    type: "takeover_started",
+    severity: "info",
+    title: `Conversa assumida por ${auth.user}`,
+    body: `Sessão ${sessionId} está sob controle do operador.`,
+    metadata: { sessionId, operatorSlug: auth.user },
+  });
+
+  return c.json({
+    sessionId,
+    takenOverBy: updated.takeover_by,
+    takenOverAt: updated.takeover_at,
+  });
+});
+
+// --- Release ---
+
+conversationRoutes.post("/conversations/:sessionId/release", (c) => {
+  const sessionId = c.req.param("sessionId");
+  const session = getSession(sessionId);
+  if (!session) return c.json({ error: "not found" }, 404);
+
+  const auth = getAuthUser(c);
+  const updated = releaseTakeover(sessionId);
+  if (!updated) return c.json({ error: "not found" }, 404);
+
+  eventBus.emit("session:takeover", {
+    ts: Date.now(),
+    sessionId,
+    action: "release",
+    takenOverBy: null,
+  });
+
+  emitNotification({
+    type: "takeover_ended",
+    severity: "info",
+    title: `Conversa devolvida ao agente`,
+    body: `Sessão ${sessionId} foi devolvida ao agente por ${auth.user}.`,
+    metadata: { sessionId, operatorSlug: auth.user },
+  });
+
+  return c.json({ sessionId, released: true });
 });
 
 // --- Send Message (streaming) ---

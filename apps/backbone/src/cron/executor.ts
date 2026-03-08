@@ -7,6 +7,9 @@ import { logCronRun } from "./log.js";
 import { collectAgentResult } from "../utils/agent-stream.js";
 import type { CronJob } from "./types.js";
 import { formatError } from "../utils/errors.js";
+import { emitNotification } from "../notifications/index.js";
+import { trackCost } from "../db/costs.js";
+import { trackCron } from "../db/analytics.js";
 
 const EXECUTION_TIMEOUT_MS = 10 * 60 * 1000;
 
@@ -39,6 +42,16 @@ export async function executeCronJob(job: CronJob): Promise<CronExecutionResult>
       error,
     });
 
+    emitNotification({
+      type: "cron_error",
+      severity: "error",
+      agentId: job.agentId,
+      title: `Cron job falhou: ${job.agentId}/${job.slug}`,
+      body: error,
+      metadata: { jobSlug: job.slug, durationMs },
+    });
+
+    trackCron({ agentId: job.agentId, status: "error", durationMs });
     return { status: "error", error, durationMs };
   }
 }
@@ -124,6 +137,27 @@ async function executeMessagePayload(
     inputTokens: usageData?.inputTokens,
     outputTokens: usageData?.outputTokens,
     costUsd: usageData?.totalCostUsd,
+  });
+
+  if (usageData) {
+    trackCost({
+      agentId: job.agentId,
+      operation: "cron",
+      tokensIn: usageData.inputTokens,
+      tokensOut: usageData.outputTokens,
+      costUsd: usageData.totalCostUsd,
+    });
+  }
+
+  trackCron({ agentId: job.agentId, status: "ok", durationMs });
+
+  emitNotification({
+    type: "cron_ok",
+    severity: "info",
+    agentId: job.agentId,
+    title: `Cron job concluido: ${job.agentId}/${job.slug}`,
+    body: summary,
+    metadata: { jobSlug: job.slug, durationMs },
   });
 
   return { status: "ok", summary, usage: usageData, durationMs };

@@ -54,6 +54,46 @@ export interface JobStatusEvent {
   tail?: string;
 }
 
+export interface NotificationNewEvent {
+  ts: number;
+  id: number;
+  type: string;
+  severity: "info" | "warning" | "error";
+  agentId?: string;
+  title: string;
+  body?: string;
+}
+
+export interface SessionTakeoverEvent {
+  ts: number;
+  sessionId: string;
+  action: "takeover" | "release";
+  takenOverBy: string | null;
+}
+
+export interface ApprovalPendingEvent {
+  type: "approval:pending";
+  approvalId: number;
+  agentId: string;
+  sessionId?: string;
+  actionLabel: string;
+  expiresAt: string;
+}
+
+export interface SecurityAlertEvent {
+  ts: number;
+  agentId: string;
+  eventCount: number;
+  windowMinutes: number;
+}
+
+export interface AgentQuotaExceededEvent {
+  ts: number;
+  agentId: string;
+  quota: string;
+  value: number;
+}
+
 export interface BackboneEventMap {
   "heartbeat:status": HeartbeatStatusEvent;
   "channel:message": ChannelMessageEvent;
@@ -62,6 +102,11 @@ export interface BackboneEventMap {
   "registry:adapters": RegistryChangeEvent;
   "cron:job": CronJobEvent;
   "job:status": JobStatusEvent;
+  "notification:new": NotificationNewEvent;
+  "session:takeover": SessionTakeoverEvent;
+  "approval:pending": ApprovalPendingEvent;
+  "security:alert": SecurityAlertEvent;
+  "agent:quota-exceeded": AgentQuotaExceededEvent;
 }
 
 // --- Typed Event Bus ---
