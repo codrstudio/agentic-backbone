@@ -346,7 +346,7 @@
     "id": "F-113",
     "name": "Rate Limiting: enforcement em runAgent() + tool timeout",
     "description": "Antes de cada execucao: checkExceeded(agentId, mode). Se exceeded E pause_on_exceed: escrever enabled: false no AGENT.md, emitir SSE agent:quota-exceeded {agentId, quota, value}, retornar sem executar. Se exceeded E !pause_on_exceed: logar aviso e continuar. Para heartbeat: skip silencioso se heartbeats >= max_heartbeats_day. Ao concluir: recordUsage com tokens da resposta. Tool call timeout: AbortSignal.timeout(max_tool_timeout_ms) em cada tool call, retornando {error: 'timeout', ms: N} sem abortar o agente. Adicionar tipo agent:quota-exceeded ao event bus.",
-    "status": "blocked",
+    "status": "passing",
     "priority": 17,
     "agent": "coder",
     "task": "vibe-code",
@@ -362,13 +362,14 @@
       "Com pause_on_exceed: false, agente continua executando mesmo acima do limite (apenas loga)",
       "`npm run typecheck` passa sem erros"
     ],
-    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-5/worktree/sprints/sprint-5/3-prps/PRP-29-rate-limiting-quotas.md"
+    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-5/worktree/sprints/sprint-5/3-prps/PRP-29-rate-limiting-quotas.md",
+    "completed_at": "2026-03-08T00:10:52.348281Z"
   },
   {
     "id": "F-114",
     "name": "Rate Limiting: endpoints de gestao de quotas + API Hub",
     "description": "Criar apps/backbone/src/routes/quotas.ts com: GET /agents/:agentId/quota (config + consumo atual em JSON com pctUsed calculado), PUT (atualizar config no DB), DELETE (remover override DB), POST /quota/reset (zerar janela atual). Response do GET inclui config, usage.hourly e usage.daily com pctUsed. Montar rotas no index.ts. Criar apps/hub/src/api/quotas.ts com quotaQueryOptions.",
-    "status": "blocked",
+    "status": "pending",
     "priority": 18,
     "agent": "coder",
     "task": "vibe-code",

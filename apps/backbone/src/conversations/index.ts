@@ -16,6 +16,8 @@ import { trackCost } from "../db/costs.js";
 import { trackConversation } from "../db/analytics.js";
 import type { UsageData } from "../agent/index.js";
 import { checkMessageSecurity } from "../security/filter.js";
+import { eventBus } from "../events/index.js";
+import { checkExceeded, getQuotas, recordUsage, pauseAgent } from "../quotas/quota-manager.js";
 
 export { readMessages };
 
@@ -333,6 +335,32 @@ export async function* sendMessage(
   }
   // flagged: continue to agent, already logged in security_events
 
+  // --- Quota enforcement ---
+  const quotaCheck = checkExceeded(agentId, "conversation");
+  if (quotaCheck.exceeded) {
+    const quotas = getQuotas(agentId);
+    if (quotas.pauseOnExceed !== false) {
+      pauseAgent(agentId);
+      eventBus.emit("agent:quota-exceeded", {
+        ts: Date.now(),
+        agentId,
+        quota: quotaCheck.reason ?? "unknown",
+        value: 0,
+      });
+      const errorMsg = "Agente pausado: limite de quota atingido.";
+      appendMessage(agentId, sessionId, {
+        ts: new Date().toISOString(),
+        role: "assistant",
+        content: errorMsg,
+      });
+      yield { type: "result", content: errorMsg };
+      return;
+    } else {
+      console.warn(`[conversation:${agentId}] quota exceeded (pause_on_exceed=false): ${quotaCheck.reason}`);
+    }
+  }
+  // --- End quota enforcement ---
+
   // --- Orchestration: supervisor routing ---
   let effectiveAgentId = agentId;
   if (agent.role === "supervisor") {
@@ -425,6 +453,7 @@ export async function* sendMessage(
       tokensOut: usageData.outputTokens,
       costUsd: usageData.totalCostUsd,
     });
+    recordUsage(effectiveAgentId, usageData.inputTokens, usageData.outputTokens, "conversation");
   }
 
   const durationMs = Date.now() - agentStartMs;

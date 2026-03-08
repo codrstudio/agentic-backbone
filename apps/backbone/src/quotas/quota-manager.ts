@@ -1,5 +1,7 @@
+import { readFileSync, writeFileSync } from "node:fs";
 import { db } from "../db/index.js";
 import { getAgent } from "../agents/registry.js";
+import { agentConfigPath } from "../context/paths.js";
 import type { QuotaConfig } from "../agents/types.js";
 
 export type WindowType = "hourly" | "daily";
@@ -138,6 +140,39 @@ export function recordToolCall(agentId: string): void {
     heartbeats: 0,
     tool_calls: 1,
   });
+}
+
+/**
+ * Writes enabled: false to the agent's AGENT.md frontmatter.
+ * Used to auto-pause an agent when quota is exceeded and pause_on_exceed is true.
+ */
+export function pauseAgent(agentId: string): void {
+  const path = agentConfigPath(agentId);
+  let content: string;
+  try {
+    content = readFileSync(path, "utf-8");
+  } catch {
+    console.warn(`[quota] could not read AGENT.md for ${agentId}`);
+    return;
+  }
+
+  // If frontmatter has enabled: true, flip it. Otherwise insert before closing ---
+  if (/^enabled:\s*true\s*$/m.test(content)) {
+    content = content.replace(/^(enabled:\s*)true(\s*)$/m, "$1false$2");
+  } else if (/^enabled:\s*false\s*$/m.test(content)) {
+    // already disabled
+    return;
+  } else {
+    // Insert enabled: false after the opening ---
+    content = content.replace(/^---\n/, "---\nenabled: false\n");
+  }
+
+  try {
+    writeFileSync(path, content, "utf-8");
+    console.log(`[quota] agent ${agentId} paused (enabled: false written to AGENT.md)`);
+  } catch (err) {
+    console.warn(`[quota] could not write AGENT.md for ${agentId}:`, err);
+  }
 }
 
 /**
