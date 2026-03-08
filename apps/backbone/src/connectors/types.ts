@@ -26,7 +26,7 @@ export interface ConnectorDef {
   credentialSchema: z.ZodObject<any>;
   optionsSchema: z.ZodObject<any>;
   createClient(credential: unknown, options: unknown): unknown;
-  createTools?(adapters: { slug: string; policy: string }[]): Record<string, any> | null;
+  createTools?(adapters: { slug: string; policy: string }[], agentId?: string): Record<string, any> | null;
   routes?: Hono;
   start?(ctx: ConnectorContext): Promise<void>;
   stop?(): Promise<void>;

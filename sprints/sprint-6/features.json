@@ -143,7 +143,7 @@
     "id": "F-124",
     "name": "MCP: Connector MCP Cliente (stdio + HTTP)",
     "description": "Criar connector `mcp` em `src/connectors/mcp/` seguindo o padrao existente. Suporte a transporte `stdio` (via command/args/env) e `http` (via URL + api_key opcional). Descoberta dinamica de tools do servidor MCP e injecao em `runAgent()` com prefixo `mcp_{adapter_slug}_{tool_name}`. Cada chamada auditada em `mcp_tool_calls`. Schema Zod para ADAPTER.yaml. Endpoints GET /agents/:id/mcp-tools e GET /agents/:id/mcp-calls. Dependencia: `@modelcontextprotocol/sdk`.",
-    "status": "pending",
+    "status": "passing",
     "priority": 8,
     "agent": "coder",
     "task": "vibe-code",
@@ -159,7 +159,8 @@
       "Multiplos adapters MCP coexistem sem conflito (prefixo por adapter_slug)",
       "`npm run typecheck` passa sem erros"
     ],
-    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-6/worktree/sprints/sprint-6/3-prps/PRP-35-mcp-support.md"
+    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab-hub/wave-6/worktree/sprints/sprint-6/3-prps/PRP-35-mcp-support.md",
+    "completed_at": "2026-03-08T06:17:07Z"
   },
   {
     "id": "F-134",
@@ -226,7 +227,7 @@
     "id": "F-143",
     "name": "Hub + API: Visão Sysadmin — Agentes de Todos os Usuários",
     "description": "Quando usuário logado tem role=sysadmin, a listagem de agentes no Hub exibe todos os agentes de todos os owners. Backend: GET /agents aceita ?scope=all (apenas sysadmin, retorna 403 caso contrário) usando listAgents() do registry sem filtro de owner. Hub: verificar role no useAuthStore, chamar ?scope=all se sysadmin, exibir badge com owner do agente na listagem (ID já contém owner.slug). Adicionar badge visual Admin no header quando sysadmin.",
-    "status": "blocked",
+    "status": "pending",
     "priority": 12,
     "agent": "coder",
     "task": "vibe-code",
