@@ -31,6 +31,7 @@ import { Route as AuthenticatedConversationsIdRouteImport } from './routes/_auth
 import { Route as AuthenticatedChannelsSlugRouteImport } from './routes/_authenticated/channels.$slug'
 import { Route as AuthenticatedAgentsNewRouteImport } from './routes/_authenticated/agents.new'
 import { Route as AuthenticatedAgentsIdRouteImport } from './routes/_authenticated/agents.$id'
+import { Route as AuthenticatedAgentsIdRatingsRouteImport } from './routes/_authenticated/agents.$id.ratings'
 import { Route as AuthenticatedAgentsIdEvalRunsRunIdRouteImport } from './routes/_authenticated/agents.$id.eval-runs.$runId'
 import { Route as AuthenticatedAgentsIdDraftsDraftIdRouteImport } from './routes/_authenticated/agents.$id.drafts.$draftId'
 import { Route as AuthenticatedAgentsIdDraftsDraftIdCompareRouteImport } from './routes/_authenticated/agents.$id.drafts.$draftId.compare'
@@ -151,6 +152,12 @@ const AuthenticatedAgentsIdRoute = AuthenticatedAgentsIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => AuthenticatedAgentsRoute,
 } as any)
+const AuthenticatedAgentsIdRatingsRoute =
+  AuthenticatedAgentsIdRatingsRouteImport.update({
+    id: '/ratings',
+    path: '/ratings',
+    getParentRoute: () => AuthenticatedAgentsIdRoute,
+  } as any)
 const AuthenticatedAgentsIdEvalRunsRunIdRoute =
   AuthenticatedAgentsIdEvalRunsRunIdRouteImport.update({
     id: '/eval-runs/$runId',
@@ -192,6 +199,7 @@ export interface FileRoutesByFullPath {
   '/approvals/': typeof AuthenticatedApprovalsIndexRoute
   '/inbox/': typeof AuthenticatedInboxIndexRoute
   '/security/': typeof AuthenticatedSecurityIndexRoute
+  '/agents/$id/ratings': typeof AuthenticatedAgentsIdRatingsRoute
   '/agents/$id/drafts/$draftId': typeof AuthenticatedAgentsIdDraftsDraftIdRouteWithChildren
   '/agents/$id/eval-runs/$runId': typeof AuthenticatedAgentsIdEvalRunsRunIdRoute
   '/agents/$id/drafts/$draftId/compare': typeof AuthenticatedAgentsIdDraftsDraftIdCompareRoute
@@ -218,6 +226,7 @@ export interface FileRoutesByTo {
   '/approvals': typeof AuthenticatedApprovalsIndexRoute
   '/inbox': typeof AuthenticatedInboxIndexRoute
   '/security': typeof AuthenticatedSecurityIndexRoute
+  '/agents/$id/ratings': typeof AuthenticatedAgentsIdRatingsRoute
   '/agents/$id/drafts/$draftId': typeof AuthenticatedAgentsIdDraftsDraftIdRouteWithChildren
   '/agents/$id/eval-runs/$runId': typeof AuthenticatedAgentsIdEvalRunsRunIdRoute
   '/agents/$id/drafts/$draftId/compare': typeof AuthenticatedAgentsIdDraftsDraftIdCompareRoute
@@ -246,6 +255,7 @@ export interface FileRoutesById {
   '/_authenticated/approvals/': typeof AuthenticatedApprovalsIndexRoute
   '/_authenticated/inbox/': typeof AuthenticatedInboxIndexRoute
   '/_authenticated/security/': typeof AuthenticatedSecurityIndexRoute
+  '/_authenticated/agents/$id/ratings': typeof AuthenticatedAgentsIdRatingsRoute
   '/_authenticated/agents/$id/drafts/$draftId': typeof AuthenticatedAgentsIdDraftsDraftIdRouteWithChildren
   '/_authenticated/agents/$id/eval-runs/$runId': typeof AuthenticatedAgentsIdEvalRunsRunIdRoute
   '/_authenticated/agents/$id/drafts/$draftId/compare': typeof AuthenticatedAgentsIdDraftsDraftIdCompareRoute
@@ -274,6 +284,7 @@ export interface FileRouteTypes {
     | '/approvals/'
     | '/inbox/'
     | '/security/'
+    | '/agents/$id/ratings'
     | '/agents/$id/drafts/$draftId'
     | '/agents/$id/eval-runs/$runId'
     | '/agents/$id/drafts/$draftId/compare'
@@ -300,6 +311,7 @@ export interface FileRouteTypes {
     | '/approvals'
     | '/inbox'
     | '/security'
+    | '/agents/$id/ratings'
     | '/agents/$id/drafts/$draftId'
     | '/agents/$id/eval-runs/$runId'
     | '/agents/$id/drafts/$draftId/compare'
@@ -327,6 +339,7 @@ export interface FileRouteTypes {
     | '/_authenticated/approvals/'
     | '/_authenticated/inbox/'
     | '/_authenticated/security/'
+    | '/_authenticated/agents/$id/ratings'
     | '/_authenticated/agents/$id/drafts/$draftId'
     | '/_authenticated/agents/$id/eval-runs/$runId'
     | '/_authenticated/agents/$id/drafts/$draftId/compare'
@@ -493,6 +506,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAgentsIdRouteImport
       parentRoute: typeof AuthenticatedAgentsRoute
     }
+    '/_authenticated/agents/$id/ratings': {
+      id: '/_authenticated/agents/$id/ratings'
+      path: '/ratings'
+      fullPath: '/agents/$id/ratings'
+      preLoaderRoute: typeof AuthenticatedAgentsIdRatingsRouteImport
+      parentRoute: typeof AuthenticatedAgentsIdRoute
+    }
     '/_authenticated/agents/$id/eval-runs/$runId': {
       id: '/_authenticated/agents/$id/eval-runs/$runId'
       path: '/eval-runs/$runId'
@@ -533,11 +553,13 @@ const AuthenticatedAgentsIdDraftsDraftIdRouteWithChildren =
   )
 
 interface AuthenticatedAgentsIdRouteChildren {
+  AuthenticatedAgentsIdRatingsRoute: typeof AuthenticatedAgentsIdRatingsRoute
   AuthenticatedAgentsIdDraftsDraftIdRoute: typeof AuthenticatedAgentsIdDraftsDraftIdRouteWithChildren
   AuthenticatedAgentsIdEvalRunsRunIdRoute: typeof AuthenticatedAgentsIdEvalRunsRunIdRoute
 }
 
 const AuthenticatedAgentsIdRouteChildren: AuthenticatedAgentsIdRouteChildren = {
+  AuthenticatedAgentsIdRatingsRoute: AuthenticatedAgentsIdRatingsRoute,
   AuthenticatedAgentsIdDraftsDraftIdRoute:
     AuthenticatedAgentsIdDraftsDraftIdRouteWithChildren,
   AuthenticatedAgentsIdEvalRunsRunIdRoute:
