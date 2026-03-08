@@ -1,6 +1,5 @@
 import { existsSync } from "node:fs";
-import { join } from "node:path";
-import { systemDir } from "../context/paths.js";
+import { settingsPath } from "../context/paths.js";
 import { readYaml, writeYaml } from "../context/readers.js";
 
 // --- Types ---
@@ -12,12 +11,6 @@ export interface WebSearchConfig {
 }
 
 const VALID_PROVIDERS: WebSearchProviderType[] = ["duckduckgo", "brave", "none"];
-
-// --- Path ---
-
-function settingsPath(): string {
-  return join(systemDir(), "settings.yml");
-}
 
 // --- Read / Write ---
 

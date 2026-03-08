@@ -91,7 +91,7 @@ export function AppSidebar() {
   return (
     <Sidebar>
       <SidebarHeader className="px-4 py-3">
-        <span className="text-lg font-semibold tracking-tight">AB Hub</span>
+        <span className="text-lg font-semibold tracking-tight">Agentic Backbone</span>
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>

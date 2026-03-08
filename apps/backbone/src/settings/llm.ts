@@ -1,6 +1,6 @@
 import { readdirSync, existsSync } from "node:fs";
 import { join } from "node:path";
-import { systemDir } from "../context/paths.js";
+import { plansDir, settingsPath } from "../context/paths.js";
 import { readYaml, writeYaml } from "../context/readers.js";
 
 // --- Types ---
@@ -39,16 +39,6 @@ const ALL_SLUGS: SlugName[] = SLUG_CLASSES.flatMap((c) =>
 
 let plans: Map<string, Plan> = new Map();
 let activePlanName = "";
-
-// --- Paths ---
-
-function plansDir(): string {
-  return join(systemDir(), "plans");
-}
-
-function settingsPath(): string {
-  return join(systemDir(), "settings.yml");
-}
 
 // --- Load / Reload ---
 

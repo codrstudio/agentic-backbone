@@ -11,7 +11,7 @@ self.addEventListener("push", (event) => {
     data = { title: event.data.text() };
   }
 
-  const title = data.title || "AB Hub";
+  const title = data.title || "Agentic Backbone";
   const options = {
     body: data.body || "",
     icon: "/pwa-192x192.png",

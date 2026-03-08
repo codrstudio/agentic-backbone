@@ -1,6 +1,6 @@
 import chokidar, { type FSWatcher } from "chokidar";
-import { basename, join } from "node:path";
-import { agentsDir, usersDir, sharedResourceDir, systemDir } from "../context/paths.js";
+import { basename } from "node:path";
+import { agentsDir, usersDir, sharedResourceDir, plansDir, settingsPath } from "../context/paths.js";
 import { listAgents, refreshAgentRegistry } from "../agents/registry.js";
 import { refreshChannelRegistry } from "../channels/registry.js";
 import { updateHeartbeatAgent } from "../heartbeat/index.js";
@@ -194,8 +194,8 @@ export function startWatchers(): void {
     );
 
   // Plan watcher — plans dir + settings.yml
-  const plansPath = join(systemDir(), "plans");
-  const settingsFilePath = join(systemDir(), "settings.yml");
+  const plansPath = plansDir();
+  const settingsFilePath = settingsPath();
   planWatcher = chokidar.watch([plansPath, settingsFilePath], {
     ignoreInitial: true,
     awaitWriteFinish: { stabilityThreshold: 300, pollInterval: 100 },

@@ -1,24 +1,27 @@
 import { queryOptions } from "@tanstack/react-query";
 import { request } from "@/lib/api";
 
-export interface LlmProfile {
-  model: string;
+export interface SlugDef {
+  slug: string;
+  class: string;
+  effort: string;
+  llm: { model: string; parameters: Record<string, unknown> };
+  tags: string[];
+  title: string;
+  description: string;
 }
 
 export interface LlmPlan {
-  label: string;
+  name: string;
+  title: string;
   description: string;
-  profiles: Record<string, LlmProfile>;
-  effort?: "low" | "medium" | "high" | "max";
-  thinking?:
-    | { type: "adaptive" }
-    | { type: "enabled"; budgetTokens: number }
-    | { type: "disabled" };
+  slugs: Record<string, SlugDef>;
+  roles: Record<string, string>;
 }
 
 export interface LlmConfig {
-  active: string;
-  plans: Record<string, LlmPlan>;
+  activePlan: string;
+  plans: LlmPlan[];
 }
 
 export function llmSettingsQueryOptions() {
@@ -28,10 +31,10 @@ export function llmSettingsQueryOptions() {
   });
 }
 
-export function activateLlmPlan(active: string) {
+export function activateLlmPlan(activePlan: string) {
   return request<LlmConfig>("/settings/llm", {
     method: "PATCH",
-    body: JSON.stringify({ active }),
+    body: JSON.stringify({ activePlan }),
   });
 }
 

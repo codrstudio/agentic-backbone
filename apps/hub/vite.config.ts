@@ -16,7 +16,7 @@ export default defineConfig(({ mode }) => {
       VitePWA({
         registerType: "autoUpdate",
         manifest: {
-          name: "AB Hub",
+          name: "Agentic Backbone",
           short_name: "AB Hub",
           description: "Agentic Backbone Hub — Gestao de agentes IA",
           theme_color: "#0a0a0a",
@@ -43,6 +43,7 @@ export default defineConfig(({ mode }) => {
           ],
         },
         workbox: {
+          maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
           importScripts: ["/push-handler.js"],
           runtimeCaching: [
             {

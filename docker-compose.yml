@@ -9,20 +9,11 @@ services:
       context: .
       dockerfile: apps/backbone/Dockerfile
     restart: unless-stopped
+    env_file:
+      - .env
     environment:
-      TZ: America/Sao_Paulo
-      NODE_ENV: production
-      BACKBONE_PORT: ${BACKBONE_PORT}
-      CONTEXT_FOLDER: ./context
-      JWT_SECRET: ${JWT_SECRET}
-      SYSUSER: ${SYSUSER}
-      SYSPASS: ${SYSPASS}
-
-      OPENAI_API_KEY: ${OPENAI_API_KEY}
-      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY}
-      EVOLUTION_URL: http://evolution.internal:8080
-      EVOLUTION_API_KEY: ${EVOLUTION_API_KEY}
-      EVOLUTION_INSTANCE_NAME: ${EVOLUTION_INSTANCE_NAME}
+      CONTEXT_FOLDER: /app/context
+      SERVER_HOST: 0.0.0.0
     volumes:
       - ./context:/app/context
       - ./data:/app/apps/backbone/data
@@ -31,12 +22,15 @@ services:
         aliases:
           - backbone.internal
       web_network:
+      shared-net:
 
   hub:
     build:
       context: .
       dockerfile: apps/hub/Dockerfile
     restart: unless-stopped
+    env_file:
+      - .env
     depends_on:
       - backbone
     volumes:
@@ -44,7 +38,10 @@ services:
     networks:
       internal:
       web_network:
+      shared-net:
 
 networks:
+  shared-net:
+    external: true
   web_network:
     external: true

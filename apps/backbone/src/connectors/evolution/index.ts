@@ -127,6 +127,20 @@ export const evolutionConnector: ConnectorDef = {
       actions!.removeInstance(instanceName);
     });
 
+    // Sync webhooks on instance discovery
+    ctx.eventBus.onModule("evolution", "instance-discovered", () => {
+      syncWebhooks(ctx.env, ctx.log).catch((err) => {
+        ctx.log(`webhook sync failed: ${err}`);
+      });
+    });
+
+    // Sync webhooks when API comes back online
+    ctx.eventBus.onModule("evolution", "api-online", () => {
+      syncWebhooks(ctx.env, ctx.log).catch((err) => {
+        ctx.log(`webhook sync failed: ${err}`);
+      });
+    });
+
     // Create routes
     this.routes = createEvolutionRoutes({
       probe,
@@ -177,11 +191,6 @@ export const evolutionConnector: ConnectorDef = {
     // Start the probe loop
     probe.start();
     ctx.log("started");
-
-    // Sync webhooks for existing instances (fire-and-forget)
-    syncWebhooks(ctx.env, ctx.log).catch((err) => {
-      ctx.log(`webhook sync failed: ${err}`);
-    });
   },
 
   async stop() {

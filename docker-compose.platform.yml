@@ -69,7 +69,6 @@ services:
       CACHE_REDIS_ENABLED: "true"
       CACHE_REDIS_URI: redis://redis.internal:6379
       AUTHENTICATION_API_KEY: ${EVOLUTION_API_KEY}
-      AUTHENTICATION_INSTANCE_NAME: ${EVOLUTION_INSTANCE_NAME}
       AUTHENTICATION_INSTANCE_MODE: container
     volumes:
       - ./data/evolution/instances:/evolution/instances
@@ -78,23 +77,6 @@ services:
       internal:
         aliases:
           - evolution.internal
-
-  evolution-init:
-    image: curlimages/curl:8.12.1
-    depends_on:
-      evolution:
-        condition: service_started
-    environment:
-      EVOLUTION_URL: http://evolution.internal:8080
-      EVOLUTION_API_KEY: ${EVOLUTION_API_KEY}
-      EVOLUTION_INSTANCE_NAME: ${EVOLUTION_INSTANCE_NAME}
-      WEBHOOK_URL: http://${BACKBONE_CALLBACK_HOST}:${BACKBONE_PORT}/api/v1/ai/modules/evolution/webhook
-    volumes:
-      - ./docker/evolution/init.sh:/init.sh:ro
-    entrypoint: ["sh", "/init.sh"]
-    networks:
-      - internal
-    restart: "no"
 
   whisper:
     image: fedirz/faster-whisper-server:latest-cpu

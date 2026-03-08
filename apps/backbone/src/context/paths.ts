@@ -24,8 +24,12 @@ export function sharedDir(): string {
   return join(CONTEXT_DIR, "shared");
 }
 
-export function systemDir(): string {
-  return join(CONTEXT_DIR, "system");
+export function plansDir(): string {
+  return join(CONTEXT_DIR, "plans");
+}
+
+export function settingsPath(): string {
+  return join(CONTEXT_DIR, "settings.yml");
 }
 
 export function usersDir(): string {
@@ -106,10 +110,6 @@ export function ownerUserPath(ownerSlug: string): string {
 
 export function sharedResourceDir(kind: ResourceKind): string {
   return join(sharedDir(), kind);
-}
-
-export function systemResourceDir(kind: ResourceKind): string {
-  return join(systemDir(), kind);
 }
 
 export function userResourceDir(userSlug: string, kind: ResourceKind): string {

@@ -7,17 +7,15 @@ import {
   CardDescription,
   CardContent,
   CardFooter,
-  CardAction,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 interface LlmPlanCardProps {
-  slug: string;
   plan: LlmPlan;
   isActive: boolean;
-  onActivate: (slug: string) => void;
+  onActivate: (name: string) => void;
   isLoading?: boolean;
 }
 
@@ -32,45 +30,7 @@ function formatModelName(model: string) {
   return parts.length > 1 ? parts[1] : model;
 }
 
-function ThinkingBadge({ thinking }: { thinking: LlmPlan["thinking"] }) {
-  if (!thinking) return <Badge variant="outline">Sem thinking</Badge>;
-
-  switch (thinking.type) {
-    case "adaptive":
-      return <Badge variant="secondary">Adaptativo</Badge>;
-    case "enabled":
-      return (
-        <Badge variant="secondary">
-          Habilitado ({Math.round(thinking.budgetTokens / 1000)}K tokens)
-        </Badge>
-      );
-    case "disabled":
-      return <Badge variant="outline">Desabilitado</Badge>;
-  }
-}
-
-function EffortBadge({ effort }: { effort?: LlmPlan["effort"] }) {
-  if (!effort) return null;
-
-  const variants: Record<string, "secondary" | "outline" | "default"> = {
-    low: "outline",
-    medium: "secondary",
-    high: "default",
-    max: "default",
-  };
-
-  const labels: Record<string, string> = {
-    low: "Baixo",
-    medium: "Medio",
-    high: "Alto",
-    max: "Maximo",
-  };
-
-  return <Badge variant={variants[effort]}>{labels[effort]}</Badge>;
-}
-
 export function LlmPlanCard({
-  slug,
   plan,
   isActive,
   onActivate,
@@ -85,16 +45,10 @@ export function LlmPlanCard({
     >
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          {plan.label}
+          {plan.title}
           {isActive && <Badge variant="default">Ativo</Badge>}
         </CardTitle>
         <CardDescription>{plan.description}</CardDescription>
-        <CardAction>
-          <div className="flex gap-1.5">
-            <EffortBadge effort={plan.effort} />
-            <ThinkingBadge thinking={plan.thinking} />
-          </div>
-        </CardAction>
       </CardHeader>
 
       <CardContent>
@@ -103,19 +57,22 @@ export function LlmPlanCard({
             Modelos por role
           </p>
           <div className="grid gap-1">
-            {Object.entries(plan.profiles).map(([role, profile]) => (
-              <div
-                key={role}
-                className="flex items-center justify-between text-sm"
-              >
-                <span className="text-muted-foreground">
-                  {roleLabels[role] ?? role}
-                </span>
-                <code className="text-xs bg-muted px-1.5 py-0.5 rounded">
-                  {formatModelName(profile.model)}
-                </code>
-              </div>
-            ))}
+            {Object.entries(plan.roles).map(([role, slugName]) => {
+              const slug = plan.slugs[slugName];
+              return (
+                <div
+                  key={role}
+                  className="flex items-center justify-between text-sm"
+                >
+                  <span className="text-muted-foreground">
+                    {roleLabels[role] ?? role}
+                  </span>
+                  <code className="text-xs bg-muted px-1.5 py-0.5 rounded">
+                    {slug ? formatModelName(slug.llm.model) : slugName}
+                  </code>
+                </div>
+              );
+            })}
           </div>
         </div>
       </CardContent>
@@ -125,7 +82,7 @@ export function LlmPlanCard({
           size="sm"
           variant={isActive ? "outline" : "default"}
           disabled={isActive || isLoading}
-          onClick={() => onActivate(slug)}
+          onClick={() => onActivate(plan.name)}
           className="w-full"
         >
           {isLoading ? (

@@ -4,13 +4,11 @@ import { parseFrontmatter, readContextFile, readMarkdown } from "./readers.js";
 import {
   type ResourceKind,
   sharedResourceDir,
-  systemResourceDir,
   agentResourceDir,
   parseAgentId,
   userResourceDir,
   agentSoulPath,
   ownerUserPath,
-  systemDir,
   agentHeartbeatPath,
   agentConversationPath,
   agentRequestPath,
@@ -53,22 +51,11 @@ export function getResourceDirs(
   kind: ResourceKind
 ): { dir: string; source: string }[] {
   const { owner } = parseAgentId(agentId);
-  const dirs: { dir: string; source: string }[] = [
+  return [
     { dir: sharedResourceDir(kind), source: "shared" },
+    { dir: userResourceDir(owner, kind), source: `user:${owner}` },
+    { dir: agentResourceDir(agentId, kind), source: `agent:${agentId}` },
   ];
-
-  if (owner === "system") {
-    dirs.push({ dir: systemResourceDir(kind), source: "system" });
-  } else {
-    dirs.push({ dir: userResourceDir(owner, kind), source: `user:${owner}` });
-  }
-
-  dirs.push({
-    dir: agentResourceDir(agentId, kind),
-    source: `agent:${agentId}`,
-  });
-
-  return dirs;
 }
 
 export function resolveResources(
@@ -99,17 +86,11 @@ export function resolveTools(
   return resolveResources(agentId, "tools", "TOOL.md");
 }
 
-// --- Soul resolution (agent → system fallback) ---
+// --- Soul resolution (agent-specific only, no fallback) ---
 
 export function resolveAgentSoul(agentId: string): string {
   const agentPath = agentSoulPath(agentId);
-  if (existsSync(agentPath)) {
-    return readContextFile(agentPath);
-  }
-  const systemPath = join(systemDir(), "SOUL.md");
-  if (existsSync(systemPath)) {
-    return readContextFile(systemPath);
-  }
+  if (existsSync(agentPath)) return readContextFile(agentPath);
   return "";
 }
 

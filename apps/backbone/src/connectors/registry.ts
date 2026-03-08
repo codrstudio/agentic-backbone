@@ -6,7 +6,7 @@ import { AdapterYmlSchema } from "../context/schemas.js";
 import {
   type ResourceKind,
   sharedResourceDir,
-  systemResourceDir,
+  userResourceDir,
   agentResourceDir,
   agentsDir,
 } from "../context/paths.js";
@@ -265,9 +265,9 @@ export class ConnectorRegistry {
       adapters.push(...this.scanAdaptersInDir(sharedDir, "shared"));
     }
 
-    const sysDir = systemResourceDir(KIND);
+    const sysDir = userResourceDir("system", KIND);
     if (existsSync(sysDir)) {
-      adapters.push(...this.scanAdaptersInDir(sysDir, "system"));
+      adapters.push(...this.scanAdaptersInDir(sysDir, "user:system"));
     }
 
     const agentsRoot = agentsDir();
@@ -411,7 +411,7 @@ export class ConnectorRegistry {
   findAdapter(slug: string): ResolvedAdapter | null {
     for (const [dir, source] of [
       [sharedResourceDir(KIND), "shared"] as const,
-      [systemResourceDir(KIND), "system"] as const,
+      [userResourceDir("system", KIND), "user:system"] as const,
     ]) {
       const entries = this.scanAdaptersInDir(dir, source);
       const found = entries.find((a) => a.slug === slug);
@@ -422,7 +422,7 @@ export class ConnectorRegistry {
 
   private resolveDir(scope: string): string {
     if (scope === "shared") return sharedResourceDir(KIND);
-    if (scope === "system") return systemResourceDir(KIND);
+    if (scope === "system") return userResourceDir("system", KIND);
     return agentResourceDir(scope, KIND);
   }
 }

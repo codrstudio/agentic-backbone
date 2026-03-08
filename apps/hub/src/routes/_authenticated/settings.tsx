@@ -122,14 +122,13 @@ function LlmSettingsTab() {
 
   return (
     <div className="grid gap-4 md:grid-cols-2">
-      {Object.entries(config.plans).map(([slug, plan]) => (
+      {config.plans.map((plan) => (
         <LlmPlanCard
-          key={slug}
-          slug={slug}
+          key={plan.name}
           plan={plan}
-          isActive={config.active === slug}
+          isActive={config.activePlan === plan.name}
           onActivate={handleActivate}
-          isLoading={activatingSlug === slug}
+          isLoading={activatingSlug === plan.name}
         />
       ))}
     </div>

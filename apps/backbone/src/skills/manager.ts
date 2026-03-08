@@ -9,7 +9,7 @@ import {
 import { join } from "node:path";
 import {
   sharedResourceDir,
-  systemResourceDir,
+  userResourceDir,
   agentResourceDir,
   type ResourceKind,
 } from "../context/paths.js";
@@ -38,7 +38,7 @@ export interface UpdateSkillInput {
 
 function resolveDir(scope: string): string {
   if (scope === "shared") return sharedResourceDir(KIND);
-  if (scope === "system") return systemResourceDir(KIND);
+  if (scope === "system") return userResourceDir("system", KIND);
   return agentResourceDir(scope, KIND);
 }
 

@@ -47,7 +47,7 @@ function LoginPage() {
     <div className="flex min-h-svh items-center justify-center bg-background p-4">
       <Card className="w-full max-w-sm">
         <CardHeader className="text-center">
-          <CardTitle className="text-xl">AB Hub</CardTitle>
+          <CardTitle className="text-xl">Agentic Backbone</CardTitle>
           <p className="text-sm text-muted-foreground">
             Entre com suas credenciais
           </p>
