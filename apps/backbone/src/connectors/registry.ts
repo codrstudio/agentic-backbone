@@ -79,6 +79,7 @@ export class ConnectorRegistry {
         name: data.name ?? slug,
         description: data.description ?? "",
         source,
+        enabled: (metadata.enabled as boolean) ?? false,
         dir: dirname(ymlPath),
         content: "",
         metadata,
