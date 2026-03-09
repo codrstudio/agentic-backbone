@@ -256,17 +256,28 @@ complianceRoutes.get("/compliance/overview", (c) => {
   }
 
   const totalAgents = agents.length;
-  const byRiskLevel: Record<string, number> = { high: 0, limited: 0, minimal: 0, unclassified: 0 };
+  const byRiskLevel: Record<string, number> = { high: 0, limited: 0, minimal: 0 };
   const nonCompliantItems: Array<{ agentId: string; itemKey: string; category: string }> = [];
   const pendingReviews: Array<{ agentId: string; reviewDueAt: string }> = [];
+  const overviewAgents: Array<{
+    agentId: string;
+    riskLevel: "high" | "limited" | "minimal" | null;
+    complianceRate: number;
+    checklistTotal: number;
+    checklistCompliant: number;
+    reviewDueAt: string | null;
+    hasOverdueReview: boolean;
+  }> = [];
 
   let totalCompliant = 0;
   let totalItems = 0;
 
   for (const agent of agents) {
     const classification = complianceManager.getClassification(agent.id);
-    const riskLevel = classification?.riskLevel ?? "unclassified";
-    byRiskLevel[riskLevel] = (byRiskLevel[riskLevel] ?? 0) + 1;
+    const riskLevel = classification?.riskLevel ?? null;
+    if (riskLevel) {
+      byRiskLevel[riskLevel] = (byRiskLevel[riskLevel] ?? 0) + 1;
+    }
 
     // Pending reviews
     if (classification?.reviewDueAt) {
@@ -278,10 +289,15 @@ complianceRoutes.get("/compliance/overview", (c) => {
 
     // Checklist compliance
     const checklist = complianceManager.getChecklist(agent.id);
+    const checklistNonApplicable = checklist.filter((i) => i.status === "not_applicable").length;
+    const checklistTotal = checklist.length - checklistNonApplicable;
+    let checklistCompliant = 0;
+
     totalItems += checklist.length;
     for (const item of checklist) {
       if (item.status === "compliant") {
         totalCompliant++;
+        checklistCompliant++;
       } else if (item.status === "non_compliant") {
         nonCompliantItems.push({
           agentId: agent.id,
@@ -290,6 +306,21 @@ complianceRoutes.get("/compliance/overview", (c) => {
         });
       }
     }
+
+    const agentComplianceRate = checklistTotal > 0 ? checklistCompliant / checklistTotal : 0;
+    const hasOverdueReview = classification?.reviewDueAt
+      ? new Date(classification.reviewDueAt) < new Date()
+      : false;
+
+    overviewAgents.push({
+      agentId: agent.id,
+      riskLevel: riskLevel as "high" | "limited" | "minimal" | null,
+      complianceRate: agentComplianceRate,
+      checklistTotal: checklistTotal,
+      checklistCompliant: checklistCompliant,
+      reviewDueAt: classification?.reviewDueAt ?? null,
+      hasOverdueReview,
+    });
   }
 
   const complianceRate = totalItems > 0 ? totalCompliant / totalItems : 0;
@@ -300,6 +331,7 @@ complianceRoutes.get("/compliance/overview", (c) => {
     complianceRate,
     nonCompliantItems,
     pendingReviews,
+    agents: overviewAgents,
   });
 });
 
