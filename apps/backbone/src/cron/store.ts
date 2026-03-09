@@ -2,7 +2,7 @@ import { readdirSync, readFileSync, existsSync, mkdirSync, unlinkSync } from "no
 import { join, basename } from "node:path";
 import { agentDir } from "../context/paths.js";
 import { listAgents } from "../agents/registry.js";
-import { readYaml, writeYaml, writeFileAtomic } from "../context/readers.js";
+import { readYaml, readYamlAs, writeYamlAs, writeFileAtomic } from "../context/readers.js";
 import { CronYmlSchema, type CronYml } from "../context/schemas.js";
 import type { CronJob, CronJobDef, CronJobState, CronJobPatch, CronSchedule, CronPayload } from "./types.js";
 
@@ -171,12 +171,12 @@ export function createCronJobFile(
 
   const filePath = join(dir, `${slug}.yml`);
   const metadata = defToMetadata(def);
-  writeYaml(filePath, metadata);
+  writeYamlAs(filePath, metadata, CronYmlSchema);
   return filePath;
 }
 
 export function updateCronJobFile(jobPath: string, patch: CronJobPatch): void {
-  const config = readYaml(jobPath);
+  const config = readYamlAs(jobPath, CronYmlSchema) as Record<string, unknown>;
 
   if (patch.name !== undefined) config["name"] = patch.name;
   if (patch.enabled !== undefined) config["enabled"] = patch.enabled;
@@ -207,7 +207,7 @@ export function updateCronJobFile(jobPath: string, patch: CronJobPatch): void {
     }
   }
 
-  writeYaml(jobPath, config);
+  writeYamlAs(jobPath, config, CronYmlSchema);
 }
 
 export function deleteCronJobFile(jobPath: string): void {

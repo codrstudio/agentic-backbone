@@ -1,7 +1,7 @@
 import { existsSync, mkdirSync, readdirSync, rmSync } from "node:fs";
 import { join, dirname } from "node:path";
 import type { Hono } from "hono";
-import { readYaml, writeYaml } from "../context/readers.js";
+import { readYaml, readYamlAs, writeYamlAs } from "../context/readers.js";
 import { AdapterYmlSchema } from "../context/schemas.js";
 import {
   type ResourceKind,
@@ -79,7 +79,6 @@ export class ConnectorRegistry {
         name: data.name ?? slug,
         description: data.description ?? "",
         source,
-        enabled: (metadata.enabled as boolean) ?? true,
         dir: dirname(ymlPath),
         content: "",
         metadata,
@@ -301,7 +300,7 @@ export class ConnectorRegistry {
       throw new Error(`Adapter ${slug} not found in scope ${scope}`);
     }
 
-    const config = readYaml(ymlPath);
+    const config = readYamlAs(ymlPath, AdapterYmlSchema) as Record<string, unknown>;
 
     if (updates.name !== undefined) config.name = updates.name;
     if (updates.description !== undefined) config.description = updates.description;
@@ -309,7 +308,7 @@ export class ConnectorRegistry {
     if (updates.params !== undefined) config.params = updates.params;
     if (updates.enabled !== undefined) config.enabled = updates.enabled;
 
-    writeYaml(ymlPath, config);
+    writeYamlAs(ymlPath, config, AdapterYmlSchema);
 
     this.invalidateClient(slug);
 
@@ -354,7 +353,7 @@ export class ConnectorRegistry {
     if (data.options) config.options = data.options;
 
     mkdirSync(adapterDir, { recursive: true });
-    writeYaml(ymlPath, config);
+    writeYamlAs(ymlPath, config, AdapterYmlSchema);
 
     const created = this.getAdapter(scope, slug);
     if (!created) throw new Error(`Failed to read adapter after create`);

@@ -11,6 +11,7 @@ import {
 import { join, dirname, basename } from "node:path";
 import { randomBytes } from "node:crypto";
 import yaml from "js-yaml";
+import { type ZodType } from "zod";
 import { processYamlFields } from "../utils/encryption.js";
 
 // ── Env interpolation ────────────────────────────────────
@@ -165,4 +166,35 @@ export function writeYaml(filePath: string, data: Record<string, unknown>): void
 /** Le arquivo de contexto com interpolacao de env vars */
 export function readContextFile(filePath: string): string {
   return interpolateEnvVars(readFileSync(filePath, "utf-8"));
+}
+
+// ── Typed wrappers with Zod validation ──────────────────
+
+export function readYamlAs<T>(filePath: string, schema: ZodType<T>): T {
+  return schema.parse(readYaml(filePath));
+}
+
+export function writeYamlAs<T>(
+  filePath: string,
+  data: T,
+  schema: ZodType<T>
+): void {
+  writeYaml(filePath, schema.parse(data) as Record<string, unknown>);
+}
+
+export function readMarkdownAs<T>(
+  filePath: string,
+  schema: ZodType<T>
+): { metadata: T; content: string } {
+  const { metadata, content } = readMarkdown(filePath);
+  return { metadata: schema.parse(metadata), content };
+}
+
+export function writeMarkdownAs<T>(
+  filePath: string,
+  metadata: T,
+  content: string,
+  schema: ZodType<T>
+): void {
+  writeMarkdown(filePath, schema.parse(metadata) as Record<string, unknown>, content);
 }

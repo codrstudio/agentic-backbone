@@ -8,7 +8,8 @@ import {
 } from "node:fs";
 import { join } from "node:path";
 import { agentDir, agentsDir, agentConfigPath } from "../context/paths.js";
-import { readYaml, writeYaml, readContextFile } from "../context/readers.js";
+import { readYaml, readYamlAs, writeYamlAs, readContextFile } from "../context/readers.js";
+import { AgentYmlSchema } from "../context/schemas.js";
 import { refreshAgentRegistry, getAgent } from "./registry.js";
 import type { AgentConfig } from "./types.js";
 
@@ -58,7 +59,7 @@ export function createAgent(input: CreateAgentInput): AgentConfig {
     ...input.metadata,
   };
 
-  writeYaml(agentConfigPath(agentId), config);
+  writeYamlAs(agentConfigPath(agentId), config, AgentYmlSchema);
 
   // Create default markdown files
   writeFileSync(join(dir, "SOUL.md"), `# ${input.slug} Soul\n\nDescribe this agent's identity and behavior.\n`);
@@ -76,7 +77,7 @@ export function updateAgent(agentId: string, updates: UpdateAgentInput): AgentCo
     throw new Error(`Agent ${agentId} not found`);
   }
 
-  const config = readYaml(configPath);
+  const config = readYamlAs(configPath, AgentYmlSchema) as Record<string, unknown>;
 
   if (updates.delivery !== undefined) config.delivery = updates.delivery;
   if (updates.enabled !== undefined) config.enabled = updates.enabled;
@@ -89,7 +90,7 @@ export function updateAgent(agentId: string, updates: UpdateAgentInput): AgentCo
     }
   }
 
-  writeYaml(configPath, config);
+  writeYamlAs(configPath, config, AgentYmlSchema);
 
   refreshAgentRegistry();
   return getAgent(agentId)!;
@@ -124,11 +125,11 @@ export function duplicateAgent(
 
   // Update the AGENT.yml with new identity
   const configPath = agentConfigPath(newId);
-  const config = readYaml(configPath);
+  const config = readYamlAs(configPath, AgentYmlSchema) as Record<string, unknown>;
   config.id = newId;
   config.owner = newOwner;
   config.slug = newSlug;
-  writeYaml(configPath, config);
+  writeYamlAs(configPath, config, AgentYmlSchema);
 
   refreshAgentRegistry();
   return getAgent(newId)!;

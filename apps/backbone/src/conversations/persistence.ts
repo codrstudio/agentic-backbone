@@ -7,7 +7,7 @@ import {
 import { join } from "node:path";
 import { randomBytes } from "node:crypto";
 import { agentDir } from "../context/paths.js";
-import { readYaml, writeYaml } from "../context/readers.js";
+import { readYamlAs, writeYamlAs } from "../context/readers.js";
 import { SessionYmlSchema } from "../context/schemas.js";
 
 export interface PersistentMessage {
@@ -40,14 +40,14 @@ export function initSession(
 
   const sessionYml = join(dir, "SESSION.yml");
   if (!existsSync(sessionYml)) {
-    const sessionData = SessionYmlSchema.parse({
+    const sessionData = {
       "session-id": sessionId,
       "user-id": userId,
       "agent-id": agentId,
       "created-at": new Date().toISOString(),
       "message-count": 0,
-    });
-    writeYaml(sessionYml, sessionData);
+    };
+    writeYamlAs(sessionYml, sessionData, SessionYmlSchema);
   }
 }
 
@@ -78,11 +78,11 @@ export function updateSessionMetadata(
   const sessionYml = join(dir, "SESSION.yml");
   if (!existsSync(sessionYml)) return;
 
-  const config = readYaml(sessionYml);
+  const config = readYamlAs(sessionYml, SessionYmlSchema) as Record<string, unknown>;
   for (const [key, value] of Object.entries(updates)) {
     config[key] = value;
   }
-  writeYaml(sessionYml, config);
+  writeYamlAs(sessionYml, config, SessionYmlSchema);
 }
 
 // --- Read messages ---

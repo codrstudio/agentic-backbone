@@ -5,7 +5,8 @@ import {
 } from "node:fs";
 import { join } from "node:path";
 import { channelDir } from "../context/paths.js";
-import { readYaml, writeYaml } from "../context/readers.js";
+import { readYamlAs, writeYamlAs } from "../context/readers.js";
+import { ChannelYmlSchema } from "../context/schemas.js";
 import { refreshChannelRegistry, getChannel } from "./registry.js";
 import type { ChannelConfig } from "./types.js";
 
@@ -41,7 +42,7 @@ export function createChannel(input: CreateChannelInput): ChannelConfig {
     ...input.metadata,
   };
 
-  writeYaml(ymlPath, config);
+  writeYamlAs(ymlPath, config, ChannelYmlSchema);
 
   refreshChannelRegistry();
   return getChannel(input.slug)!;
@@ -59,7 +60,7 @@ export function updateChannel(
     throw new Error(`Channel ${slug} not found`);
   }
 
-  const config = readYaml(ymlPath);
+  const config = readYamlAs(ymlPath, ChannelYmlSchema) as Record<string, unknown>;
 
   if (updates.type !== undefined) config.type = updates.type;
   if (updates.description !== undefined) config.description = updates.description;
@@ -69,7 +70,7 @@ export function updateChannel(
     }
   }
 
-  writeYaml(ymlPath, config);
+  writeYamlAs(ymlPath, config, ChannelYmlSchema);
 
   refreshChannelRegistry();
   return getChannel(slug)!;

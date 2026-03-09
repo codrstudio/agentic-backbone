@@ -6,7 +6,7 @@ import {
 } from "node:fs";
 import { join } from "node:path";
 import { usersDir, userDir } from "../context/paths.js";
-import { readMarkdown, writeMarkdown, readYaml, writeYaml } from "../context/readers.js";
+import { readYaml, readMarkdown, readMarkdownAs, writeMarkdownAs, readYamlAs, writeYamlAs } from "../context/readers.js";
 import { UserMdSchema, CredentialYmlSchema } from "../context/schemas.js";
 import {
   type UserConfig,
@@ -142,20 +142,20 @@ export function createUser(
   const userEmail = email ?? "";
 
   // USER.md — profile (no secrets)
-  writeMarkdown(join(dir, "USER.md"), {
+  writeMarkdownAs(join(dir, "USER.md"), {
     slug,
     displayName,
     canCreateAgents: perms.canCreateAgents,
     canCreateChannels: perms.canCreateChannels,
     maxAgents: perms.maxAgents,
-  }, `# ${displayName}\n`);
+  }, `# ${displayName}\n`, UserMdSchema);
 
   // credential.yml — secrets (auto-encrypted)
-  writeYaml(credentialPath(slug), {
+  writeYamlAs(credentialPath(slug), {
     type: "user-password",
     email: userEmail,
     password: passwordHash,
-  });
+  }, CredentialYmlSchema);
 
   return { slug, displayName, email: userEmail, permissions: perms };
 }
@@ -180,22 +180,22 @@ export function updateUser(
   const perms = { ...current.permissions, ...updates.permissions };
 
   // Update USER.md (profile only)
-  writeMarkdown(mdPath, {
+  writeMarkdownAs(mdPath, {
     slug,
     displayName,
     canCreateAgents: perms.canCreateAgents,
     canCreateChannels: perms.canCreateChannels,
     maxAgents: perms.maxAgents,
-  }, `# ${displayName}\n`);
+  }, `# ${displayName}\n`, UserMdSchema);
 
   // Update credential.yml
   const credPath = credentialPath(slug);
-  const cred = existsSync(credPath) ? readYaml(credPath) : { type: "user-password" };
+  const cred = existsSync(credPath) ? (readYamlAs(credPath, CredentialYmlSchema) as Record<string, unknown>) : { type: "user-password" };
 
   if (updates.email !== undefined) cred.email = updates.email;
   if (updates.password) cred.password = hashPassword(updates.password);
 
-  writeYaml(credPath, cred);
+  writeYamlAs(credPath, cred, CredentialYmlSchema);
 
   return { slug, displayName, email, permissions: perms };
 }
