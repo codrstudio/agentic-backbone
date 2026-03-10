@@ -186,6 +186,10 @@ JWT-based. Hybrid: accepts both Laravel JWT (`role_id` + `unidades`) and Backbon
 - ESM-only (`"type": "module"`) — use `.js` extensions in import paths
 - `dotenv-cli` required for env loading (`node --env-file` does NOT interpolate `${VAR}`)
 
+## Project Hygiene
+
+- **Temporary files go in `.tmp/`** — scripts, test outputs, browser sessions, etc. Never clutter the root. Add `.tmp/` to `.gitignore`.
+
 ## Agent Design Rules
 
 - `composeAgentTools()` must give ALL tools in ALL modes. No `if (mode === "x")` guards.
