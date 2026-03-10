@@ -39,79 +39,75 @@ export function MessageBubble({ message, isStreaming, sessionId, onTrace, messag
     setTimeout(() => setCopied(false), 2000);
   }
 
-  return (
-    <div
-      className={cn(
-        "group flex w-full",
-        isUser ? "justify-end" : "justify-start",
-      )}
-    >
-      <div
-        className={cn(
-          "relative max-w-[85%] rounded-2xl px-4 py-2.5 text-sm",
-          isUser
-            ? "bg-primary text-primary-foreground"
-            : "bg-muted text-foreground",
-        )}
-      >
-        {isUser ? (
+  if (isUser) {
+    return (
+      <div className="group flex w-full justify-end">
+        <div className="relative max-w-[85%] rounded-2xl bg-muted px-4 py-2.5 text-sm">
           <p className="whitespace-pre-wrap">{message.content}</p>
-        ) : (
-          <div className="prose prose-sm dark:prose-invert max-w-none [&>*:first-child]:mt-0 [&>*:last-child]:mb-0">
-            <Markdown>{message.content}</Markdown>
-            {isStreaming && <StreamingIndicator />}
-          </div>
-        )}
-
-        {!isUser && Boolean(message.metadata?.agentId) && (
-          <div className="mt-1.5">
-            <Badge variant="outline" className="gap-1 text-[10px] px-1.5 py-0">
-              <Bot className="size-2.5" />
-              {message.metadata?.agentId as string}
-            </Badge>
-          </div>
-        )}
-
-        {!isStreaming && message.content && (
-          <div
-            className={cn(
-              "absolute -top-3 flex gap-0.5 opacity-0 transition-opacity group-hover:opacity-100",
-              isUser ? "-left-2" : "-right-2",
-            )}
-          >
-            {!isUser && sessionId && onTrace && (
+          {!isStreaming && message.content && (
+            <div className="absolute -top-3 -left-2 flex gap-0.5 opacity-0 transition-opacity group-hover:opacity-100">
               <Button
                 variant="ghost"
                 size="icon"
                 className="size-6"
-                title="Ver trace"
-                onClick={() => onTrace(sessionId)}
+                onClick={handleCopy}
               >
-                <Activity className="size-3" />
+                {copied ? <Check className="size-3" /> : <Copy className="size-3" />}
               </Button>
-            )}
-            {!isUser && sessionId && messageId && (
-              <MessageFeedback
-                sessionId={sessionId}
-                messageId={messageId}
-                feedback={message.feedback}
-              />
-            )}
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // Assistant: no bubble, clean text aligned left
+  return (
+    <div className="group relative w-full text-sm">
+      <div className="prose prose-sm dark:prose-invert max-w-none [&>*:first-child]:mt-0 [&>*:last-child]:mb-0">
+        <Markdown>{message.content}</Markdown>
+        {isStreaming && <StreamingIndicator />}
+      </div>
+
+      {Boolean(message.metadata?.agentId) && (
+        <div className="mt-1.5">
+          <Badge variant="outline" className="gap-1 text-[10px] px-1.5 py-0">
+            <Bot className="size-2.5" />
+            {message.metadata?.agentId as string}
+          </Badge>
+        </div>
+      )}
+
+      {!isStreaming && message.content && (
+        <div className="mt-1 flex gap-0.5 opacity-0 transition-opacity group-hover:opacity-100">
+          {sessionId && onTrace && (
             <Button
               variant="ghost"
               size="icon"
               className="size-6"
-              onClick={handleCopy}
+              title="Ver trace"
+              onClick={() => onTrace(sessionId)}
             >
-              {copied ? (
-                <Check className="size-3" />
-              ) : (
-                <Copy className="size-3" />
-              )}
+              <Activity className="size-3" />
             </Button>
-          </div>
-        )}
-      </div>
+          )}
+          {sessionId && messageId && (
+            <MessageFeedback
+              sessionId={sessionId}
+              messageId={messageId}
+              feedback={message.feedback}
+            />
+          )}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="size-6"
+            onClick={handleCopy}
+          >
+            {copied ? <Check className="size-3" /> : <Copy className="size-3" />}
+          </Button>
+        </div>
+      )}
     </div>
   );
 }
