@@ -188,6 +188,7 @@ JWT-based. Hybrid: accepts both Laravel JWT (`role_id` + `unidades`) and Backbon
 ## Project Hygiene
 
 - **Temporary files go in `.tmp/`** — scripts, test outputs, browser sessions, etc. Never clutter the root. Add `.tmp/` to `.gitignore`.
+- **YAML files must never be written with raw `fs`** — always use `writeYamlAs` (create) or `patchYamlAs` (update) from `context/readers.ts`. See `guides/yaml-metadata/GUIDE.md`.
 
 ## Agent Design Rules
 
