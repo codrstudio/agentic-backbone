@@ -198,3 +198,29 @@ export function writeMarkdownAs<T>(
 ): void {
   writeMarkdown(filePath, schema.parse(metadata) as Record<string, unknown>, content);
 }
+
+export function patchYamlAs<T>(
+  filePath: string,
+  patch: Record<string, unknown>,
+  schema: ZodType<T>
+): T {
+  const current = existsSync(filePath) ? readYaml(filePath) : {};
+  const merged = { ...current, ...patch };
+  const validated = schema.parse(merged);
+  writeYaml(filePath, validated as Record<string, unknown>);
+  return validated;
+}
+
+export function patchMarkdownAs<T>(
+  filePath: string,
+  patch: Record<string, unknown>,
+  schema: ZodType<T>,
+  body?: string
+): { metadata: T; content: string } {
+  const { metadata: current, content: currentBody } = readMarkdown(filePath);
+  const merged = { ...current, ...patch };
+  const validated = schema.parse(merged);
+  const finalBody = body !== undefined ? body : currentBody;
+  writeMarkdown(filePath, validated as Record<string, unknown>, finalBody);
+  return { metadata: validated, content: finalBody };
+}

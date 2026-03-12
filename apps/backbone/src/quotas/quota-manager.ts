@@ -1,7 +1,8 @@
-import { readFileSync, writeFileSync } from "node:fs";
 import { db } from "../db/index.js";
 import { getAgent } from "../agents/registry.js";
 import { agentConfigPath } from "../context/paths.js";
+import { readYamlAs, writeYamlAs } from "../context/readers.js";
+import { AgentYmlSchema } from "../context/schemas.js";
 import type { QuotaConfig } from "../agents/types.js";
 
 export type WindowType = "hourly" | "daily";
@@ -143,35 +144,26 @@ export function recordToolCall(agentId: string): void {
 }
 
 /**
- * Writes enabled: false to the agent's AGENT.md frontmatter.
+ * Writes enabled: false to the agent's AGENT.yml.
  * Used to auto-pause an agent when quota is exceeded and pause_on_exceed is true.
  */
 export function pauseAgent(agentId: string): void {
   const path = agentConfigPath(agentId);
-  let content: string;
+  let data: ReturnType<typeof AgentYmlSchema.parse>;
   try {
-    content = readFileSync(path, "utf-8");
+    data = readYamlAs(path, AgentYmlSchema);
   } catch {
-    console.warn(`[quota] could not read AGENT.md for ${agentId}`);
+    console.warn(`[quota] could not read AGENT.yml for ${agentId}`);
     return;
   }
 
-  // If frontmatter has enabled: true, flip it. Otherwise insert before closing ---
-  if (/^enabled:\s*true\s*$/m.test(content)) {
-    content = content.replace(/^(enabled:\s*)true(\s*)$/m, "$1false$2");
-  } else if (/^enabled:\s*false\s*$/m.test(content)) {
-    // already disabled
-    return;
-  } else {
-    // Insert enabled: false after the opening ---
-    content = content.replace(/^---\n/, "---\nenabled: false\n");
-  }
+  if (data.enabled === false) return;
 
   try {
-    writeFileSync(path, content, "utf-8");
-    console.log(`[quota] agent ${agentId} paused (enabled: false written to AGENT.md)`);
+    writeYamlAs(path, { ...data, enabled: false }, AgentYmlSchema);
+    console.log(`[quota] agent ${agentId} paused (enabled: false written to AGENT.yml)`);
   } catch (err) {
-    console.warn(`[quota] could not write AGENT.md for ${agentId}:`, err);
+    console.warn(`[quota] could not write AGENT.yml for ${agentId}:`, err);
   }
 }
 

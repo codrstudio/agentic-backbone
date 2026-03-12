@@ -17,9 +17,9 @@ export const AgentYmlSchema = z
 
 export type AgentYml = z.infer<typeof AgentYmlSchema>;
 
-// ── USER.md frontmatter ──────────────────────────────────
+// ── USER.yml ─────────────────────────────────────────────
 
-export const UserMdSchema = z.object({
+export const UserYmlSchema = z.object({
   slug: z.string().optional(),
   displayName: z.string().optional(),
   email: z.string().default(""),
@@ -27,19 +27,11 @@ export const UserMdSchema = z.object({
   canCreateAgents: z.boolean().default(true),
   canCreateChannels: z.boolean().default(true),
   maxAgents: z.number().int().positive().default(5),
-});
-
-export type UserMd = z.infer<typeof UserMdSchema>;
-
-// ── credential.yml ───────────────────────────────────────
-
-export const CredentialYmlSchema = z.object({
   type: z.literal("user-password").default("user-password"),
-  email: z.string().default(""),
   password: z.string().optional(),
 });
 
-export type CredentialYml = z.infer<typeof CredentialYmlSchema>;
+export type UserYml = z.infer<typeof UserYmlSchema>;
 
 // ── CHANNEL.yml ──────────────────────────────────────────
 
@@ -89,43 +81,38 @@ export type CronYml = z.infer<typeof CronYmlSchema>;
 
 // ── SKILL.md frontmatter ─────────────────────────────────
 
-export const SkillMdSchema = z
-  .object({
-    name: z.string().optional(),
-    description: z.string().optional(),
-    enabled: z.boolean().default(true),
-    "user-invocable": z.boolean().optional(),
-    trigger: z.string().optional(),
-  })
-  .passthrough();
+export const SkillMdSchema = z.object({
+  name: z.string().optional(),
+  description: z.string().optional(),
+  enabled: z.boolean().default(true),
+  "user-invocable": z.boolean().optional(),
+  trigger: z.string().optional(),
+});
 
 export type SkillMd = z.infer<typeof SkillMdSchema>;
 
 // ── SERVICE.md frontmatter ───────────────────────────────
 
-export const ServiceMdSchema = z
-  .object({
-    name: z.string().optional(),
-    description: z.string().optional(),
-    enabled: z.boolean().default(true),
-    "skip-agent": z.boolean().optional(),
-  })
-  .passthrough();
+export const ServiceMdSchema = z.object({
+  name: z.string().optional(),
+  description: z.string().optional(),
+  enabled: z.boolean().default(true),
+  "skip-agent": z.boolean().optional(),
+});
 
 export type ServiceMd = z.infer<typeof ServiceMdSchema>;
 
 // ── ADAPTER.yml ──────────────────────────────────────────
 
-export const AdapterYmlSchema = z
-  .object({
-    connector: z.string(),
-    name: z.string().optional(),
-    description: z.string().optional(),
-    policy: z.enum(["readonly", "readwrite"]).default("readonly"),
-    credential: z.record(z.unknown()).optional(),
-    params: z.record(z.unknown()).optional(),
-    options: z.record(z.unknown()).optional(),
-  })
-  .passthrough();
+export const AdapterYmlSchema = z.object({
+  connector: z.string(),
+  name: z.string().optional(),
+  description: z.string().optional(),
+  enabled: z.boolean().default(false),
+  policy: z.enum(["readonly", "readwrite"]).default("readonly"),
+  credential: z.record(z.unknown()).optional(),
+  params: z.record(z.unknown()).optional(),
+  options: z.record(z.unknown()).optional(),
+});
 
 export type AdapterYml = z.infer<typeof AdapterYmlSchema>;

@@ -1,14 +1,13 @@
 import { tool } from "ai";
 import { z } from "zod";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
-import { userDir } from "../../context/paths.js";
+import { userAboutPath } from "../../context/paths.js";
 
 export function createMemoryUserSaveTool(): Record<string, any> {
   return {
     memory_user_save: tool({
       description:
-        "Save learned facts about a user to their USER.md profile. " +
+        "Save learned facts about a user to their ABOUT.md profile. " +
         "Use when you discover user preferences, context, or relevant information during interactions. " +
         "Duplicates are skipped automatically.",
       parameters: z.object({
@@ -21,7 +20,7 @@ export function createMemoryUserSaveTool(): Record<string, any> {
           .describe("Facts to record about the user. Each should be concise and objective."),
       }),
       execute: async (args) => {
-        const path = join(userDir(args.userSlug), "USER.md");
+        const path = userAboutPath(args.userSlug);
 
         if (!existsSync(path)) {
           return { saved: false, error: `User '${args.userSlug}' not found` };

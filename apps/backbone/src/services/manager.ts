@@ -1,7 +1,5 @@
 import {
   existsSync,
-  readFileSync,
-  writeFileSync,
   mkdirSync,
   rmSync,
   cpSync,
@@ -14,8 +12,9 @@ import {
   type ResourceKind,
 } from "../context/paths.js";
 import {
-  parseFrontmatter,
-  serializeFrontmatter,
+  readMarkdownAs,
+  writeMarkdown,
+  patchMarkdownAs,
 } from "../context/readers.js";
 import { ServiceMdSchema } from "../context/schemas.js";
 import { resolveServices, type ResolvedResource } from "../context/resolver.js";
@@ -59,21 +58,17 @@ export function createService(input: CreateServiceInput): ResolvedResource {
 
   mkdirSync(serviceDir, { recursive: true });
 
-  const metaRaw: Record<string, unknown> = {
+  const metaRaw = {
     name: input.name,
     description: input.description ?? "",
     "skip-agent": input.skipAgent ?? false,
     enabled: true,
     ...input.metadata,
   };
-  const result = ServiceMdSchema.safeParse(metaRaw);
-  if (!result.success) {
-    throw new Error(`Invalid service metadata: ${result.error.message}`);
-  }
-  const meta = result.data;
 
+  const meta = ServiceMdSchema.parse(metaRaw);
   const body = input.body ?? `# ${input.name}\n`;
-  writeFileSync(mdPath, serializeFrontmatter(meta, body));
+  writeMarkdown(mdPath, meta as Record<string, unknown>, body);
 
   return {
     slug: input.slug,
@@ -96,29 +91,20 @@ export function updateService(
     throw new Error(`Service ${slug} not found in scope ${scope}`);
   }
 
-  const raw = readFileSync(mdPath, "utf-8");
-  const { metadata, content } = parseFrontmatter(raw);
+  const patch: Record<string, unknown> = {};
+  if (updates.name !== undefined) patch.name = updates.name;
+  if (updates.description !== undefined) patch.description = updates.description;
+  if (updates.skipAgent !== undefined) patch["skip-agent"] = updates.skipAgent;
+  if (updates.metadata) Object.assign(patch, updates.metadata);
 
-  if (updates.name !== undefined) metadata.name = updates.name;
-  if (updates.description !== undefined)
-    metadata.description = updates.description;
-  if (updates.skipAgent !== undefined)
-    metadata["skip-agent"] = updates.skipAgent;
-  if (updates.metadata) {
-    for (const [key, value] of Object.entries(updates.metadata)) {
-      metadata[key] = value;
-    }
-  }
-
-  const newContent = updates.body !== undefined ? updates.body : content;
-  writeFileSync(mdPath, serializeFrontmatter(metadata, newContent));
+  const { metadata, content } = patchMarkdownAs(mdPath, patch, ServiceMdSchema, updates.body);
 
   return {
     slug,
     path: mdPath,
     source: scope,
-    metadata,
-    content: newContent,
+    metadata: metadata as Record<string, unknown>,
+    content,
   };
 }
 
@@ -148,14 +134,13 @@ export function assignServiceToAgent(
   cpSync(sourceDir, destDir, { recursive: true });
 
   const mdPath = join(destDir, FILENAME);
-  const raw = readFileSync(mdPath, "utf-8");
-  const { metadata, content } = parseFrontmatter(raw);
+  const { metadata, content } = readMarkdownAs(mdPath, ServiceMdSchema);
 
   return {
     slug,
     path: mdPath,
     source: `agent:${agentId}`,
-    metadata,
+    metadata: metadata as Record<string, unknown>,
     content,
   };
 }

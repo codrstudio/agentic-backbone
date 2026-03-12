@@ -64,7 +64,6 @@ export class ConnectorRegistry {
         continue;
       }
       const data = result.data;
-      const metadata = data as Record<string, unknown>;
 
       const params = data.params ?? {};
       const credential = data.credential ?? params;
@@ -79,10 +78,10 @@ export class ConnectorRegistry {
         name: data.name ?? slug,
         description: data.description ?? "",
         source,
-        enabled: (metadata.enabled as boolean) ?? false,
+        enabled: data.enabled,
         dir: dirname(ymlPath),
         content: "",
-        metadata,
+        metadata: data as Record<string, unknown>,
       });
     }
     return entries;
@@ -92,6 +91,7 @@ export class ConnectorRegistry {
     const result = new Map<string, ResolvedAdapter>();
     for (const { dir, source } of getResourceDirs(agentId, KIND)) {
       for (const entry of this.scanAdaptersInDir(dir, source)) {
+        if (!entry.enabled) continue;
         result.set(entry.slug, entry); // last wins (higher precedence)
       }
     }

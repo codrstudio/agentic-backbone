@@ -4,14 +4,13 @@ import {
   existsSync,
   mkdirSync,
   readdirSync,
-  readFileSync,
   unlinkSync,
-  writeFileSync,
 } from "node:fs";
 import { join } from "node:path";
-import yaml from "js-yaml";
 import { db } from "../db/index.js";
-import { userDir, agentDir } from "../context/paths.js";
+import { userDir, agentDir, agentConfigPath } from "../context/paths.js";
+import { readYamlAs, writeYamlAs } from "../context/readers.js";
+import { AgentYmlSchema } from "../context/schemas.js";
 import { listAgents } from "../agents/registry.js";
 
 export const workflowRoutes = new Hono();
@@ -192,33 +191,12 @@ function conditionToTriggerIntent(cond: WorkflowCondition, label: string): strin
   }
 }
 
-/**
- * Reads AGENT.md using raw YAML frontmatter so we can preserve/update
- * array-valued fields like `handoff`.
- */
-function readAgentMdRaw(agentId: string): { frontmatter: Record<string, unknown>; body: string } {
-  const path = join(agentDir(agentId), "AGENT.md");
-  if (!existsSync(path)) {
-    return { frontmatter: {}, body: "" };
-  }
-  const raw = readFileSync(path, "utf-8");
-  const match = raw.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?([\s\S]*)$/);
-  if (!match) {
-    return { frontmatter: {}, body: raw };
-  }
-  let frontmatter: Record<string, unknown> = {};
-  try {
-    frontmatter = (yaml.load(match[1]) ?? {}) as Record<string, unknown>;
-  } catch {
-    frontmatter = {};
-  }
-  return { frontmatter, body: match[2] };
+function readAgentYml(agentId: string): ReturnType<typeof AgentYmlSchema.parse> {
+  return readYamlAs(agentConfigPath(agentId), AgentYmlSchema);
 }
 
-function writeAgentMd(agentId: string, frontmatter: Record<string, unknown>, body: string): void {
-  const path = join(agentDir(agentId), "AGENT.md");
-  const fm = yaml.dump(frontmatter, { lineWidth: -1 }).trimEnd();
-  writeFileSync(path, `---\n${fm}\n---\n${body}`, "utf-8");
+function writeAgentYml(agentId: string, data: ReturnType<typeof AgentYmlSchema.parse>): void {
+  writeYamlAs(agentConfigPath(agentId), data, AgentYmlSchema);
 }
 
 // POST /workflows/:id/apply — apply workflow to agents
@@ -252,7 +230,7 @@ workflowRoutes.post("/workflows/:id/apply", (c) => {
       continue;
     }
 
-    // Build handoff entries for AGENT.md frontmatter
+    // Build handoff entries for AGENT.yml
     const handoffEntries = outEdges.map((edge) => {
       const targetNode = nodeById.get(edge.to);
       const condValue = buildConditionRegex(edge.condition);
@@ -263,13 +241,12 @@ workflowRoutes.post("/workflows/:id/apply", (c) => {
       };
     });
 
-    // Write to AGENT.md frontmatter
-    const { frontmatter, body } = readAgentMdRaw(sourceAgentId);
-    frontmatter["handoff"] = handoffEntries;
+    // Write handoff to AGENT.yml
     try {
-      writeAgentMd(sourceAgentId, frontmatter, body);
+      const agentYml = readAgentYml(sourceAgentId);
+      writeAgentYml(sourceAgentId, { ...agentYml, handoff: handoffEntries });
     } catch (err) {
-      warnings.push(`Failed to write AGENT.md for '${sourceAgentId}': ${String(err)}`);
+      warnings.push(`Failed to write AGENT.yml for '${sourceAgentId}': ${String(err)}`);
     }
 
     // Sync to agent_handoffs DB — delete existing for this supervisor, re-insert
@@ -304,7 +281,7 @@ workflowRoutes.post("/workflows/:id/apply", (c) => {
 });
 
 /**
- * Converts a WorkflowCondition to a regex string for AGENT.md frontmatter.
+ * Converts a WorkflowCondition to a regex string for AGENT.yml.
  * `fallback` uses ".*" (matches everything).
  */
 function buildConditionRegex(cond: WorkflowCondition): string {

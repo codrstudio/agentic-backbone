@@ -1,7 +1,5 @@
 import {
   existsSync,
-  readFileSync,
-  writeFileSync,
   mkdirSync,
   rmSync,
   cpSync,
@@ -13,7 +11,11 @@ import {
   agentResourceDir,
   type ResourceKind,
 } from "../context/paths.js";
-import { parseFrontmatter, serializeFrontmatter } from "../context/readers.js";
+import {
+  readMarkdownAs,
+  writeMarkdown,
+  patchMarkdownAs,
+} from "../context/readers.js";
 import { SkillMdSchema } from "../context/schemas.js";
 import { resolveSkills, type ResolvedResource } from "../context/resolver.js";
 
@@ -52,19 +54,15 @@ export function createSkill(input: CreateSkillInput): ResolvedResource {
 
   mkdirSync(skillDir, { recursive: true });
 
-  const metaRaw: Record<string, unknown> = {
+  const metaRaw = {
     name: input.name,
     description: input.description ?? "",
     ...input.metadata,
   };
-  const result = SkillMdSchema.safeParse(metaRaw);
-  if (!result.success) {
-    throw new Error(`Invalid skill metadata: ${result.error.message}`);
-  }
-  const meta = result.data;
 
+  const meta = SkillMdSchema.parse(metaRaw);
   const body = input.body ?? `# ${input.name}\n`;
-  writeFileSync(mdPath, serializeFrontmatter(meta, body));
+  writeMarkdown(mdPath, meta as Record<string, unknown>, body);
 
   return {
     slug: input.slug,
@@ -87,26 +85,19 @@ export function updateSkill(
     throw new Error(`Skill ${slug} not found in scope ${scope}`);
   }
 
-  const raw = readFileSync(mdPath, "utf-8");
-  const { metadata, content } = parseFrontmatter(raw);
+  const patch: Record<string, unknown> = {};
+  if (updates.name !== undefined) patch.name = updates.name;
+  if (updates.description !== undefined) patch.description = updates.description;
+  if (updates.metadata) Object.assign(patch, updates.metadata);
 
-  if (updates.name !== undefined) metadata.name = updates.name;
-  if (updates.description !== undefined) metadata.description = updates.description;
-  if (updates.metadata) {
-    for (const [key, value] of Object.entries(updates.metadata)) {
-      metadata[key] = value;
-    }
-  }
-
-  const newContent = updates.body !== undefined ? updates.body : content;
-  writeFileSync(mdPath, serializeFrontmatter(metadata, newContent));
+  const { metadata, content } = patchMarkdownAs(mdPath, patch, SkillMdSchema, updates.body);
 
   return {
     slug,
     path: mdPath,
     source: scope,
-    metadata,
-    content: newContent,
+    metadata: metadata as Record<string, unknown>,
+    content,
   };
 }
 
@@ -136,14 +127,13 @@ export function assignSkillToAgent(
   cpSync(sourceDir, destDir, { recursive: true });
 
   const mdPath = join(destDir, FILENAME);
-  const raw = readFileSync(mdPath, "utf-8");
-  const { metadata, content } = parseFrontmatter(raw);
+  const { metadata, content } = readMarkdownAs(mdPath, SkillMdSchema);
 
   return {
     slug,
     path: mdPath,
     source: `agent:${agentId}`,
-    metadata,
+    metadata: metadata as Record<string, unknown>,
     content,
   };
 }

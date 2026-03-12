@@ -106,8 +106,17 @@ export function agentWorkspaceDir(agentId: string): string {
   return join(agentDir(agentId), "workspace");
 }
 
+export function userYmlPath(slug: string): string {
+  return join(userDir(slug), "USER.yml");
+}
+
+export function userAboutPath(slug: string): string {
+  return join(userDir(slug), "ABOUT.md");
+}
+
+/** @deprecated use userAboutPath */
 export function ownerUserPath(ownerSlug: string): string {
-  return join(userDir(ownerSlug), "USER.md");
+  return userAboutPath(ownerSlug);
 }
 
 // --- Resource kind directories at each level ---
