@@ -1,6 +1,6 @@
 import chokidar, { type FSWatcher } from "chokidar";
 import { basename } from "node:path";
-import { agentsDir, usersDir, sharedResourceDir, plansDir, settingsPath } from "../context/paths.js";
+import { agentsDir, usersDir, sharedResourceDir, plansDir, settingsPath, credentialsUsersDir } from "../context/paths.js";
 import { listAgents, refreshAgentRegistry } from "../agents/registry.js";
 import { refreshChannelRegistry } from "../channels/registry.js";
 import { updateHeartbeatAgent } from "../heartbeat/index.js";
@@ -13,6 +13,7 @@ let agentWatcher: FSWatcher | null = null;
 let channelWatcher: FSWatcher | null = null;
 let adapterWatcher: FSWatcher | null = null;
 let planWatcher: FSWatcher | null = null;
+let credentialsWatcher: FSWatcher | null = null;
 
 const DEBOUNCE_MS = 300;
 
@@ -210,10 +211,22 @@ export function startWatchers(): void {
     .on("unlink", planReloadHandler.handler)
     .on("error", (err) => console.warn("[watchers] plan watcher error:", err));
 
+  const credUsersPath = credentialsUsersDir();
+  credentialsWatcher = chokidar.watch(credUsersPath, {
+    ignoreInitial: true,
+    awaitWriteFinish: { stabilityThreshold: 300, pollInterval: 100 },
+  });
+
+  credentialsWatcher
+    .on("add", handleYmlChange)
+    .on("change", handleYmlChange)
+    .on("error", (err) => console.warn("[watchers] credentials watcher error:", err));
+
   console.log(`[watchers] watching agents: ${agentsPath}`);
   console.log(`[watchers] watching channels: ${usersPath}`);
   console.log(`[watchers] watching adapters: ${sharedAdaptersPath}`);
   console.log(`[watchers] watching plans: ${plansPath}`);
+  console.log(`[watchers] watching credentials: ${credUsersPath}`);
 }
 
 export function stopWatchers(): void {
@@ -237,5 +250,9 @@ export function stopWatchers(): void {
   if (planWatcher) {
     planWatcher.close();
     planWatcher = null;
+  }
+  if (credentialsWatcher) {
+    credentialsWatcher.close();
+    credentialsWatcher = null;
   }
 }
