@@ -7,9 +7,16 @@ import {
   pollingStatus,
 } from "./channel-adapter.js";
 import {
-  createEmailSendReplyTool,
-  createEmailGetThreadTool,
-  createEmailCreateDraftTool,
+  createEmailSendTool,
+  createEmailSearchTool,
+  createEmailReadTool,
+  createEmailDownloadAttachmentTool,
+  createEmailManageFlagsTool,
+  createEmailMoveTool,
+  createEmailDeleteTool,
+  createEmailListMailboxesTool,
+  createEmailDraftCreateTool,
+  createEmailDraftSendTool,
 } from "./tools/index.js";
 
 export const emailConnector: ConnectorDef = {
@@ -27,9 +34,16 @@ export const emailConnector: ConnectorDef = {
     if (adapters.length === 0) return null;
     const slugs = adapters.map((a) => a.slug) as [string, ...string[]];
     return {
-      ...createEmailSendReplyTool(slugs),
-      ...createEmailGetThreadTool(slugs),
-      ...createEmailCreateDraftTool(slugs),
+      ...createEmailSendTool(slugs),
+      ...createEmailSearchTool(slugs),
+      ...createEmailReadTool(slugs),
+      ...createEmailDownloadAttachmentTool(slugs),
+      ...createEmailManageFlagsTool(slugs),
+      ...createEmailMoveTool(slugs),
+      ...createEmailDeleteTool(slugs),
+      ...createEmailListMailboxesTool(slugs),
+      ...createEmailDraftCreateTool(slugs),
+      ...createEmailDraftSendTool(slugs),
     };
   },
 

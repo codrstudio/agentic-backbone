@@ -187,12 +187,26 @@ function buildEmailPrompt(email: ParsedEmail): string {
     ? `${email.fromName} &lt;${email.from}&gt;`
     : email.from;
 
+  const toTag = email.to.length > 0 ? `\n  <to>${escapeXml(email.to.join(", "))}</to>` : "";
+  const ccTag = email.cc.length > 0 ? `\n  <cc>${escapeXml(email.cc.join(", "))}</cc>` : "";
+
+  let attachmentsTag = "";
+  if (email.attachments.length > 0) {
+    const items = email.attachments
+      .map(
+        (a) =>
+          `    <attachment part_id="${escapeXml(a.partId)}" filename="${escapeXml(a.filename)}" content_type="${escapeXml(a.contentType)}" size="${a.size}" />`
+      )
+      .join("\n");
+    attachmentsTag = `\n  <attachments>\n${items}\n  </attachments>`;
+  }
+
   return `<email_received>
-  <from>${fromTag}</from>
+  <from>${fromTag}</from>${toTag}${ccTag}
   <subject>${escapeXml(email.subject)}</subject>
   <message_id>${escapeXml(email.messageId)}</message_id>
   <date>${email.date ? email.date.toISOString() : ""}</date>
-  <body>${escapeXml(email.bodyText)}</body>
+  <body>${escapeXml(email.bodyText)}</body>${attachmentsTag}
 </email_received>`;
 }
 
