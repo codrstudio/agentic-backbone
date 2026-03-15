@@ -169,3 +169,76 @@
 .dark .react-flow__attribution a {
   color: var(--muted-foreground);
 }
+
+/* ── Prose (typography for markdown preview) ── */
+.prose {
+  line-height: 1.65;
+}
+.prose h1 { font-size: 1.5em; font-weight: 700; margin: 1.2em 0 0.6em; }
+.prose h2 { font-size: 1.25em; font-weight: 600; margin: 1.1em 0 0.5em; }
+.prose h3 { font-size: 1.1em; font-weight: 600; margin: 1em 0 0.4em; }
+.prose h4, .prose h5, .prose h6 { font-size: 1em; font-weight: 600; margin: 0.8em 0 0.3em; }
+.prose p { margin: 0.6em 0; }
+.prose strong { font-weight: 700; }
+.prose em { font-style: italic; }
+.prose ul { list-style: disc; padding-left: 1.5em; margin: 0.5em 0; }
+.prose ol { list-style: decimal; padding-left: 1.5em; margin: 0.5em 0; }
+.prose li { margin: 0.25em 0; }
+.prose li > ul, .prose li > ol { margin: 0.15em 0; }
+.prose blockquote {
+  border-left: 3px solid var(--border);
+  padding-left: 1em;
+  margin: 0.6em 0;
+  color: var(--muted-foreground);
+  font-style: italic;
+}
+.prose code {
+  font-size: 0.875em;
+  padding: 0.15em 0.35em;
+  border-radius: 0.25em;
+  background: var(--muted);
+}
+.prose pre {
+  margin: 0.75em 0;
+  padding: 0.75em 1em;
+  border-radius: 0.375em;
+  background: var(--muted);
+  overflow-x: auto;
+}
+.prose pre code {
+  padding: 0;
+  background: transparent;
+  font-size: 0.85em;
+}
+.prose a {
+  color: var(--primary);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.prose hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 1em 0;
+}
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0.75em 0;
+  font-size: 0.875em;
+}
+.prose th, .prose td {
+  border: 1px solid var(--border);
+  padding: 0.4em 0.75em;
+  text-align: left;
+}
+.prose th {
+  font-weight: 600;
+  background: var(--muted);
+}
+.prose img { max-width: 100%; border-radius: 0.375em; margin: 0.75em 0; }
+
+.prose-sm { font-size: 0.875rem; }
+
+.prose.dark\:prose-invert:is(.dark *) {
+  color: var(--foreground);
+}
