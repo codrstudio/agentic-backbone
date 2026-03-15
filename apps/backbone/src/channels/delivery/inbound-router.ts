@@ -1,6 +1,7 @@
 import { getChannel } from "../registry.js";
 import { findOrCreateSession, sendMessage } from "../../conversations/index.js";
 import { createStreamDispatcher } from "./stream-dispatcher.js";
+import { eventBus } from "../../events/index.js";
 import type { InboundMessage } from "./types.js";
 
 const MAX_CONTENT_LENGTH = 4000;
@@ -57,6 +58,15 @@ export async function routeInboundMessage(
   const prefixedContent = `[canal: ${adapterSlug}] ${content}`;
 
   console.log(`[inbound-router] processing: agent=${agentId} session=${sessionId} content="${content.substring(0, 50)}"`);
+
+  eventBus.emit("channel:message", {
+    ts: message.ts ?? Date.now(),
+    channelId,
+    agentId,
+    role: "user",
+    content,
+    sessionId,
+  });
 
   try {
     const events = sendMessage(message.senderId, sessionId, prefixedContent);

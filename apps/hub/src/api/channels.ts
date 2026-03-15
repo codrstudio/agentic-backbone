@@ -5,6 +5,7 @@ export interface Channel {
   slug: string;
   owner: string;
   type: string;
+  agent?: string;
   metadata: Record<string, unknown>;
   description: string;
   listeners: number;
@@ -26,7 +27,7 @@ export function channelQueryOptions(slug: string) {
 
 export async function updateChannel(
   slug: string,
-  data: Partial<Pick<Channel, "description" | "owner" | "metadata">>,
+  data: Partial<Pick<Channel, "description" | "owner" | "agent" | "metadata">>,
 ): Promise<Channel> {
   return request<Channel>(`/channels/${slug}`, {
     method: "PATCH",

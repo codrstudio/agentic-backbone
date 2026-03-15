@@ -34,5 +34,7 @@ export interface ChannelAdapter {
   send(options: ChannelAdapterSendOptions): Promise<void>;
   onInbound?(callback: InboundCallback): void;
   health?(): { status: "healthy" | "degraded" | "unhealthy"; details?: Record<string, unknown> };
+  reconnect?(): Promise<void>;
+  disconnect?(): Promise<void>;
   close?(): Promise<void>;
 }

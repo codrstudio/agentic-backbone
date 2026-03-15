@@ -8,29 +8,52 @@ import { deliverToSystemChannel, deliverToChannel } from "../channels/system-cha
 import { getAuthUser, filterByOwner, assertOwnership } from "./auth-helpers.js";
 import { formatError } from "../utils/errors.js";
 import { collectAgentResult } from "../utils/agent-stream.js";
+import { channelAdapterRegistry } from "../channels/delivery/index.js";
+import type { ChannelConfig } from "../channels/types.js";
+
+async function enrichWithHealth(channel: ChannelConfig) {
+  const adapterSlug = channel["channel-adapter"];
+  let connected = false;
+  if (adapterSlug) {
+    try {
+      const adapter = await channelAdapterRegistry.resolve(adapterSlug, {
+        ...channel.options,
+        "channel-id": channel.slug,
+        "channel-adapter": adapterSlug,
+      });
+      const health = adapter.health?.();
+      connected = health?.status === "healthy";
+    } catch {
+      // adapter not available
+    }
+  }
+  return { ...channel, metadata: { ...channel.metadata, connected } };
+}
 
 export const channelRoutes = new Hono();
 
 // --- List Channels ---
 
-channelRoutes.get("/channels", (c) => {
+channelRoutes.get("/channels", async (c) => {
   const auth = getAuthUser(c);
-  const channels = filterByOwner(listChannels(), auth).map((ch) => ({
-    ...ch,
-    listeners: sseHub.getClientCount(ch.slug),
-  }));
+  const channels = await Promise.all(
+    filterByOwner(listChannels(), auth).map(async (ch) => ({
+      ...(await enrichWithHealth(ch)),
+      listeners: sseHub.getClientCount(ch.slug),
+    }))
+  );
   return c.json(channels);
 });
 
 // --- Get Channel ---
 
-channelRoutes.get("/channels/:slug", (c) => {
+channelRoutes.get("/channels/:slug", async (c) => {
   const channel = getChannel(c.req.param("slug"));
   if (!channel) return c.json({ error: "not found" }, 404);
   const denied = assertOwnership(c, channel.owner);
   if (denied) return denied;
   return c.json({
-    ...channel,
+    ...(await enrichWithHealth(channel)),
     listeners: sseHub.getClientCount(channel.slug),
   });
 });
@@ -81,6 +104,56 @@ channelRoutes.delete("/channels/:slug", (c) => {
   const deleted = deleteChannel(channel.owner, slug);
   if (!deleted) return c.json({ error: "delete failed" }, 500);
   return c.json({ status: "deleted" });
+});
+
+// --- Reconnect ---
+
+channelRoutes.post("/channels/:slug/reconnect", async (c) => {
+  const channel = getChannel(c.req.param("slug"));
+  if (!channel) return c.json({ error: "not found" }, 404);
+  const denied = assertOwnership(c, channel.owner);
+  if (denied) return denied;
+
+  const adapterSlug = channel["channel-adapter"];
+  if (!adapterSlug) return c.json({ error: "no adapter" }, 400);
+
+  try {
+    const adapter = await channelAdapterRegistry.resolve(adapterSlug, {
+      ...channel.options,
+      "channel-id": channel.slug,
+      "channel-adapter": adapterSlug,
+    });
+    if (!adapter.reconnect) return c.json({ error: "adapter does not support reconnect" }, 400);
+    await adapter.reconnect();
+    return c.json({ status: "reconnecting" });
+  } catch (err) {
+    return c.json({ error: formatError(err) }, 500);
+  }
+});
+
+// --- Disconnect ---
+
+channelRoutes.post("/channels/:slug/disconnect", async (c) => {
+  const channel = getChannel(c.req.param("slug"));
+  if (!channel) return c.json({ error: "not found" }, 404);
+  const denied = assertOwnership(c, channel.owner);
+  if (denied) return denied;
+
+  const adapterSlug = channel["channel-adapter"];
+  if (!adapterSlug) return c.json({ error: "no adapter" }, 400);
+
+  try {
+    const adapter = await channelAdapterRegistry.resolve(adapterSlug, {
+      ...channel.options,
+      "channel-id": channel.slug,
+      "channel-adapter": adapterSlug,
+    });
+    if (!adapter.disconnect) return c.json({ error: "adapter does not support disconnect" }, 400);
+    await adapter.disconnect();
+    return c.json({ status: "disconnecting" });
+  } catch (err) {
+    return c.json({ error: formatError(err) }, 500);
+  }
 });
 
 // --- Channel SSE ---

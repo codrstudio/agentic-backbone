@@ -42,15 +42,13 @@ export function ChannelStatusTab({ channel }: ChannelStatusTabProps) {
 
   const assignMutation = useMutation({
     mutationFn: (agentId: string) =>
-      updateChannel(channel.slug, {
-        metadata: { ...channel.metadata, assignedAgent: agentId },
-      }),
+      updateChannel(channel.slug, { agent: agentId }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["channels", channel.slug] });
     },
   });
 
-  const assignedAgent = (channel.metadata?.assignedAgent as string) ?? "";
+  const assignedAgent = channel.agent ?? "";
 
   return (
     <div className="space-y-6">

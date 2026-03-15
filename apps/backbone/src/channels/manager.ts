@@ -21,6 +21,7 @@ export interface CreateChannelInput {
 export interface UpdateChannelInput {
   type?: string;
   description?: string;
+  agent?: string;
   metadata?: Record<string, unknown>;
 }
 
@@ -64,6 +65,7 @@ export function updateChannel(
 
   if (updates.type !== undefined) config.type = updates.type;
   if (updates.description !== undefined) config.description = updates.description;
+  if (updates.agent !== undefined) config.agent = updates.agent;
   if (updates.metadata) {
     for (const [key, value] of Object.entries(updates.metadata)) {
       config[key] = value;
