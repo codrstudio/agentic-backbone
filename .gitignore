@@ -94,7 +94,7 @@ context/**/conversations/**
 context/**/journal/**
 context/**/sqlite*
 # Agents
-context/agents/*/
+context/agents/**
 context/credentials/*/**
 context/plans/**
 context/shared/*/**
