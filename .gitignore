@@ -89,7 +89,16 @@ apps/hub/dev-dist/
 # =============================================================================
 # Agent Backbone
 # =============================================================================
-context/**
+# Geral
+context/**/conversations/**
+context/**/journal/**
+context/**/sqlite*
+# Agents
+context/agents/*/
+context/credentials/*/**
+context/plans/**
+context/shared/*/**
+context/users/**
 
 # =============================================================================
 # Arquivos mantidos
