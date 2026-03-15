@@ -3,35 +3,34 @@ import {
   readdirSync,
   mkdirSync,
   rmSync,
-  writeFileSync,
 } from "node:fs";
 import { join } from "node:path";
 import {
   usersDir,
   userDir,
-  userYmlPath,
-  userAboutPath,
+  userMdPath,
   credentialsUsersDir,
   userCredentialPath,
 } from "../context/paths.js";
-import { readYamlAs, writeYamlAs, patchYamlAs } from "../context/readers.js";
-import { UserYmlSchema, UserCredentialYmlSchema } from "../context/schemas.js";
+import { readMarkdownAs, writeMarkdownAs, patchMarkdownAs, readYamlAs, writeYamlAs, patchYamlAs } from "../context/readers.js";
+import { UserMdSchema, UserCredentialYmlSchema } from "../context/schemas.js";
 import {
   type UserConfig,
   type UserPermissions,
+  type UserAddress,
   DEFAULT_PERMISSIONS,
   SYSTEM_USER,
 } from "./types.js";
 
 function parseUserConfig(slug: string): UserConfig | null {
-  const ymlPath = userYmlPath(slug);
-  if (!existsSync(ymlPath)) return null;
+  const mdPath = userMdPath(slug);
+  if (!existsSync(mdPath)) return null;
 
-  const result = UserYmlSchema.safeParse(
-    (() => { try { return readYamlAs(ymlPath, UserYmlSchema); } catch { return null; } })()
+  const result = UserMdSchema.safeParse(
+    (() => { try { return readMarkdownAs(mdPath, UserMdSchema).metadata; } catch { return null; } })()
   );
   if (!result.success) {
-    console.warn(`[users] invalid USER.yml for ${slug}:`, result.error.issues);
+    console.warn(`[users] invalid USER.md for ${slug}:`, result.error.issues);
     return null;
   }
   const u = result.data;
@@ -40,12 +39,14 @@ function parseUserConfig(slug: string): UserConfig | null {
     slug: u.slug ?? slug,
     displayName: u.displayName ?? slug,
     email: u.email,
+    phoneNumber: u.phoneNumber,
     role: u.role,
     permissions: {
       canCreateAgents: u.canCreateAgents,
       canCreateChannels: u.canCreateChannels,
       maxAgents: u.maxAgents,
     },
+    address: u.address,
   };
 }
 
@@ -74,7 +75,7 @@ export function getUser(slug: string): UserConfig | null {
 }
 
 export function userExists(slug: string): boolean {
-  return existsSync(userYmlPath(slug));
+  return existsSync(userMdPath(slug));
 }
 
 export function getUserCredential(
@@ -105,12 +106,12 @@ export function getUserByEmail(
   if (!existsSync(dir)) return null;
 
   for (const slug of readdirSync(dir)) {
-    const ymlPath = userYmlPath(slug);
-    if (!existsSync(ymlPath)) continue;
+    const mdPath = userMdPath(slug);
+    if (!existsSync(mdPath)) continue;
 
-    let data: ReturnType<typeof UserYmlSchema.parse>;
+    let data: ReturnType<typeof UserMdSchema.parse>;
     try {
-      data = readYamlAs(ymlPath, UserYmlSchema);
+      data = readMarkdownAs(mdPath, UserMdSchema).metadata;
     } catch {
       continue;
     }
@@ -131,7 +132,9 @@ export function createUser(
   displayName: string,
   password: string,
   permissions?: Partial<UserPermissions>,
-  email?: string
+  email?: string,
+  phoneNumber?: string,
+  address?: UserAddress
 ): UserConfig {
   const dir = userDir(slug);
   mkdirSync(dir, { recursive: true });
@@ -141,23 +144,23 @@ export function createUser(
   const perms = { ...DEFAULT_PERMISSIONS, ...permissions };
   const userEmail = email ?? "";
 
-  writeYamlAs(userYmlPath(slug), {
+  writeMarkdownAs(userMdPath(slug), {
     slug,
     displayName,
     email: userEmail,
+    phoneNumber: phoneNumber ?? undefined,
     canCreateAgents: perms.canCreateAgents,
     canCreateChannels: perms.canCreateChannels,
     maxAgents: perms.maxAgents,
-  }, UserYmlSchema);
+    address: address ?? undefined,
+  }, `# ${displayName}\n`, UserMdSchema);
 
   writeYamlAs(userCredentialPath(slug), {
     type: "user-password",
     password,
   }, UserCredentialYmlSchema);
 
-  writeFileSync(userAboutPath(slug), `# ${displayName}\n`, "utf-8");
-
-  return { slug, displayName, email: userEmail, permissions: perms };
+  return { slug, displayName, email: userEmail, phoneNumber, permissions: perms, address };
 }
 
 export function updateUser(
@@ -165,8 +168,10 @@ export function updateUser(
   updates: {
     displayName?: string;
     email?: string;
+    phoneNumber?: string;
     password?: string;
     role?: string | null;
+    address?: UserAddress;
     permissions?: Partial<UserPermissions>;
   }
 ): UserConfig | null {
@@ -176,7 +181,9 @@ export function updateUser(
 
   if (updates.displayName !== undefined) profilePatch.displayName = updates.displayName;
   if (updates.email !== undefined) profilePatch.email = updates.email;
+  if (updates.phoneNumber !== undefined) profilePatch.phoneNumber = updates.phoneNumber;
   if (updates.role !== undefined) profilePatch.role = updates.role ?? undefined;
+  if (updates.address !== undefined) profilePatch.address = updates.address;
   if (updates.permissions) {
     if (updates.permissions.canCreateAgents !== undefined)
       profilePatch.canCreateAgents = updates.permissions.canCreateAgents;
@@ -186,7 +193,7 @@ export function updateUser(
       profilePatch.maxAgents = updates.permissions.maxAgents;
   }
 
-  const updated = patchYamlAs(userYmlPath(slug), profilePatch, UserYmlSchema);
+  const { metadata: updated } = patchMarkdownAs(userMdPath(slug), profilePatch, UserMdSchema);
 
   if (updates.password) {
     const credPath = userCredentialPath(slug);
@@ -201,12 +208,14 @@ export function updateUser(
     slug: updated.slug ?? slug,
     displayName: updated.displayName ?? slug,
     email: updated.email,
+    phoneNumber: updated.phoneNumber,
     role: updated.role,
     permissions: {
       canCreateAgents: updated.canCreateAgents,
       canCreateChannels: updated.canCreateChannels,
       maxAgents: updated.maxAgents,
     },
+    address: updated.address,
   };
 }
 

@@ -8,9 +8,9 @@
 |---|---|---|---|
 | Metadata puro | `.yml` | Config, credenciais, flags | Nunca |
 | Prompt puro | `.md` | Texto para o agente ler | Sempre |
-| Híbrido | `.md` com frontmatter | Metadata + texto | O corpo vai; o frontmatter não |
+| Híbrido | `.md` com frontmatter | Metadata + texto | O corpo vai; o frontmatter é processado programaticamente |
 
-**Regra:** se o arquivo não tem corpo de texto útil para o agente, ele é `.yml`. Arquivos híbridos existem apenas quando o mesmo recurso tem metadata E conteúdo de prompt (ex: `SKILL.md`, `SERVICE.md`, `ABOUT.md`).
+**Regra:** se o arquivo não tem corpo de texto útil para o agente, ele é `.yml`. Arquivos híbridos existem quando o mesmo recurso tem metadata E conteúdo de prompt (ex: `SKILL.md`, `SERVICE.md`, `USER.md`).
 
 ---
 
@@ -19,7 +19,6 @@
 | Arquivo | Schema | Descrição |
 |---|---|---|
 | `AGENT.yml` | `AgentYmlSchema` | Config do agente (enabled, heartbeat, handoff, etc.) |
-| `USER.yml` | `UserYmlSchema` | Perfil + credencial do usuário (password auto-criptografado) |
 | `CHANNEL.yml` | `ChannelYmlSchema` | Config do canal (adapter, agent, options) |
 | `ADAPTER.yml` | `AdapterYmlSchema` | Config de conector (credential, options, policy) |
 | `SESSION.yml` | `SessionYmlSchema` | Estado de sessão de conversa |
@@ -31,7 +30,7 @@
 |---|---|---|
 | `SKILL.md` | `SkillMdSchema` | Prompt da skill |
 | `SERVICE.md` | `ServiceMdSchema` | Prompt do serviço |
-| `ABOUT.md` | *(sem schema — corpo puro)* | Perfil narrativo do usuário |
+| `USER.md` | `UserMdSchema` | Perfil narrativo do usuário |
 
 ---
 
@@ -64,11 +63,8 @@ Fluxo interno: `load → merge → validate → save`.
 
 **Exemplo:**
 ```ts
-// Só altera o displayName. Password e demais campos não são tocados.
-patchYamlAs(userYmlPath(slug), { displayName: "Fulano" }, UserYmlSchema);
-
-// Só altera a senha. displayName e demais campos não são tocados.
-patchYamlAs(userYmlPath(slug), { password: hash }, UserYmlSchema);
+// Só altera o displayName.
+patchYamlAs(adapterPath, { name: "Novo Nome" }, AdapterYmlSchema);
 ```
 
 #### Ler
@@ -80,7 +76,7 @@ readYaml(path)             // retorna Record<string, unknown> sem validação (u
 
 ---
 
-### Arquivos híbridos `.md` com frontmatter (ex: `SKILL.md`, `SERVICE.md`)
+### Arquivos híbridos `.md` com frontmatter (ex: `SKILL.md`, `SERVICE.md`, `USER.md`)
 
 #### Criar (arquivo não existe)
 
@@ -136,7 +132,7 @@ Campos cujo nome contém `key`, `secret`, `token`, `password` ou `pass` são **a
 - `readYaml` / `readYamlAs` — decriptam na leitura
 - A chave é derivada de `JWT_SECRET` via scrypt
 
-Isso significa que `USER.yml` pode conter `password` sem risco: o campo nunca aparece em texto claro no disco.
+Credenciais de usuário ficam em `credentials/users/{slug}.yml` (separado do `USER.md`).
 
 ---
 
@@ -146,10 +142,10 @@ O usuário tem dois arquivos com responsabilidades distintas:
 
 | Arquivo | Conteúdo | Quem lê |
 |---|---|---|
-| `USER.yml` | Metadata + credencial (password encriptado) | `users/manager.ts` — nunca vai para o agente |
-| `ABOUT.md` | Perfil narrativo em markdown | `context/resolver.ts` → injetado no prompt do agente |
+| `USER.md` | Frontmatter (metadata estruturado) + corpo (perfil narrativo) | `users/manager.ts` (metadata) + `context/resolver.ts` (metadata + corpo → prompt do agente) |
+| `credentials/users/{slug}.yml` | Credencial (password encriptado) | `users/manager.ts` — nunca vai para o agente |
 
-Updates de senha e updates de perfil são dois `patchYamlAs` separados sobre o mesmo `USER.yml`. A separação é feita na camada de rota/serviço, não no arquivo.
+O `resolveUserProfile()` injeta no prompt do agente tanto os dados estruturados (displayName, email, phoneNumber, role, location, timezone) quanto o corpo narrativo do `USER.md`.
 
 ---
 

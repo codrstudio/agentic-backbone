@@ -8,7 +8,7 @@ import {
   parseAgentId,
   userResourceDir,
   agentSoulPath,
-  ownerUserPath,
+  userMdPath,
   agentHeartbeatPath,
   agentConversationPath,
   agentRequestPath,
@@ -117,14 +117,29 @@ export function resolveModeInstructions(
 
 export function resolveUserProfile(agentId: string): string {
   const { owner } = parseAgentId(agentId);
-
   if (owner === "system") return "";
 
-  const ownerPath = ownerUserPath(owner);
-  if (!existsSync(ownerPath)) return "";
+  const mdPath = userMdPath(owner);
+  if (!existsSync(mdPath)) return "";
 
-  const { content } = readMarkdown(ownerPath);
-  return content.trim();
+  const { metadata, content } = readMarkdown(mdPath);
+  const parts: string[] = [];
+
+  const fields = ["displayName", "email", "phoneNumber", "role"];
+  for (const f of fields) {
+    if (metadata[f]) parts.push(`- ${f}: ${metadata[f]}`);
+  }
+  const addr = metadata.address as Record<string, unknown> | undefined;
+  if (addr) {
+    const addrParts = [addr.city, addr.state, addr.country].filter(Boolean);
+    if (addrParts.length) parts.push(`- location: ${addrParts.join(", ")}`);
+    if (addr.timezone) parts.push(`- timezone: ${addr.timezone}`);
+  }
+
+  if (parts.length) parts.push("");
+  if (content.trim()) parts.push(content.trim());
+
+  return parts.join("\n");
 }
 
 // --- Services ---

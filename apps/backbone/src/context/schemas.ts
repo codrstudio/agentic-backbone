@@ -15,23 +15,38 @@ export const AgentYmlSchema = z.object({
   role: z.string().optional(),
   members: z.array(z.string()).optional(),
   quotas: z.record(z.string(), z.unknown()).optional(),
+  adapters: z.array(z.string()).optional(),
 });
 
 export type AgentYml = z.infer<typeof AgentYmlSchema>;
 
-// ── USER.yml ─────────────────────────────────────────────
+// ── USER.md (frontmatter) ────────────────────────────────
 
-export const UserYmlSchema = z.object({
+export const AddressSchema = z.object({
+  street: z.string().optional(),
+  neighborhood: z.string().optional(),
+  city: z.string().optional(),
+  state: z.string().optional(),
+  country: z.string().optional(),
+  postalCode: z.string().optional(),
+  timezone: z.string().optional(),
+});
+
+export type Address = z.infer<typeof AddressSchema>;
+
+export const UserMdSchema = z.object({
   slug: z.string().optional(),
   displayName: z.string().optional(),
   email: z.string().default(""),
+  phoneNumber: z.string().optional(),
   role: z.string().optional(),
   canCreateAgents: z.boolean().default(true),
   canCreateChannels: z.boolean().default(true),
   maxAgents: z.number().int().positive().default(5),
+  address: AddressSchema.optional(),
 });
 
-export type UserYml = z.infer<typeof UserYmlSchema>;
+export type UserMd = z.infer<typeof UserMdSchema>;
 
 // ── credentials/users/{slug}.yml ─────────────────────────
 

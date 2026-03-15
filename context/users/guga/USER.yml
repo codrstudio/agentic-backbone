@@ -1,9 +1,0 @@
-slug: guga
-displayName: Guga
-email: guga.coder@gmail.com
-role: sysadmin
-canCreateAgents: true
-canCreateChannels: true
-maxAgents: 200
-
-

@@ -1,1 +1,0 @@
-# Handerson Silva
