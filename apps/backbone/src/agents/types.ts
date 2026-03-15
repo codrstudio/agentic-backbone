@@ -31,4 +31,5 @@ export interface AgentConfig {
   role?: string;
   members?: string[];
   quotas?: QuotaConfig;
+  adapters?: string[];
 }

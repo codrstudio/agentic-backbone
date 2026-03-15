@@ -58,9 +58,26 @@ connectorAdapterRoutes.patch("/adapters/:scope/:slug", async (c) => {
 connectorAdapterRoutes.delete("/adapters/:scope/:slug", (c) => {
   const scope = c.req.param("scope");
   const slug = c.req.param("slug");
+
+  const agents = connectorRegistry.getAdapterAgents(slug);
+  if (agents.length > 0) {
+    return c.json({
+      error: `Adaptador "${slug}" está associado a ${agents.length} agente(s): ${agents.join(", ")}. Desassocie os agentes antes de excluir.`,
+      agents,
+    }, 409);
+  }
+
   const deleted = connectorRegistry.deleteAdapter(scope, slug);
   if (!deleted) return c.json({ error: "not found" }, 404);
   return c.json({ status: "deleted" });
+});
+
+// --- Adapter Agents ---
+
+connectorAdapterRoutes.get("/adapters/:slug/agents", (c) => {
+  const slug = c.req.param("slug");
+  const agents = connectorRegistry.getAdapterAgents(slug);
+  return c.json({ agents });
 });
 
 // --- Test Adapter Connection ---

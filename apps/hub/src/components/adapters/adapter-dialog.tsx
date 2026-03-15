@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { useQueryClient, useMutation } from "@tanstack/react-query";
-import { Loader2, CheckCircle2, XCircle } from "lucide-react";
+import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
+import { Loader2, CheckCircle2, XCircle, X } from "lucide-react";
 import { toast } from "sonner";
 import {
   Sheet,
@@ -23,6 +23,9 @@ import { ConnectorForm, McpConnectorForm, EmailConnectorForm, EvolutionConnector
 import type { ConnectorType, ConnectorCredential, McpOptions, EmailOptions, EvolutionOptions, ElevenLabsOptions, GitLabOptions, GitHubOptions, DiscordOptions } from "@/components/adapters/connector-form";
 import { request } from "@/lib/api";
 import type { Adapter } from "@/api/adapters";
+import { adapterAgentsQueryOptions } from "@/api/adapters";
+import { agentQueryOptions, updateAgentAdapters } from "@/api/agents";
+import { Badge } from "@/components/ui/badge";
 
 function slugify(text: string): string {
   return text
@@ -652,6 +655,13 @@ export function AdapterDialog({ open, onOpenChange, editingAdapter, defaultConne
           </div>
         </div>
 
+        {isEditing && (
+          <div className="border-t px-6 py-4 space-y-2">
+            <p className="text-sm font-medium">Agentes associados</p>
+            <AdapterAgentsList adapterSlug={editingAdapter!.slug} />
+          </div>
+        )}
+
         <SheetFooter className="p-6 pt-4 border-t gap-2">
           <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isBusy}>
             Cancelar
@@ -663,5 +673,48 @@ export function AdapterDialog({ open, onOpenChange, editingAdapter, defaultConne
         </SheetFooter>
       </SheetContent>
     </Sheet>
+  );
+}
+
+function AdapterAgentsList({ adapterSlug }: { adapterSlug: string }) {
+  const queryClient = useQueryClient();
+  const { data: agents, isLoading } = useQuery(adapterAgentsQueryOptions(adapterSlug));
+
+  const removeMutation = useMutation({
+    mutationFn: async (agentId: string) => {
+      const agent = await request<{ adapters?: string[] }>(`/agents/${agentId}`);
+      const current = agent.adapters ?? [];
+      const next = current.filter(s => s !== adapterSlug);
+      await updateAgentAdapters(agentId, next);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["adapters", adapterSlug, "agents"] });
+      queryClient.invalidateQueries({ queryKey: ["agents"] });
+    },
+  });
+
+  if (isLoading) {
+    return <p className="text-xs text-muted-foreground">Carregando...</p>;
+  }
+
+  if (!agents?.length) {
+    return <p className="text-xs text-muted-foreground">Nenhum agente associado</p>;
+  }
+
+  return (
+    <div className="flex flex-wrap gap-2">
+      {agents.map((agentId) => (
+        <Badge key={agentId} variant="secondary" className="gap-1 pr-1">
+          {agentId}
+          <button
+            onClick={() => removeMutation.mutate(agentId)}
+            disabled={removeMutation.isPending}
+            className="ml-1 rounded-full hover:bg-muted-foreground/20 p-0.5"
+          >
+            <X className="size-3" />
+          </button>
+        </Badge>
+      ))}
+    </div>
   );
 }

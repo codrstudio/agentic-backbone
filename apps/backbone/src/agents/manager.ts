@@ -31,6 +31,7 @@ export interface UpdateAgentInput {
   heartbeatEnabled?: boolean;
   heartbeatInterval?: number;
   metadata?: Record<string, unknown>;
+  adapters?: string[];
 }
 
 export function createAgent(input: CreateAgentInput): AgentConfig {
@@ -84,6 +85,7 @@ export function updateAgent(agentId: string, updates: UpdateAgentInput): AgentCo
   if (updates.heartbeatEnabled !== undefined) config["heartbeat-enabled"] = updates.heartbeatEnabled;
   if (updates.heartbeatInterval !== undefined) config["heartbeat-interval"] = updates.heartbeatInterval;
   if (updates.description !== undefined) config.description = updates.description;
+  if (updates.adapters !== undefined) config.adapters = updates.adapters;
   if (updates.metadata) {
     for (const [key, value] of Object.entries(updates.metadata)) {
       config[key] = value;

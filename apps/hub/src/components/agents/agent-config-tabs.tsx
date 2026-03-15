@@ -1,9 +1,11 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { FileText, MessageSquare, Heart, Sparkles, Wrench, Shield, GitBranch, Plus, Pencil, Trash2, ChevronLeft, Check, Loader2, AlertCircle } from "lucide-react";
-import { agentFileQueryOptions, saveAgentFile } from "@/api/agents";
+import { FileText, MessageSquare, Heart, Sparkles, Wrench, Cable, Shield, GitBranch, Plus, Pencil, Trash2, ChevronLeft, Check, Loader2, AlertCircle } from "lucide-react";
+import { agentFileQueryOptions, saveAgentFile, agentQueryOptions, updateAgentAdapters } from "@/api/agents";
 import type { Agent } from "@/api/agents";
+import { adaptersQueryOptions } from "@/api/adapters";
+import type { Adapter } from "@/api/adapters";
 import {
   agentSkillsQueryOptions,
   createSkill,
@@ -37,6 +39,7 @@ const subtabs = [
   { value: "heartbeat", label: "Heartbeat", icon: Heart, kind: "file" as const, filename: "HEARTBEAT.md" },
   { value: "skills", label: "Skills", icon: Sparkles, kind: "resource" as const },
   { value: "tools", label: "Tools", icon: Wrench, kind: "resource" as const, disabled: true },
+  { value: "adapters", label: "Adaptadores", icon: Cable, kind: "resource" as const },
   { value: "routing", label: "Routing", icon: GitBranch, kind: "routing" as const },
   { value: "advanced", label: "Avancado", icon: Shield, kind: "advanced" as const },
 ] as const;
@@ -112,6 +115,9 @@ export function AgentConfigTabs({ agentId, agent, subtab }: AgentConfigTabsProps
         )}
         {activeSubtab === "tools" && (
           <ToolsPanel agentId={agentId} />
+        )}
+        {activeSubtab === "adapters" && (
+          <AdaptersPanel agentId={agentId} />
         )}
         {activeSubtab === "routing" && (
           <AgentRoutingSettings agentId={agentId} />
@@ -523,6 +529,196 @@ function SaveStatusBadge({ status }: { status: SaveStatus }) {
       {status === "saved" && <><Check className="size-3 text-green-600" />Salvo</>}
       {status === "error" && <><AlertCircle className="size-3 text-destructive" />Erro ao salvar</>}
     </span>
+  );
+}
+
+const ADAPTER_CONNECTOR_GROUPS = [
+  {
+    label: null,
+    items: [{ value: "Todos", label: "Todos" }],
+  },
+  {
+    label: "Banco de Dados",
+    items: [
+      { value: "mysql", label: "MySQL" },
+      { value: "postgres", label: "Postgres" },
+    ],
+  },
+  {
+    label: "Comunicação",
+    items: [
+      { value: "evolution", label: "Evolution" },
+      { value: "twilio", label: "Twilio" },
+      { value: "whatsapp-cloud", label: "WhatsApp Cloud" },
+      { value: "email", label: "Email (IMAP/SMTP)" },
+      { value: "discord", label: "Discord" },
+    ],
+  },
+  {
+    label: "IA & Mídia",
+    items: [{ value: "elevenlabs", label: "ElevenLabs (TTS)" }],
+  },
+  {
+    label: "Automação",
+    items: [
+      { value: "http", label: "HTTP" },
+      { value: "mcp", label: "MCP Server" },
+    ],
+  },
+  {
+    label: "DevOps",
+    items: [
+      { value: "gitlab", label: "GitLab" },
+      { value: "github", label: "GitHub" },
+    ],
+  },
+] as const;
+
+type AdapterConnectorFilter = (typeof ADAPTER_CONNECTOR_GROUPS)[number]["items"][number]["value"];
+
+function AdaptersPanel({ agentId }: { agentId: string }) {
+  const queryClient = useQueryClient();
+  const { data: allAdapters, isLoading: loadingAdapters } = useQuery(adaptersQueryOptions());
+  const { data: agent, isLoading: loadingAgent } = useQuery(agentQueryOptions(agentId));
+  const [filter, setFilter] = useState<AdapterConnectorFilter>("Todos");
+
+  const isLegacy = agent && agent.adapters === undefined;
+
+  const mutation = useMutation({
+    mutationFn: (adapters: string[]) => updateAgentAdapters(agentId, adapters),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["agents", agentId] });
+    },
+  });
+
+  function handleToggle(slug: string, checked: boolean) {
+    const current = agent?.adapters ?? allAdapters?.map(a => a.slug) ?? [];
+    const next = checked
+      ? [...current, slug]
+      : current.filter(s => s !== slug);
+    mutation.mutate(next);
+  }
+
+  if (loadingAdapters || loadingAgent) {
+    return (
+      <div className="flex gap-6">
+        <div className="w-44 shrink-0 space-y-1">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <Skeleton key={i} className="h-7 w-full" />
+          ))}
+        </div>
+        <div className="flex-1 space-y-2">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <Skeleton key={i} className="h-16 w-full rounded-lg" />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  const assignedSet = new Set(agent?.adapters ?? []);
+
+  const filtered =
+    filter === "Todos"
+      ? (allAdapters ?? [])
+      : (allAdapters ?? []).filter((a) => a.connector === filter);
+
+  function countFor(f: AdapterConnectorFilter): [number, number] {
+    if (!allAdapters) return [0, 0];
+    const group = f === "Todos" ? allAdapters : allAdapters.filter((a) => a.connector === f);
+    const assigned = group.filter((a) => isLegacy ? true : assignedSet.has(a.slug)).length;
+    return [assigned, group.length];
+  }
+
+  return (
+    <div className="space-y-4">
+      {isLegacy && (
+        <div className="rounded-md border border-yellow-300 bg-yellow-50 dark:bg-yellow-950/20 px-4 py-3 text-sm text-yellow-800 dark:text-yellow-200">
+          Este agente tem acesso a todos os adaptadores (modo legado). Ao desativar qualquer toggle, uma lista explicita sera salva.
+        </div>
+      )}
+
+      <div className="flex gap-6">
+        {/* Sidebar de categorias */}
+        <nav className="w-44 shrink-0 flex flex-col gap-0.5">
+          {ADAPTER_CONNECTOR_GROUPS.map((group, gi) => (
+            <div key={gi} className={cn("flex flex-col gap-0.5", gi > 0 && group.label && "mt-3")}>
+              {group.label && (
+                <span className="px-3 py-1 text-[11px] font-medium text-muted-foreground/50 uppercase tracking-wide">
+                  {group.label}
+                </span>
+              )}
+              {group.items.map(({ value, label }) => {
+                const [assigned, total] = countFor(value);
+                return (
+                  <button
+                    key={value}
+                    onClick={() => setFilter(value)}
+                    className={cn(
+                      "w-full flex items-center justify-between rounded-md px-3 py-1.5 text-sm text-left transition-colors",
+                      filter === value
+                        ? "bg-accent text-accent-foreground font-medium"
+                        : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                    )}
+                  >
+                    <span>{label}</span>
+                    {total > 0 && (
+                      <span className={cn(
+                        "text-xs tabular-nums",
+                        filter === value ? "text-accent-foreground" : "text-muted-foreground"
+                      )}>
+                        {assigned}/{total}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          ))}
+        </nav>
+
+        {/* Cards compactos */}
+        <div className="flex-1 min-w-0">
+          {filtered.length === 0 ? (
+            <div className="rounded-md border border-dashed p-8 text-center text-sm text-muted-foreground">
+              {filter === "Todos"
+                ? "Nenhum adaptador configurado no sistema."
+                : "Nenhum adaptador nesta categoria."}
+            </div>
+          ) : (
+            <div className="grid gap-2" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))" }}>
+              {filtered.map((adapter) => {
+                const isAssigned = isLegacy ? true : assignedSet.has(adapter.slug);
+                return (
+                  <div
+                    key={adapter.slug}
+                    className={cn(
+                      "flex items-center gap-3 rounded-lg border px-4 py-3 transition-colors",
+                      isAssigned ? "bg-accent/30 border-accent" : "hover:bg-accent/10"
+                    )}
+                  >
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium truncate">{adapter.name}</span>
+                        <Badge variant="outline" className="text-[10px] shrink-0">{adapter.connector}</Badge>
+                      </div>
+                      {adapter.slug !== adapter.name && (
+                        <p className="text-xs text-muted-foreground truncate mt-0.5">{adapter.slug}</p>
+                      )}
+                    </div>
+                    <Switch
+                      checked={isAssigned}
+                      onCheckedChange={(checked) => handleToggle(adapter.slug, checked)}
+                      disabled={mutation.isPending}
+                    />
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
   );
 }
 

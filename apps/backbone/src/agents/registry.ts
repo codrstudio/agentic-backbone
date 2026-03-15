@@ -53,6 +53,7 @@ function parseAgentConfig(agentId: string): AgentConfig | null {
     role: data.role,
     members: data.members,
     quotas,
+    adapters: data.adapters,
   };
 }
 

@@ -11,6 +11,7 @@ import {
   agentsDir,
 } from "../context/paths.js";
 import { getResourceDirs } from "../context/resolver.js";
+import { getAgent, listAgents } from "../agents/registry.js";
 import { formatError } from "../utils/errors.js";
 import { maskSensitiveFields } from "../utils/sensitive.js";
 import type {
@@ -95,7 +96,23 @@ export class ConnectorRegistry {
         result.set(entry.slug, entry); // last wins (higher precedence)
       }
     }
+
+    // Filter by explicit adapter list if declared on agent
+    const agent = getAgent(agentId);
+    if (agent?.adapters) {
+      const allowed = new Set(agent.adapters);
+      for (const slug of result.keys()) {
+        if (!allowed.has(slug)) result.delete(slug);
+      }
+    }
+
     return result;
+  }
+
+  getAdapterAgents(adapterSlug: string): string[] {
+    return listAgents()
+      .filter(a => a.adapters?.includes(adapterSlug))
+      .map(a => a.id);
   }
 
   // --- Client factory ---

@@ -18,3 +18,10 @@ export const adaptersQueryOptions = () =>
     queryKey: ["adapters"],
     queryFn: () => request<{ adapters: Adapter[] }>("/adapters").then((r) => r.adapters),
   });
+
+export function adapterAgentsQueryOptions(slug: string) {
+  return queryOptions({
+    queryKey: ["adapters", slug, "agents"],
+    queryFn: () => request<{ agents: string[] }>(`/adapters/${slug}/agents`).then(r => r.agents),
+  });
+}

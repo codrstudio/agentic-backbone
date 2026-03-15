@@ -10,6 +10,7 @@ export interface Agent {
   heartbeatEnabled?: boolean;
   role?: string;
   members?: string[];
+  adapters?: string[];
 }
 
 export interface AgentStats {
@@ -132,6 +133,13 @@ export async function deleteAgent(id: string): Promise<void> {
   await request(`/agents/${id}`, { method: "DELETE" });
 }
 
+export async function updateAgentAdapters(id: string, adapters: string[]): Promise<Agent> {
+  return request<Agent>(`/agents/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify({ adapters }),
+  });
+}
+
 export interface MemoryStatus {
   fileCount: number;
   chunkCount: number;
@@ -165,6 +173,13 @@ export async function searchAgentMemory(
 
 export async function syncAgentMemory(id: string): Promise<void> {
   await request(`/agents/${id}/memory/sync`, { method: "POST" });
+}
+
+export function agentFilesQueryOptions(id: string) {
+  return queryOptions({
+    queryKey: ["agents", id, "files"],
+    queryFn: () => request<string[]>(`/agents/${id}/files`),
+  });
 }
 
 export async function resetAgentMemory(id: string): Promise<void> {
