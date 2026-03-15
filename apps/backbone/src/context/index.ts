@@ -10,6 +10,7 @@ import { connectorRegistry } from "../connectors/index.js";
 import { formatServicesPrompt } from "../services/prompt.js";
 import { getAgentMemoryManager } from "../memory/manager.js";
 import { agentDir, agentWorkspaceDir } from "./paths.js";
+import { getUser } from "../users/manager.js";
 
 export { CONTEXT_DIR } from "./paths.js";
 export type { InteractionMode } from "./resolver.js";
@@ -35,10 +36,19 @@ export function isMarkdownEmpty(raw: string, opts?: { ignoreFrontmatter?: boolea
   return isEffectivelyEmpty(content);
 }
 
+// --- Channel descriptions ---
+
+const CHANNEL_DESCRIPTIONS: Record<string, string> = {
+  "twilio-voice": "Você está numa chamada telefônica. Suas respostas serão convertidas em fala (TTS). Seja conciso e natural como numa conversa por voz. Não use formatação, links ou emojis.",
+  "evolution": "Você está conversando via WhatsApp.",
+  "sse": "Você está conversando via chat web.",
+};
+
 // --- Unified Prompt Assembly ---
 
 export interface AssemblePromptOpts {
   userMessage?: string;
+  channelType?: string;
 }
 
 export interface AssembledPrompt {
@@ -63,6 +73,31 @@ export async function assemblePrompt(
   const workspace = agentWorkspaceDir(agentId);
 
   let system = "";
+
+  // 2a. Location + datetime context
+  const owner = agentId.split(".")[0];
+  const ownerUser = getUser(owner);
+  const tz = ownerUser?.address?.timezone ?? process.env.TIMEZONE ?? "UTC";
+  const now = new Date();
+  const formatted = now.toLocaleDateString("en-US", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    timeZone: tz,
+  });
+  const time = now.toLocaleTimeString("en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+    timeZone: tz,
+  });
+  let locationLine = `It is now ${formatted} (${tz}) at ${time}.`;
+  const locationParts = [ownerUser?.address?.city, ownerUser?.address?.state, ownerUser?.address?.country].filter(Boolean);
+  if (locationParts.length > 0) {
+    locationLine += ` Location: ${locationParts.join(", ")}`;
+  }
+  system += `${locationLine}\n\n`;
 
   if (soul) {
     system += `<identity>\n${soul}\n</identity>\n\n`;
@@ -103,7 +138,13 @@ export async function assemblePrompt(
     }
   }
 
-  // 9. Mode instructions (generic tag)
+  // 9. Channel context
+  if (opts.channelType) {
+    const channelDesc = CHANNEL_DESCRIPTIONS[opts.channelType] ?? opts.channelType;
+    system += `<channel>\n${channelDesc}\n</channel>\n\n`;
+  }
+
+  // 10. Mode instructions (generic tag)
   system += `<instructions>\n${instructions}\n</instructions>\n\n`;
 
   // 10. Tail

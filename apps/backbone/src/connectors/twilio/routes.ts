@@ -131,7 +131,7 @@ export function createTwilioRoutes(): Hono {
     if (voiceSession) {
       // Outbound call — we already have a session
       const cfg = voiceSession.config;
-      const agentMessage = voiceSession.reason ?? "O usuário atendeu a ligação.";
+      const agentMessage = voiceSession.reason ?? "(O usuário atendeu o telefone.)";
       const agentResponse = await consumeAgentResponse(
         voiceSession.senderId,
         voiceSession.sessionId,
@@ -192,7 +192,7 @@ export function createTwilioRoutes(): Hono {
 
     voiceSession = getCall(callSid)!;
 
-    const agentMessage = `Ligação recebida de ${senderId}.`;
+    const agentMessage = `(Ligação recebida de ${senderId}.)`;
     const agentResponse = await consumeAgentResponse(
       senderId,
       session.session_id,
