@@ -5,7 +5,7 @@ import { createTwilioTools } from "./tools/index.js";
 import { createTwilioRoutes } from "./routes.js";
 import { listActiveCalls, clearCalls } from "./calls.js";
 import { findChannelsByAdapter } from "../../channels/lookup.js";
-import { loadCallbackBaseUrl } from "./config.js";
+import { loadCallbackBaseUrl, refreshNgrokUrl, resolveAdapterCredential } from "./config.js";
 import { formatError } from "../../utils/errors.js";
 
 let started = false;
@@ -36,6 +36,10 @@ export const twilioConnector: ConnectorDef = {
       return;
     }
 
+    // Cache adapter credentials and ngrok URL
+    await resolveAdapterCredential();
+    await refreshNgrokUrl();
+
     try {
       loadCallbackBaseUrl(ctx.env);
     } catch (err) {
@@ -49,6 +53,13 @@ export const twilioConnector: ConnectorDef = {
       slug: "twilio-voice",
       async send() {
         // Voice responses are delivered synchronously via TwiML in webhook handlers.
+      },
+      health() {
+        const calls = listActiveCalls();
+        return {
+          status: "healthy" as const,
+          details: { activeCalls: calls.length },
+        };
       },
     }));
 

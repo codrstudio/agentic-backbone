@@ -2,7 +2,7 @@ import { tool } from "ai";
 import { z } from "zod";
 import { findChannelsByAdapter } from "../../../channels/lookup.js";
 import { findOrCreateSession } from "../../../conversations/index.js";
-import { loadTwilioConfigFromChannel } from "../config.js";
+import { loadTwilioConfigFromChannel, refreshNgrokUrl, resolveAdapterCredential } from "../config.js";
 import { createCall } from "../calls.js";
 import { formatError } from "../../../utils/errors.js";
 
@@ -42,6 +42,8 @@ export function createMakeCallTool(): Record<string, any> {
 
         let config;
         try {
+          await resolveAdapterCredential();
+          await refreshNgrokUrl();
           config = loadTwilioConfigFromChannel(channel);
         } catch (err) {
           return { error: formatError(err) };
