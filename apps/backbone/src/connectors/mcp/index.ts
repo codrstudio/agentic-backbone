@@ -3,8 +3,13 @@ import type { ConnectorDef, ConnectorContext } from "../types.js";
 import { credentialSchema, optionsSchema } from "./schemas.js";
 import { mcpClientPool } from "./client.js";
 import { formatError } from "../../utils/errors.js";
+import {
+  activateNotifications,
+  deactivateNotifications,
+} from "./notification-handler.js";
 
 export { mcpClientPool };
+export type { McpNotificationHandler } from "./client.js";
 
 export const mcpConnector: ConnectorDef = {
   slug: "mcp",
@@ -54,12 +59,21 @@ export const mcpConnector: ConnectorDef = {
           parameters: jsonSchema(schema as Parameters<typeof jsonSchema>[0]),
           execute: async (args) => {
             try {
-              return await mcpClientPool.callTool(
+              const result = await mcpClientPool.callTool(
                 adapterSlug,
                 originalToolName,
                 args,
                 effectiveAgentId
               );
+
+              // Activate/deactivate notifications on presence changes
+              if (originalToolName === "presence_online") {
+                activateNotifications(effectiveAgentId, adapterSlug);
+              } else if (originalToolName === "presence_offline") {
+                deactivateNotifications(effectiveAgentId);
+              }
+
+              return result;
             } catch (err) {
               return { error: formatError(err) };
             }
@@ -74,8 +88,10 @@ export const mcpConnector: ConnectorDef = {
   async start(ctx: ConnectorContext) {
     const { connectorRegistry } = await import("../index.js");
 
+    // Use findAdapter (unmasked) instead of listAdapters (masked) to get real credentials
     const allAdapters = connectorRegistry.listAdapters();
-    const mcpAdapters = allAdapters.filter((a) => a.connector === "mcp");
+    const mcpSlugs = allAdapters.filter((a) => a.connector === "mcp").map((a) => a.slug);
+    const mcpAdapters = mcpSlugs.map((slug) => connectorRegistry.findAdapter(slug)).filter(Boolean) as typeof allAdapters;
 
     if (mcpAdapters.length === 0) {
       ctx.log("no MCP adapters configured — pool not started");

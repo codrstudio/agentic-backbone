@@ -1,6 +1,7 @@
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
 import { SSEClientTransport } from "@modelcontextprotocol/sdk/client/sse.js";
+import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/streamableHttp.js";
 import { randomUUID } from "node:crypto";
 import type { McpCredential, McpOptions } from "./schemas.js";
 import { formatError } from "../../utils/errors.js";
@@ -12,10 +13,17 @@ export interface McpToolDefinition {
   inputSchema: Record<string, unknown>;
 }
 
+export type McpNotificationHandler = (
+  slug: string,
+  method: string,
+  params: Record<string, unknown>
+) => void;
+
 interface CachedEntry {
   client: Client;
   tools: McpToolDefinition[];
   options: McpOptions;
+  credential: McpCredential;
 }
 
 // ---------------------------------------------------------------------------
@@ -25,6 +33,31 @@ interface CachedEntry {
 
 class McpClientPool {
   private cache = new Map<string, CachedEntry>();
+  private notificationHandlers: McpNotificationHandler[] = [];
+
+  // --- Notification subscription ---
+
+  onNotification(handler: McpNotificationHandler): () => void {
+    this.notificationHandlers.push(handler);
+    return () => {
+      const idx = this.notificationHandlers.indexOf(handler);
+      if (idx >= 0) this.notificationHandlers.splice(idx, 1);
+    };
+  }
+
+  private emitNotification(
+    slug: string,
+    method: string,
+    params: Record<string, unknown>
+  ): void {
+    for (const handler of this.notificationHandlers) {
+      try {
+        handler(slug, method, params);
+      } catch (err) {
+        console.warn(`[mcp] notification handler error:`, err);
+      }
+    }
+  }
 
   // --- Connection management ---
 
@@ -35,7 +68,7 @@ class McpClientPool {
   ): Promise<void> {
     if (this.cache.has(slug)) return; // already connected
 
-    let transport: StdioClientTransport | SSEClientTransport;
+    let transport: StdioClientTransport | SSEClientTransport | StreamableHTTPClientTransport;
 
     if (options.transport === "stdio") {
       if (!options.command) {
@@ -52,6 +85,20 @@ class McpClientPool {
         },
         stderr: "pipe",
       });
+    } else if (options.transport === "streamable-http") {
+      if (!options.url) {
+        throw new Error(
+          `MCP adapter "${slug}": url is required for streamable-http transport`
+        );
+      }
+      const headers: Record<string, string> = {};
+      if (credential.api_key) {
+        headers["Authorization"] = `Bearer ${credential.api_key}`;
+      }
+      transport = new StreamableHTTPClientTransport(
+        new URL(options.url),
+        { requestInit: { headers } }
+      );
     } else {
       if (!options.url) {
         throw new Error(
@@ -97,7 +144,16 @@ class McpClientPool {
         tools = tools.filter((t) => allowed.has(t.name));
       }
 
-      this.cache.set(slug, { client, tools, options });
+      // Subscribe to server notifications and forward to handlers
+      client.fallbackNotificationHandler = async (notification) => {
+        this.emitNotification(
+          slug,
+          notification.method,
+          (notification.params ?? {}) as Record<string, unknown>
+        );
+      };
+
+      this.cache.set(slug, { client, tools, options, credential });
       console.log(
         `[mcp] connected to "${slug}" (${options.server_label}) — ${tools.length} tool(s) available`
       );
@@ -161,7 +217,24 @@ class McpClientPool {
       output = result;
       return result;
     } catch (err) {
-      error = formatError(err);
+      const errMsg = formatError(err);
+      // Auto-reconnect on session expiry
+      if (errMsg.includes("Session not found") || errMsg.includes("session")) {
+        console.log(`[mcp] session expired for "${slug}" — reconnecting...`);
+        try {
+          await this.reconnect(slug);
+          const retryResult = await this.cache.get(slug)!.client.callTool({
+            name: toolName,
+            arguments: args as Record<string, unknown>,
+          });
+          output = retryResult;
+          return retryResult;
+        } catch (retryErr) {
+          error = formatError(retryErr);
+          throw retryErr;
+        }
+      }
+      error = errMsg;
       throw err;
     } finally {
       const durationMs = Date.now() - startMs;
@@ -177,7 +250,29 @@ class McpClientPool {
     }
   }
 
+  private async reconnect(slug: string): Promise<void> {
+    const entry = this.cache.get(slug);
+    if (!entry) return;
+    const { credential, options } = entry;
+    try { await entry.client.close(); } catch { /* ignore */ }
+    this.cache.delete(slug);
+    await this.connect(slug, credential, options);
+    console.log(`[mcp] reconnected to "${slug}"`);
+  }
+
   // --- Lifecycle ---
+
+  async disconnect(slug: string): Promise<void> {
+    const entry = this.cache.get(slug);
+    if (!entry) return;
+    try {
+      await entry.client.close();
+      console.log(`[mcp] disconnected from "${slug}"`);
+    } catch (err) {
+      console.warn(`[mcp] error closing "${slug}": ${formatError(err)}`);
+    }
+    this.cache.delete(slug);
+  }
 
   async closeAll(): Promise<void> {
     for (const [slug, entry] of this.cache) {

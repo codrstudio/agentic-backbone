@@ -8,7 +8,7 @@ export const credentialSchema = z.object({
 });
 
 export const optionsSchema = z.object({
-  transport: z.enum(["stdio", "http"]).describe("Transport type: 'stdio' or 'http'"),
+  transport: z.enum(["stdio", "http", "streamable-http"]).describe("Transport type: 'stdio', 'http' (legacy SSE), or 'streamable-http' (MCP 2024-11-05+)"),
   // stdio fields
   command: z
     .string()
