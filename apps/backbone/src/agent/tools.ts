@@ -32,6 +32,8 @@ export function composeAgentTools(
 
   const connectorTools = connectorRegistry.composeTools(agentId);
   if (connectorTools) Object.assign(tools, connectorTools);
+  const mcpToolCount = Object.keys(tools).filter(k => k.startsWith("mcp_")).length;
+  console.log(`[tools] ${agentId}: ${Object.keys(tools).length} total, ${mcpToolCount} MCP tools`);
 
   const messageTools = createMessageTools(agentId, {
     recipientId: opts?.userId,

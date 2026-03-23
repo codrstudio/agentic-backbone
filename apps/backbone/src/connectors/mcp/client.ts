@@ -125,8 +125,13 @@ class McpClientPool {
       { capabilities: {} }
     );
 
+    // Debug: log transport SSE events
+    transport.onerror = (err) => console.warn(`[mcp] transport error for "${slug}":`, err.message);
+    transport.onclose = () => console.log(`[mcp] transport closed for "${slug}"`);
+
     try {
       await client.connect(transport);
+      console.log(`[mcp] connected to "${slug}", sessionId: ${(transport as any).sessionId ?? "none"}`);
       const result = await client.listTools();
 
       let tools: McpToolDefinition[] = result.tools.map((t) => ({
@@ -157,6 +162,12 @@ class McpClientPool {
       console.log(
         `[mcp] connected to "${slug}" (${options.server_label}) — ${tools.length} tool(s) available`
       );
+
+      // For streamable-http: open a SEPARATE MCP session dedicated to SSE listening.
+      // The SDK's internal SSE doesn't reliably deliver notifications in Node.js.
+      if (options.transport === "streamable-http" && options.url) {
+        this.openDedicatedSseSession(slug, options.url, credential);
+      }
     } catch (err) {
       console.error(
         `[mcp] failed to connect to "${slug}": ${formatError(err)}`
@@ -190,6 +201,160 @@ class McpClientPool {
 
   isConnected(slug: string): boolean {
     return this.cache.has(slug);
+  }
+
+  // --- Dedicated SSE session for streamable-http notifications ---
+
+  private sseAbortControllers = new Map<string, AbortController>();
+
+  private async openDedicatedSseSession(
+    slug: string,
+    url: string,
+    credential: McpCredential
+  ): Promise<void> {
+    console.log(`[mcp] opening dedicated SSE session for "${slug}" at ${url}`);
+    const controller = new AbortController();
+    this.sseAbortControllers.set(slug, controller);
+
+    const authHeaders: Record<string, string> = {
+      "Content-Type": "application/json",
+    };
+    if (credential.api_key) {
+      authHeaders["Authorization"] = `Bearer ${credential.api_key}`;
+    }
+
+    try {
+      // Step 1: Create a new MCP session via initialize
+      const initResponse = await fetch(url, {
+        method: "POST",
+        headers: { ...authHeaders, "Accept": "application/json, text/event-stream" },
+        body: JSON.stringify({
+          jsonrpc: "2.0",
+          id: 1,
+          method: "initialize",
+          params: {
+            protocolVersion: "2024-11-05",
+            capabilities: {},
+            clientInfo: { name: "backbone-sse-listener", version: "1.0.0" },
+          },
+        }),
+        signal: controller.signal,
+      });
+
+      const sessionId = initResponse.headers.get("mcp-session-id");
+      if (!sessionId) {
+        console.warn(`[mcp] SSE session for "${slug}": no session ID returned`);
+        return;
+      }
+
+      // Cancel the init response body (it's an SSE stream that never ends)
+      await initResponse.body?.cancel();
+
+      // Step 2: Send notifications/initialized to trigger SSE
+      const notifResponse = await fetch(url, {
+        method: "POST",
+        headers: { ...authHeaders, "Mcp-Session-Id": sessionId },
+        body: JSON.stringify({
+          jsonrpc: "2.0",
+          method: "notifications/initialized",
+        }),
+        signal: controller.signal,
+      });
+      await notifResponse.body?.cancel();
+
+      // Step 3: Open GET SSE on this new session
+      const sseResponse = await fetch(url, {
+        method: "GET",
+        headers: {
+          ...(credential.api_key ? { "Authorization": `Bearer ${credential.api_key}` } : {}),
+          "Accept": "text/event-stream",
+          "Mcp-Session-Id": sessionId,
+        },
+        signal: controller.signal,
+      });
+
+      if (!sseResponse.ok || !sseResponse.body) {
+        console.warn(`[mcp] SSE stream for "${slug}" failed: ${sseResponse.status}`);
+        return;
+      }
+
+      console.log(`[mcp] SSE listener opened for "${slug}" (dedicated session=${sessionId})`);
+
+      // Step 4: Parse SSE events
+      const reader = sseResponse.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+
+      const readLoop = async () => {
+        try {
+          let chunkCount = 0;
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) { console.log(`[mcp] SSE stream ended for "${slug}"`); break; }
+
+            chunkCount++;
+            const decoded = decoder.decode(value, { stream: true });
+            buffer += decoded;
+
+            // Log first few chunks and any notification
+            if (chunkCount <= 3 || decoded.includes("notifications/")) {
+              console.log(`[mcp] SSE chunk #${chunkCount} for "${slug}": ${decoded.slice(0, 120)}...`);
+            }
+
+            const lines = buffer.split("\n");
+            buffer = lines.pop() ?? "";
+
+            for (const line of lines) {
+              if (line.startsWith("data: ")) {
+                try {
+                  const msg = JSON.parse(line.slice(6));
+                  if (msg.method) {
+                    console.log(`[mcp] SSE notification: ${msg.method}`);
+                    this.emitNotification(slug, msg.method, msg.params ?? {});
+                  }
+                } catch {
+                  // Not valid JSON — skip
+                }
+              }
+            }
+          }
+        } catch (err: any) {
+          if (err?.name !== "AbortError") {
+            console.warn(`[mcp] SSE stream error for "${slug}":`, err?.message);
+            // Reconnect after 5s
+            if (this.cache.has(slug) && !controller.signal.aborted) {
+              setTimeout(() => this.openDedicatedSseSession(slug, url, credential), 5_000);
+            }
+          }
+        }
+      };
+
+      readLoop();
+    } catch (err: any) {
+      if (err?.name !== "AbortError") {
+        console.error(`[mcp] SSE session setup failed for "${slug}":`, err?.message);
+      }
+    }
+  }
+
+  ensureSseListener(slug: string): void {
+    const entry = this.cache.get(slug);
+    if (!entry || entry.options.transport !== "streamable-http" || !entry.options.url) return;
+    if (this.sseAbortControllers.has(slug)) {
+      // Already has a controller — check if it's aborted
+      const existing = this.sseAbortControllers.get(slug)!;
+      if (!existing.signal.aborted) return; // still active
+    }
+    console.log(`[mcp] re-opening SSE listener for "${slug}"`);
+    this.openDedicatedSseSession(slug, entry.options.url, entry.credential);
+  }
+
+  private closeSseListener(slug: string): void {
+    const controller = this.sseAbortControllers.get(slug);
+    if (controller) {
+      controller.abort();
+      this.sseAbortControllers.delete(slug);
+    }
   }
 
   // --- Tool execution + audit ---
@@ -263,6 +428,7 @@ class McpClientPool {
   // --- Lifecycle ---
 
   async disconnect(slug: string): Promise<void> {
+    this.closeSseListener(slug);
     const entry = this.cache.get(slug);
     if (!entry) return;
     try {
@@ -275,6 +441,9 @@ class McpClientPool {
   }
 
   async closeAll(): Promise<void> {
+    for (const slug of this.sseAbortControllers.keys()) {
+      this.closeSseListener(slug);
+    }
     for (const [slug, entry] of this.cache) {
       try {
         await entry.client.close();

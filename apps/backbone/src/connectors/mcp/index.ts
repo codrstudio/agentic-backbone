@@ -116,7 +116,24 @@ export const mcpConnector: ConnectorDef = {
         );
         connected++;
       } catch {
-        // Error already logged inside pool.connect; continue with other adapters
+        // Schedule retry for failed adapters
+        const slug = adapter.slug;
+        const cred = credResult.data;
+        const opts = optsResult.data;
+        const retryConnect = async (attempt: number) => {
+          if (mcpClientPool.isConnected(slug)) return;
+          const delay = Math.min(10_000 * attempt, 60_000);
+          setTimeout(async () => {
+            try {
+              await mcpClientPool.connect(slug, cred, opts);
+              ctx.log(`connected to "${slug}" on retry #${attempt}`);
+            } catch {
+              if (attempt < 12) retryConnect(attempt + 1);
+              else ctx.log(`gave up connecting to "${slug}" after ${attempt} retries`);
+            }
+          }, delay);
+        };
+        retryConnect(1);
       }
     }
 
