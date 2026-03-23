@@ -107,6 +107,46 @@ agentRoutes.patch("/agents/:id", async (c) => {
   }
 });
 
+// --- Presence (MCP live-chat) ---
+
+agentRoutes.post("/agents/:id/presence", async (c) => {
+  const id = c.req.param("id");
+  const denied = assertAgentOwnership(c, id);
+  if (denied) return denied;
+
+  const { action } = await c.req.json<{ action: "online" | "offline" }>();
+  const { mcpClientPool } = await import("../connectors/mcp/index.js");
+  const {
+    activateNotifications,
+    deactivateNotifications,
+    isNotificationActive,
+  } = await import("../connectors/mcp/notification-handler.js");
+
+  const adapterSlug = "coletivos-mcp";
+
+  try {
+    if (action === "online") {
+      await mcpClientPool.callTool(adapterSlug, "presence_online", { limit: 5 }, id);
+      activateNotifications(id, adapterSlug);
+      return c.json({ status: "online", handler: "active" });
+    } else if (action === "offline") {
+      await mcpClientPool.callTool(adapterSlug, "presence_offline", {}, id);
+      deactivateNotifications(id);
+      return c.json({ status: "offline", handler: "inactive" });
+    }
+    return c.json({ error: "action must be 'online' or 'offline'" }, 400);
+  } catch (err: any) {
+    console.error(`[presence] error for ${id}:`, err?.message ?? err);
+    return c.json({ error: err?.message ?? "presence call failed" }, 500);
+  }
+});
+
+agentRoutes.get("/agents/:id/presence", async (c) => {
+  const id = c.req.param("id");
+  const { isNotificationActive } = await import("../connectors/mcp/notification-handler.js");
+  return c.json({ active: isNotificationActive(id) });
+});
+
 // --- Delete Agent ---
 
 agentRoutes.delete("/agents/:id", (c) => {
