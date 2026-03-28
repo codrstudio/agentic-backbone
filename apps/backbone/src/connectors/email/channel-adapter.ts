@@ -3,6 +3,7 @@ import { join } from "node:path";
 import { credentialSchema, optionsSchema } from "./schemas.js";
 import { EmailClient } from "./client.js";
 import type { ParsedEmail } from "./client.js";
+import { DATA_DIR as ROOT_DATA_DIR } from "../../context/paths.js";
 
 // ---- State persistence ----
 
@@ -19,7 +20,7 @@ interface EmailPollingState {
   lastError: string | null;
 }
 
-const DATA_DIR = join(process.cwd(), "data", "email-state");
+const DATA_DIR = join(ROOT_DATA_DIR, "email-state");
 
 function stateFilePath(adapterId: string): string {
   return join(DATA_DIR, `${adapterId}.json`);

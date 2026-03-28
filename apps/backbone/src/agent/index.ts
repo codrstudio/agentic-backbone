@@ -9,15 +9,16 @@ import {
 import { loadWebSearchConfig } from "../settings/web-search.js";
 import { readFileSync, appendFileSync, mkdirSync } from "node:fs";
 import { join } from "node:path";
+import { DATA_DIR } from "../context/paths.js";
 
 export type { AgentEvent, UsageData };
 export type { RoutingContext, RoutingRule, ModelResult };
 
-const LOG_PATH = join(process.cwd(), "data", "agent-runs.jsonl");
+const LOG_PATH = join(DATA_DIR, "agent-runs.jsonl");
 
 function logAgentRun(entry: Record<string, unknown>): void {
   try {
-    mkdirSync(join(process.cwd(), "data"), { recursive: true });
+    mkdirSync(DATA_DIR, { recursive: true });
     appendFileSync(LOG_PATH, JSON.stringify(entry) + "\n");
   } catch (err) {
     console.warn("[agent] failed to log run:", err);
@@ -77,7 +78,7 @@ export async function* runAgent(
     apiKey,
     prompt,
     sessionId: options?.sessionId,
-    sessionDir: join(process.cwd(), "data", "ai-sessions"),
+    sessionDir: join(DATA_DIR, "ai-sessions"),
     role,
     tools: options?.tools,
     maxTurns: 100,

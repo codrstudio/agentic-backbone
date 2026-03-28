@@ -4,8 +4,9 @@ import { existsSync, readFileSync, unlinkSync } from "node:fs";
 import { join } from "node:path";
 import { formatError } from "../../../utils/errors.js";
 import type { EmailDraft } from "./draft-create.js";
+import { DATA_DIR } from "../../../context/paths.js";
 
-const DRAFTS_DIR = join(process.cwd(), "data", "email-drafts");
+const DRAFTS_DIR = join(DATA_DIR, "email-drafts");
 
 export function createEmailDraftSendTool(slugs: [string, ...string[]]): Record<string, any> {
   return {

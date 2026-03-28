@@ -1,7 +1,7 @@
 import { readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import { db } from "../db/index.js";
-import { agentDir } from "../context/paths.js";
+import { agentDir, DATA_DIR } from "../context/paths.js";
 import type { HeartbeatLogEntry } from "../heartbeat/log.js";
 import type { CronRunLogEntry } from "../cron/log.js";
 import type { Session } from "../conversations/index.js";
@@ -105,7 +105,7 @@ interface AiContentPart {
 }
 
 function loadAiSessionMessages(sdkSessionId: string): AiMessage[] {
-  const sessionPath = join(process.cwd(), "data", "ai-sessions", `${sdkSessionId}.jsonl`);
+  const sessionPath = join(DATA_DIR, "ai-sessions", `${sdkSessionId}.jsonl`);
   if (!existsSync(sessionPath)) return [];
 
   try {

@@ -1,8 +1,8 @@
 import Database, { type Database as DatabaseType } from "better-sqlite3";
 import { join } from "node:path";
 import { mkdirSync } from "node:fs";
+import { DATA_DIR } from "../context/paths.js";
 
-const DATA_DIR = join(process.cwd(), "data");
 mkdirSync(DATA_DIR, { recursive: true });
 
 const db: DatabaseType = new Database(join(DATA_DIR, "backbone.sqlite"));

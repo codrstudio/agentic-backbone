@@ -3,8 +3,9 @@ import { z } from "zod";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { randomUUID } from "node:crypto";
+import { DATA_DIR } from "../../../context/paths.js";
 
-const DRAFTS_DIR = join(process.cwd(), "data", "email-drafts");
+const DRAFTS_DIR = join(DATA_DIR, "email-drafts");
 
 export interface EmailDraft {
   draftId: string;

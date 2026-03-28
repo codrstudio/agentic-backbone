@@ -15,6 +15,7 @@ if (!process.env.CONTEXT_FOLDER) {
 }
 
 export const CONTEXT_DIR = resolve(REPO_ROOT, process.env.CONTEXT_FOLDER);
+export const DATA_DIR = resolve(REPO_ROOT, "data");
 
 export type ResourceKind = "skills" | "adapters" | "services";
 
