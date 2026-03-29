@@ -369,7 +369,7 @@
     "id": "F-216",
     "name": "SourcesListRenderer.tsx com tokens Tailwind",
     "description": "Reescrever SourcesListRenderer.tsx: lista com space-y-2. Label text-xs font-medium text-muted-foreground uppercase. Items com hover:bg-muted. Titulo text-primary. Snippet text-xs text-muted-foreground line-clamp-2. Zero classe ai-chat-display-sources.",
-    "status": "pending",
+    "status": "passing",
     "priority": 18,
     "agent": "coder",
     "task": "vibe-code",
@@ -382,7 +382,8 @@
       "Items usam hover:bg-muted",
       "Zero hsl(), oklch(), #hex, rgb() no arquivo"
     ],
-    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab/wave-7/worktree/sprints/sprint-14/3-prps/PRP-16D-display-simples-medios-shadcn.md"
+    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab/wave-7/worktree/sprints/sprint-14/3-prps/PRP-16D-display-simples-medios-shadcn.md",
+    "completed_at": "2026-03-29T21:41:54.117Z"
   },
   {
     "id": "F-217",
