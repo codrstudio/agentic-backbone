@@ -517,10 +517,11 @@
     "id": "F-223",
     "name": "ProgressStepsRenderer.tsx com Progress e Badge",
     "description": "Reescrever ProgressStepsRenderer.tsx: usar Progress do shadcn interno para barra + Badge. Titulo font-medium text-foreground. Contador text-muted-foreground. Steps com Check (completed, text-primary) ou Circle (pending, text-muted-foreground). Zero classe ai-chat-display-progress.",
-    "status": "pending",
+    "status": "passing",
     "priority": 25,
     "agent": "coder",
     "task": "vibe-code",
+    "completed_at": "2026-03-29T23:55:00Z",
     "dependencies": [
       "F-200",
       "F-201",
