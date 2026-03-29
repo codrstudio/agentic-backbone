@@ -28,3 +28,5 @@ export { CodeBlockRenderer } from "./display/CodeBlockRenderer.js";
 export { SourcesListRenderer } from "./display/SourcesListRenderer.js";
 export { StepTimelineRenderer } from "./display/StepTimelineRenderer.js";
 export { ProgressStepsRenderer } from "./display/ProgressStepsRenderer.js";
+export { ChartRenderer } from "./display/ChartRenderer.js";
+export { CarouselRenderer } from "./display/CarouselRenderer.js";

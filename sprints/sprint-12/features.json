@@ -182,7 +182,7 @@
     "id": "F-188",
     "name": "Display Renderers Chart + Carousel",
     "description": "Criar ChartRenderer.tsx (recharts: bar, line, pie, area, donut via PieChart innerRadius, ResponsiveContainer obrigatorio, height via CSS var --ai-chat-chart-height 300px, Tooltip com formatacao, 8 cores padrao) e CarouselRenderer.tsx (embla-carousel-react com drag/touch, setas prev/next desktop, cards com imagem+titulo+subtitulo+preco BRL, dots indicadores, responsivo 1/2/3 cards).",
-    "status": "pending",
+    "status": "passing",
     "priority": 9,
     "agent": "coder",
     "task": "vibe-code",
@@ -199,7 +199,8 @@
       "Dots indicadores visiveis",
       "CSS classes .ai-chat-display-chart-* e .ai-chat-display-carousel-*"
     ],
-    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab/wave-5/worktree/sprints/sprint-12/3-prps/PRP-15C-display-renderers-registry.md"
+    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab/wave-5/worktree/sprints/sprint-12/3-prps/PRP-15C-display-renderers-registry.md",
+    "completed_at": "2026-03-29T06:48:56Z"
   },
   {
     "id": "F-189",
