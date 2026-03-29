@@ -389,7 +389,7 @@
     "id": "F-217",
     "name": "CodeBlockRenderer.tsx com Button shadcn",
     "description": "Reescrever CodeBlockRenderer.tsx: container rounded-md border bg-muted. Header com language text-xs text-muted-foreground font-mono + Button variant ghost size sm para copy. Pre com p-4 font-mono text-sm. Manter logica de copy-to-clipboard com feedback visual (Check/Copy icons). Zero classe ai-chat-display-code.",
-    "status": "pending",
+    "status": "passing",
     "priority": 19,
     "agent": "coder",
     "task": "vibe-code",
@@ -403,7 +403,8 @@
       "Copy-to-clipboard funciona com feedback visual",
       "Zero hsl(), oklch(), #hex, rgb() no arquivo"
     ],
-    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab/wave-7/worktree/sprints/sprint-14/3-prps/PRP-16D-display-simples-medios-shadcn.md"
+    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab/wave-7/worktree/sprints/sprint-14/3-prps/PRP-16D-display-simples-medios-shadcn.md",
+    "completed_at": "2026-03-29T21:43:38Z"
   },
   {
     "id": "F-218",
