@@ -355,8 +355,9 @@
     "id": "F-195",
     "name": "Refatorar Hub para ai-chat",
     "description": "Modificar apps/hub/src/components/conversations/conversation-chat.tsx para usar <Chat /> do @agentic-backbone/ai-chat. Manter header, takeover, feedback do Hub. Importar styles.css em apps/hub/src/main.tsx. Remover 5 arquivos redundantes: chat/message-bubble.tsx, chat/message-list.tsx, chat/message-input.tsx, chat/streaming-indicator.tsx, lib/chat-stream.ts.",
-    "status": "pending",
+    "status": "passing",
     "priority": 16,
+    "completed_at": "2026-03-29T07:35:00Z",
     "agent": "coder",
     "task": "vibe-code",
     "dependencies": [
