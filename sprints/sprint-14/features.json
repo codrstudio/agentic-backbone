@@ -109,7 +109,7 @@
     "id": "F-204",
     "name": "MessageList.tsx com ScrollArea",
     "description": "Reescrever MessageList.tsx: substituir div.ai-chat-list por ScrollArea do shadcn. Mensagens em flex col gap-3 p-4. Empty state com text-muted-foreground. Manter logica de auto-scroll inteligente (threshold 100px do bottom) e isStreaming na ultima mensagem assistant.",
-    "status": "pending",
+    "status": "passing",
     "priority": 6,
     "agent": "coder",
     "task": "vibe-code",
@@ -124,7 +124,8 @@
       "isStreaming na ultima mensagem assistant mantido",
       "Empty state usa text-muted-foreground"
     ],
-    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab/wave-7/worktree/sprints/sprint-14/3-prps/PRP-16B-core-chat-shadcn.md"
+    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab/wave-7/worktree/sprints/sprint-14/3-prps/PRP-16B-core-chat-shadcn.md",
+    "completed_at": "2026-03-29T21:15:06Z"
   },
   {
     "id": "F-205",
