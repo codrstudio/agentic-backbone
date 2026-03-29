@@ -260,7 +260,7 @@
     "id": "F-211",
     "name": "ToolResult.tsx com Collapsible shadcn",
     "description": "Reescrever ToolResult.tsx: usar Collapsible/CollapsibleTrigger/CollapsibleContent do shadcn. Container rounded-md border bg-muted/50. Trigger com icon, toolName font-mono, chevron. Erro: text-destructive. Sucesso: text-foreground. Conteudo em pre com max-h-80 font-mono text-xs bg-muted. Manter logica de expanded state e serializacao.",
-    "status": "pending",
+    "status": "passing",
     "priority": 13,
     "agent": "coder",
     "task": "vibe-code",
@@ -276,7 +276,8 @@
       "Colapse/expande funciona via Collapsible",
       "Logica de serializacao mantida"
     ],
-    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab/wave-7/worktree/sprints/sprint-14/3-prps/PRP-16C-parts-shadcn.md"
+    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab/wave-7/worktree/sprints/sprint-14/3-prps/PRP-16C-parts-shadcn.md",
+    "completed_at": "2026-03-29T23:15:00Z"
   },
   {
     "id": "F-212",
