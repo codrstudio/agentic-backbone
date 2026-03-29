@@ -741,7 +741,7 @@
     "id": "F-233",
     "name": "Atualizar Hub — remover import stylesheet",
     "description": "Encontrar e remover import '@agentic-backbone/ai-chat/styles.css' no Hub (provavelmente em apps/hub/src/main.tsx). Nenhuma outra alteracao no Hub. O <Chat /> continua funcionando com mesmas props — agora herda tema shadcn automaticamente.",
-    "status": "pending",
+    "status": "passing",
     "priority": 34,
     "agent": "coder",
     "task": "vibe-code",
@@ -752,7 +752,8 @@
       "Zero import de '@agentic-backbone/ai-chat/styles.css' em qualquer arquivo do Hub",
       "Nenhuma outra alteracao no Hub alem da remocao do import"
     ],
-    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab/wave-7/worktree/sprints/sprint-14/3-prps/PRP-16F-limpeza-integracao-shadcn.md"
+    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab/wave-7/worktree/sprints/sprint-14/3-prps/PRP-16F-limpeza-integracao-shadcn.md",
+    "completed_at": "2026-03-29T03:45:00.000Z"
   },
   {
     "id": "F-234",
