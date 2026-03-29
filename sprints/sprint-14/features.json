@@ -585,7 +585,7 @@
     "id": "F-226",
     "name": "CarouselRenderer.tsx com embla + shadcn",
     "description": "Reescrever CarouselRenderer.tsx: manter embla-carousel-react para scroll. Slides em Card do shadcn. Arrows com Button variant outline size icon rounded-full. Dots: bg-primary (ativo) / bg-muted (inativo). Badges dentro de slides com Badge do shadcn. Zero classe ai-chat-display-carousel.",
-    "status": "pending",
+    "status": "passing",
     "priority": 28,
     "agent": "coder",
     "task": "vibe-code",
@@ -601,6 +601,7 @@
       "Zero classe ai-chat-display-carousel* no arquivo",
       "Zero hsl(), oklch(), #hex, rgb() no arquivo"
     ],
+    "completed_at": "2026-03-29T03:30:00Z",
     "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab/wave-7/worktree/sprints/sprint-14/3-prps/PRP-16E-display-complexos-shadcn.md"
   },
   {
