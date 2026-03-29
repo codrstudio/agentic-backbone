@@ -540,7 +540,7 @@
     "id": "F-224",
     "name": "MapViewRenderer.tsx com Card e Separator",
     "description": "Reescrever MapViewRenderer.tsx: usar Card com overflow-hidden. Area de mapa em aspect-video bg-muted text-muted-foreground com MapPin icon. Separator entre mapa e lista de locations. Locations com MapPin text-primary, nome font-medium, endereco text-xs text-muted-foreground. Zero classe ai-chat-display-map.",
-    "status": "pending",
+    "status": "passing",
     "priority": 26,
     "agent": "coder",
     "task": "vibe-code",
@@ -554,7 +554,8 @@
       "MapPin usa text-primary",
       "Zero hsl(), oklch(), #hex, rgb() no arquivo"
     ],
-    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab/wave-7/worktree/sprints/sprint-14/3-prps/PRP-16D-display-simples-medios-shadcn.md"
+    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab/wave-7/worktree/sprints/sprint-14/3-prps/PRP-16D-display-simples-medios-shadcn.md",
+    "completed_at": "2026-03-29T03:00:00.000Z"
   },
   {
     "id": "F-225",
