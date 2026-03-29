@@ -1,5 +1,6 @@
 import { Hono } from "hono";
 import { verify } from "hono/jwt";
+import { validateApiKey } from "../auth/api-keys.js";
 import { authPublicRoutes, authProtectedRoutes } from "./auth.js";
 import { systemRoutes } from "./system.js";
 import { agentRoutes } from "./agents.js";
@@ -100,6 +101,19 @@ routes.use("*", async (c, next) => {
 
   if (!token) {
     return c.json({ error: "unauthorized" }, 401);
+  }
+
+  // API key path — prefix sk_ bypasses JWT entirely
+  if (token.startsWith("sk_")) {
+    const apiKey = validateApiKey(token);
+    if (!apiKey) return c.json({ error: "invalid api key" }, 401);
+    c.set("jwtPayload", {
+      sub: apiKey.user,
+      role: apiKey.role,
+      allowedAgents: apiKey.allowedAgents,
+      jwtSource: "api-key",
+    });
+    return next();
   }
 
   try {

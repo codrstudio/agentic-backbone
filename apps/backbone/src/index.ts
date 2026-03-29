@@ -32,6 +32,7 @@ import { initChannelAdapters, channelAdapterRegistry } from "./channels/delivery
 import { CONTEXT_DIR } from "./context/index.js";
 import { encryptAllYamlFiles } from "./context/encryptor.js";
 import { loadPlans } from "./settings/llm.js";
+import { loadApiKeys } from "./auth/api-keys.js";
 import { initBenchmarkTrigger } from "./benchmarks/index.js";
 import { initCircuitBreaker } from "./circuit-breaker/index.js";
 import { initFleetEvents } from "./fleet/events.js";
@@ -62,6 +63,9 @@ async function bootstrap() {
 
   // Load LLM plans before any agent initialization
   loadPlans();
+
+  // Load API keys for static token auth
+  loadApiKeys();
 
   await initHooks();
   wireEventBusToHooks();

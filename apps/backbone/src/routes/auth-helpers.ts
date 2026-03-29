@@ -3,11 +3,23 @@ import type { Context } from "hono";
 export interface AuthUser {
   user: string;
   role: "sysuser" | "user";
+  allowedAgents?: string[];
 }
 
 export function getAuthUser(c: Context): AuthUser {
   const payload = c.get("jwtPayload");
-  return { user: payload.sub, role: payload.role };
+  return {
+    user: payload.sub,
+    role: payload.role,
+    allowedAgents: payload.allowedAgents,
+  };
+}
+
+export function assertAgentAccess(c: Context, agentId: string): Response | null {
+  const auth = getAuthUser(c);
+  if (!auth.allowedAgents) return null;
+  if (auth.allowedAgents.includes(agentId)) return null;
+  return c.json({ error: "forbidden" }, 403);
 }
 
 export function requireSysuser(c: Context): Response | null {

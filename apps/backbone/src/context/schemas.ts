@@ -66,6 +66,16 @@ export const UserCredentialYmlSchema = z.object({
 
 export type UserCredentialYml = z.infer<typeof UserCredentialYmlSchema>;
 
+// ── credentials/api-keys/{id}.yml ────────────────────────
+
+export const ApiKeyYmlSchema = z.object({
+  "secret-key": z.string(),
+  user: z.string(),
+  "allowed-agents": z.array(z.string()).default([]),
+});
+
+export type ApiKeyYml = z.infer<typeof ApiKeyYmlSchema>;
+
 // ── CHANNEL.yml ──────────────────────────────────────────
 
 export const ChannelYmlSchema = z.object({

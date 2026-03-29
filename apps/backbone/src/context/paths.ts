@@ -45,6 +45,10 @@ export function userCredentialPath(slug: string): string {
   return join(credentialsUsersDir(), `${slug}.yml`);
 }
 
+export function apiKeysDir(): string {
+  return join(CONTEXT_DIR, "credentials", "api-keys");
+}
+
 export function agentsDir(): string {
   return join(CONTEXT_DIR, "agents");
 }

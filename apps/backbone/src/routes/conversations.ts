@@ -13,7 +13,7 @@ import {
 } from "../conversations/index.js";
 import { eventBus } from "../events/index.js";
 import { emitNotification } from "../notifications/index.js";
-import { getAuthUser } from "./auth-helpers.js";
+import { getAuthUser, assertAgentAccess } from "./auth-helpers.js";
 import { getAgent } from "../agents/registry.js";
 import { parseBody } from "./helpers.js";
 import { db } from "../db/index.js";
@@ -54,6 +54,9 @@ conversationRoutes.post("/conversations", async (c) => {
 
   const agent = getAgent(agentId);
   if (!agent) return c.json({ error: `Agent '${agentId}' not found` }, 404);
+
+  const agentDenied = assertAgentAccess(c, agentId);
+  if (agentDenied) return agentDenied;
 
   const session = createSession(auth.user, agentId);
   return c.json(session, 201);

@@ -1,6 +1,6 @@
 import chokidar, { type FSWatcher } from "chokidar";
 import { basename } from "node:path";
-import { agentsDir, usersDir, sharedResourceDir, plansDir, settingsPath, credentialsUsersDir } from "../context/paths.js";
+import { agentsDir, usersDir, sharedResourceDir, plansDir, settingsPath, credentialsUsersDir, apiKeysDir } from "../context/paths.js";
 import { listAgents, refreshAgentRegistry } from "../agents/registry.js";
 import { refreshChannelRegistry } from "../channels/registry.js";
 import { updateHeartbeatAgent } from "../heartbeat/index.js";
@@ -8,12 +8,14 @@ import { eventBus } from "../events/index.js";
 import { connectorRegistry } from "../connectors/index.js";
 import { encryptYamlFile } from "../context/encryptor.js";
 import { reloadPlans } from "../settings/llm.js";
+import { loadApiKeys } from "../auth/api-keys.js";
 
 let agentWatcher: FSWatcher | null = null;
 let channelWatcher: FSWatcher | null = null;
 let adapterWatcher: FSWatcher | null = null;
 let planWatcher: FSWatcher | null = null;
 let credentialsWatcher: FSWatcher | null = null;
+let apiKeysWatcher: FSWatcher | null = null;
 
 const DEBOUNCE_MS = 300;
 
@@ -222,11 +224,26 @@ export function startWatchers(): void {
     .on("change", handleYmlChange)
     .on("error", (err) => console.warn("[watchers] credentials watcher error:", err));
 
+  const apiKeysPath = apiKeysDir();
+  apiKeysWatcher = chokidar.watch(apiKeysPath, {
+    ignoreInitial: true,
+    awaitWriteFinish: { stabilityThreshold: 300, pollInterval: 100 },
+  });
+
+  apiKeysWatcher
+    .on("add", handleYmlChange)
+    .on("change", handleYmlChange)
+    .on("add", () => loadApiKeys())
+    .on("change", () => loadApiKeys())
+    .on("unlink", () => loadApiKeys())
+    .on("error", (err) => console.warn("[watchers] api-keys watcher error:", err));
+
   console.log(`[watchers] watching agents: ${agentsPath}`);
   console.log(`[watchers] watching channels: ${usersPath}`);
   console.log(`[watchers] watching adapters: ${sharedAdaptersPath}`);
   console.log(`[watchers] watching plans: ${plansPath}`);
   console.log(`[watchers] watching credentials: ${credUsersPath}`);
+  console.log(`[watchers] watching api-keys: ${apiKeysPath}`);
 }
 
 export function stopWatchers(): void {
@@ -254,5 +271,9 @@ export function stopWatchers(): void {
   if (credentialsWatcher) {
     credentialsWatcher.close();
     credentialsWatcher = null;
+  }
+  if (apiKeysWatcher) {
+    apiKeysWatcher.close();
+    apiKeysWatcher = null;
   }
 }
