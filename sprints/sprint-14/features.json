@@ -759,7 +759,7 @@
     "id": "F-234",
     "name": "Validacao zero cor hardcoded",
     "description": "Executar grep nos arquivos .tsx do pacote ai-chat para garantir zero cor hardcoded. Buscar hsl(, oklch(, rgb( e #hex literals. Resultados permitidos: var(--chart-1) a var(--chart-5) e var(--border)/var(--muted-foreground) no ChartRenderer. Qualquer outro resultado deve ser corrigido.",
-    "status": "pending",
+    "status": "passing",
     "priority": 35,
     "agent": "coder",
     "task": "vibe-code",
@@ -772,7 +772,8 @@
       "grep por 'rgb(' retorna zero resultados em .tsx do pacote",
       "grep por hex colors (#[0-9a-fA-F]{3,8}) retorna zero resultados em .tsx do pacote (exceto comments/strings permitidos)"
     ],
-    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab/wave-7/worktree/sprints/sprint-14/3-prps/PRP-16F-limpeza-integracao-shadcn.md"
+    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab/wave-7/worktree/sprints/sprint-14/3-prps/PRP-16F-limpeza-integracao-shadcn.md",
+    "completed_at": "2026-03-29T04:00:00Z"
   },
   {
     "id": "F-235",
