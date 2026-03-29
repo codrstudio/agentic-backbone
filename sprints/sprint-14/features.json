@@ -676,8 +676,9 @@
     "id": "F-231",
     "name": "Deletar styles.css",
     "description": "Deletar apps/packages/ai-chat/src/styles.css (2345 linhas). Conteudo eliminado: 77 CSS variables --ai-chat-*, classes BEM .ai-chat-*, bloco .dark proprio, 3 animacoes customizadas. Verificar que nenhum .tsx ainda importa styles.css antes de deletar.",
-    "status": "blocked",
+    "status": "passing",
     "priority": 32,
+    "completed_at": "2026-03-29T23:59:45Z",
     "agent": "coder",
     "task": "vibe-code",
     "dependencies": [
