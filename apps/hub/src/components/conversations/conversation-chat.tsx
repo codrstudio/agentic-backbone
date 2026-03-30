@@ -30,6 +30,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import {
   conversationQueryOptions,
+  conversationMessagesQueryOptions,
   sessionQueryOptions,
   renameConversation,
   deleteConversation,
@@ -73,6 +74,9 @@ export function ConversationChatPage({ id, basePath }: ConversationChatPageProps
   );
   const { data: agents } = useQuery(agentsQueryOptions());
   const { data: session } = useQuery(sessionQueryOptions(id));
+  const { data: existingMessages, isLoading: msgsLoading } = useQuery(
+    conversationMessagesQueryOptions(id),
+  );
 
   const [renameValue, setRenameValue] = useState("");
 
@@ -132,7 +136,7 @@ export function ConversationChatPage({ id, basePath }: ConversationChatPageProps
 
   const token = useAuthStore.getState().token ?? "";
 
-  if (convLoading) {
+  if (convLoading || msgsLoading) {
     return (
       <div className="flex h-full flex-col gap-4 p-4">
         <Skeleton className="h-10 w-64" />
@@ -300,6 +304,18 @@ export function ConversationChatPage({ id, basePath }: ConversationChatPageProps
           endpoint=""
           token={token}
           sessionId={id}
+          initialMessages={existingMessages
+            ?.filter((m) => m.role === "user" || m.role === "assistant")
+            .map((m, i) => ({
+              id: m._meta?.id ?? m.id ?? `msg-${i}`,
+              role: m.role as "user" | "assistant",
+              content: typeof m.content === "string"
+                ? m.content
+                : (m.content as { type?: string; text?: string }[])
+                    .filter((p) => p.type === "text")
+                    .map((p) => p.text ?? "")
+                    .join(""),
+            }))}
           className="flex-1 flex flex-col overflow-hidden"
         />
       </div>

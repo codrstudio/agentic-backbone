@@ -78,8 +78,9 @@ export interface MessageFeedback {
 
 export interface ConversationMessage {
   id?: string;
-  role: "user" | "assistant";
-  content: string;
+  role: string;
+  content: string | unknown[];
+  _meta?: { id?: string; ts?: string; userId?: string; metadata?: Record<string, unknown> };
   timestamp?: string;
   metadata?: Record<string, unknown>;
   feedback?: MessageFeedback;
