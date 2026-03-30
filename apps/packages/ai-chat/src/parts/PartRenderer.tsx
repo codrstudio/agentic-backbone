@@ -12,7 +12,9 @@ type ToolInvocationPart = {
   type: "tool-invocation";
   toolInvocation: {
     toolName: string;
+    toolCallId?: string;
     state: "call" | "partial-call" | "result";
+    args?: Record<string, unknown>;
     result?: unknown;
   };
 };
@@ -58,6 +60,7 @@ export function PartRenderer({ part, isStreaming, displayRenderers }: PartRender
         <ToolActivity
           toolName={toolInvocation.toolName}
           state={toolInvocation.state}
+          args={toolInvocation.args}
         />
       );
     }

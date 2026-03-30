@@ -21,17 +21,17 @@ export function ReasoningBlock({ content, isStreaming = false, className }: Reas
 
   return (
     <Collapsible open={expanded} onOpenChange={setExpanded} className={className}>
-      <div className="bg-muted/50 border border-border rounded-md text-sm overflow-hidden">
-        <CollapsibleTrigger className="flex items-center gap-2 px-3 py-2 w-full text-left font-medium text-muted-foreground hover:bg-muted cursor-pointer">
+      <div className="border border-purple-500/30 bg-purple-500/5 rounded-md text-sm overflow-hidden">
+        <CollapsibleTrigger className="flex items-center gap-2 px-3 py-2 w-full text-left font-medium text-purple-400 hover:bg-purple-500/10 cursor-pointer">
           <Brain className="h-3.5 w-3.5" aria-hidden="true" />
-          <span>Raciocinio</span>
+          <span className="font-mono text-xs">reasoning:</span>
           {expanded
             ? <ChevronDown className="h-3.5 w-3.5 ml-auto" aria-hidden="true" />
             : <ChevronRight className="h-3.5 w-3.5 ml-auto" aria-hidden="true" />
           }
         </CollapsibleTrigger>
         <CollapsibleContent>
-          <div className="max-h-96 overflow-y-auto px-3 py-3 text-muted-foreground whitespace-pre-wrap break-words border-t border-border">
+          <div className="max-h-96 overflow-y-auto px-3 py-3 text-purple-300/80 whitespace-pre-wrap break-words border-t border-purple-500/20 text-xs">
             {content}
           </div>
         </CollapsibleContent>

@@ -28,14 +28,16 @@ export function MessageBubble({ message, isStreaming, displayRenderers, classNam
         )}
       >
         {hasParts
-          ? (message.parts as { type: string }[]).map((part, i) => (
-              <PartRenderer
-                key={i}
-                part={part as Parameters<typeof PartRenderer>[0]["part"]}
-                isStreaming={isStreaming}
-                displayRenderers={displayRenderers}
-              />
-            ))
+          ? <div className="flex flex-col gap-3">
+              {(message.parts as { type: string }[]).map((part, i) => (
+                <PartRenderer
+                  key={i}
+                  part={part as Parameters<typeof PartRenderer>[0]["part"]}
+                  isStreaming={isStreaming}
+                  displayRenderers={displayRenderers}
+                />
+              ))}
+            </div>
           : <Markdown>{message.content}</Markdown>
         }
         {isStreaming && !isUser && <StreamingIndicator />}
