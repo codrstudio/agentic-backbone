@@ -23,7 +23,7 @@ export function MessageBubble({ message, isStreaming, displayRenderers, classNam
           "inline-block max-w-[80%] rounded-lg px-4 py-2.5",
           isUser
             ? "rounded-br-sm bg-primary text-primary-foreground"
-            : "rounded-bl-sm bg-muted text-foreground",
+            : "rounded-bl-sm bg-muted/40 text-foreground",
           className
         )}
       >
