@@ -15,12 +15,13 @@
     "react-dom": "^18 || ^19"
   },
   "dependencies": {
-    "@ai-sdk/react": "^1",
     "@agentic-backbone/ai-sdk": "*",
+    "@ai-sdk/react": "^1",
     "@radix-ui/react-collapsible": "^1",
     "@radix-ui/react-dialog": "^1",
     "@radix-ui/react-scroll-area": "^1",
     "@radix-ui/react-separator": "^1",
+    "@tanstack/react-virtual": "^3.13.23",
     "class-variance-authority": "^0.7",
     "clsx": "^2",
     "embla-carousel-react": "^8",

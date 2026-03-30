@@ -39,6 +39,8 @@ export function LinkPreviewRenderer({
               src={image}
               alt={title}
               className="w-full h-full object-cover"
+              loading="lazy"
+              decoding="async"
               onError={() => setImgError(true)}
             />
           </div>

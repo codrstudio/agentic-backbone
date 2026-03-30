@@ -1,9 +1,16 @@
+import { memo } from "react";
 import { Markdown } from "../components/Markdown.js";
+import { LazyRender } from "../components/LazyRender.js";
 import { ReasoningBlock } from "./ReasoningBlock.js";
 import { ToolActivity } from "./ToolActivity.js";
 import { ToolResult } from "./ToolResult.js";
 import { resolveDisplayRenderer } from "../display/registry.js";
 import type { DisplayRendererMap } from "../display/registry.js";
+
+const HEAVY_RENDERERS = new Set([
+  "display_chart", "display_map", "display_table",
+  "display_spreadsheet", "display_gallery", "display_image",
+]);
 
 // Minimal part types — mirrors @ai-sdk/react Message["parts"]
 type TextPart = { type: "text"; text: string };
@@ -26,7 +33,7 @@ export interface PartRendererProps {
   displayRenderers?: DisplayRendererMap;
 }
 
-export function PartRenderer({ part, isStreaming, displayRenderers }: PartRendererProps) {
+export const PartRenderer = memo(function PartRenderer({ part, isStreaming, displayRenderers }: PartRendererProps) {
   switch (part.type) {
     case "text": {
       const p = part as TextPart;
@@ -44,7 +51,13 @@ export function PartRenderer({ part, isStreaming, displayRenderers }: PartRender
 
       if (isDisplay && toolInvocation.state === "result") {
         const Renderer = resolveDisplayRenderer(toolInvocation.toolName, displayRenderers);
-        if (Renderer) return <Renderer {...(toolInvocation.result as Record<string, unknown>)} />;
+        if (Renderer) {
+          const rendered = <Renderer {...(toolInvocation.result as Record<string, unknown>)} />;
+          if (!isStreaming && HEAVY_RENDERERS.has(toolInvocation.toolName)) {
+            return <LazyRender>{rendered}</LazyRender>;
+          }
+          return rendered;
+        }
       }
 
       if (toolInvocation.state === "result") {
@@ -68,4 +81,4 @@ export function PartRenderer({ part, isStreaming, displayRenderers }: PartRender
     default:
       return null;
   }
-}
+});

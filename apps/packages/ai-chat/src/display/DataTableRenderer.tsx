@@ -23,7 +23,7 @@ function renderCellValue(value: unknown, type: string): React.ReactNode {
         : String(value);
     case "image":
       return typeof value === "string" ? (
-        <img src={value} alt="" className="rounded-sm max-h-12 object-cover" />
+        <img src={value} alt="" className="rounded-sm max-h-12 object-cover" loading="lazy" decoding="async" />
       ) : null;
     case "link":
       return typeof value === "string" ? (

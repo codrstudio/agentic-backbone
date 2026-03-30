@@ -1,3 +1,4 @@
+import { memo } from "react";
 import type { Message } from "@ai-sdk/react";
 import { cn } from "../lib/utils.js";
 import { Markdown } from "./Markdown.js";
@@ -12,7 +13,7 @@ export interface MessageBubbleProps {
   className?: string;
 }
 
-export function MessageBubble({ message, isStreaming, displayRenderers, className }: MessageBubbleProps) {
+export const MessageBubble = memo(function MessageBubble({ message, isStreaming, displayRenderers, className }: MessageBubbleProps) {
   const isUser = message.role === "user";
   const hasParts = Array.isArray(message.parts) && message.parts.length > 0;
 
@@ -20,7 +21,7 @@ export function MessageBubble({ message, isStreaming, displayRenderers, classNam
     <div className={isUser ? "flex w-full justify-end" : "flex w-full justify-start"}>
       <div
         className={cn(
-          "inline-block max-w-[80%] rounded-lg px-4 py-2.5",
+          "max-w-[80%] min-w-0 rounded-lg px-4 py-2.5 overflow-hidden",
           isUser
             ? "rounded-br-sm bg-primary text-primary-foreground"
             : "rounded-bl-sm bg-muted/40 text-foreground",
@@ -44,4 +45,9 @@ export function MessageBubble({ message, isStreaming, displayRenderers, classNam
       </div>
     </div>
   );
-}
+}, (prev, next) =>
+  prev.message === next.message
+  && prev.isStreaming === next.isStreaming
+  && prev.displayRenderers === next.displayRenderers
+  && prev.className === next.className
+);

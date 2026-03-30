@@ -1,5 +1,6 @@
 import * as ScrollAreaPrimitive from "@radix-ui/react-scroll-area";
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useMemo, useCallback } from "react";
+import { useVirtualizer } from "@tanstack/react-virtual";
 import type { Message } from "@ai-sdk/react";
 import { MessageBubble } from "./MessageBubble.js";
 import type { DisplayRendererMap } from "../display/registry.js";
@@ -15,44 +16,95 @@ export interface MessageListProps {
 
 export function MessageList({ messages, isLoading, displayRenderers, className }: MessageListProps) {
   const viewportRef = useRef<HTMLDivElement>(null);
-  const anchorRef = useRef<HTMLDivElement>(null);
+  const isFollowingRef = useRef(true);
+
+  const lastAssistantIndex = useMemo(() =>
+    messages.reduceRight((found, msg, i) => {
+      if (found !== -1) return found;
+      return msg.role === "assistant" ? i : -1;
+    }, -1),
+    [messages]
+  );
+
+  const virtualizer = useVirtualizer({
+    count: messages.length,
+    getScrollElement: () => viewportRef.current,
+    estimateSize: () => 80,
+    overscan: 5,
+  });
+
+  // Track scroll position to detect if user is following
+  const handleScroll = useCallback(() => {
+    const viewport = viewportRef.current;
+    if (!viewport) return;
+    const distanceFromBottom =
+      viewport.scrollHeight - viewport.scrollTop - viewport.clientHeight;
+    isFollowingRef.current = distanceFromBottom <= 100;
+  }, []);
 
   useEffect(() => {
     const viewport = viewportRef.current;
     if (!viewport) return;
+    viewport.addEventListener("scroll", handleScroll, { passive: true });
+    return () => viewport.removeEventListener("scroll", handleScroll);
+  }, [handleScroll]);
 
-    const distanceFromBottom =
-      viewport.scrollHeight - viewport.scrollTop - viewport.clientHeight;
-
-    if (distanceFromBottom <= 100) {
-      anchorRef.current?.scrollIntoView({ behavior: "smooth" });
+  // Auto-scroll to bottom when following
+  useEffect(() => {
+    if (messages.length > 0 && isFollowingRef.current) {
+      virtualizer.scrollToIndex(messages.length - 1, { align: "end" });
     }
-  }, [messages]);
+  }, [messages, virtualizer]);
 
-  const lastAssistantIndex = messages.reduceRight((found, msg, i) => {
-    if (found !== -1) return found;
-    return msg.role === "assistant" ? i : -1;
-  }, -1);
+  const virtualItems = virtualizer.getVirtualItems();
+
+  if (messages.length === 0) {
+    return (
+      <ScrollAreaPrimitive.Root className={cn("flex-1 relative overflow-hidden", className)}>
+        <ScrollAreaPrimitive.Viewport ref={viewportRef} className="h-full w-full rounded-[inherit]">
+          <div className="flex items-center justify-center text-muted-foreground text-sm py-8">
+            Envie uma mensagem para comecar
+          </div>
+        </ScrollAreaPrimitive.Viewport>
+        <ScrollBar />
+        <ScrollAreaPrimitive.Corner />
+      </ScrollAreaPrimitive.Root>
+    );
+  }
 
   return (
     <ScrollAreaPrimitive.Root className={cn("flex-1 relative overflow-hidden", className)}>
       <ScrollAreaPrimitive.Viewport ref={viewportRef} className="h-full w-full rounded-[inherit]">
-        <div className="flex flex-col gap-3 p-4">
-          {messages.length === 0 ? (
-            <div className="flex items-center justify-center text-muted-foreground text-sm py-8">
-              Envie uma mensagem para comecar
-            </div>
-          ) : (
-            messages.map((message, i) => (
-              <MessageBubble
-                key={message.id ?? i}
-                message={message}
-                isStreaming={i === lastAssistantIndex && isLoading}
-                displayRenderers={displayRenderers}
-              />
-            ))
-          )}
-          <div ref={anchorRef} />
+        <div
+          className="relative w-full"
+          style={{ height: virtualizer.getTotalSize() + 16 }}
+        >
+          <div className="p-4 pb-0">
+            {virtualItems.map((virtualRow) => {
+              const message = messages[virtualRow.index];
+              return (
+                <div
+                  key={message.id ?? virtualRow.index}
+                  data-index={virtualRow.index}
+                  ref={virtualizer.measureElement}
+                  className="pb-3"
+                  style={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    transform: `translateY(${virtualRow.start}px)`,
+                  }}
+                >
+                  <MessageBubble
+                    message={message}
+                    isStreaming={virtualRow.index === lastAssistantIndex && isLoading}
+                    displayRenderers={displayRenderers}
+                  />
+                </div>
+              );
+            })}
+          </div>
         </div>
       </ScrollAreaPrimitive.Viewport>
       <ScrollBar />

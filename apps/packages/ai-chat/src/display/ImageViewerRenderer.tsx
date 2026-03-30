@@ -25,6 +25,8 @@ export function ImageViewerRenderer({ url, alt, caption, width, height }: Displa
           src={url}
           alt={alt ?? ""}
           className="block max-w-full rounded-md"
+          loading="lazy"
+          decoding="async"
           width={width}
           height={height}
         />

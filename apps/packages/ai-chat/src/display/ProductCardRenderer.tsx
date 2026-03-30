@@ -57,6 +57,8 @@ export function ProductCardRenderer({
             src={image}
             alt={title}
             className={cn("w-full aspect-video object-cover")}
+            loading="lazy"
+            decoding="async"
             onError={() => setImgError(true)}
           />
           {discount !== null && (

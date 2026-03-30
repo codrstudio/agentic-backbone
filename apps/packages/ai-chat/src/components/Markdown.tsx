@@ -1,8 +1,12 @@
+import { memo } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeHighlight from "rehype-highlight";
 import type { Components } from "react-markdown";
 import { cn } from "../lib/utils.js";
+
+const REMARK_PLUGINS = [remarkGfm];
+const REHYPE_PLUGINS = [rehypeHighlight];
 
 const components: Components = {
   pre({ children }) {
@@ -68,16 +72,16 @@ interface MarkdownProps {
   children: string;
 }
 
-export function Markdown({ children }: MarkdownProps) {
+export const Markdown = memo(function Markdown({ children }: MarkdownProps) {
   return (
     <div className="text-foreground text-sm leading-relaxed [&_p]:mb-3 [&_p:last-child]:mb-0 [&_h1]:text-xl [&_h2]:text-lg [&_h3]:text-base [&_h1,&_h2,&_h3,&_h4]:font-semibold [&_h1,&_h2,&_h3,&_h4]:mt-5 [&_h1,&_h2,&_h3,&_h4]:mb-2 [&_ul,&_ol]:pl-6 [&_ul,&_ol]:my-2 [&_li]:my-1 [&_hr]:border-border [&_hr]:my-4">
       <ReactMarkdown
-        remarkPlugins={[remarkGfm]}
-        rehypePlugins={[rehypeHighlight]}
+        remarkPlugins={REMARK_PLUGINS}
+        rehypePlugins={REHYPE_PLUGINS}
         components={components}
       >
         {children}
       </ReactMarkdown>
     </div>
   );
-}
+});
