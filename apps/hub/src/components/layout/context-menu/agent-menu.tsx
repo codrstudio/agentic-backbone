@@ -144,16 +144,19 @@ export function AgentNavMenu({ agentId, onNavigate }: AgentNavMenuProps) {
         className={cn(
           "flex items-center gap-3 rounded-md px-3 py-3 transition-colors",
           isOverviewActive
-            ? "bg-sidebar-accent"
-            : "hover:bg-sidebar-accent",
+            ? "bg-sidebar-accent text-sidebar-accent-foreground"
+            : "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
         )}
       >
-        <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-muted-foreground/20">
-          <Bot className="size-5 text-muted-foreground" />
+        <div className={cn(
+          "flex size-10 shrink-0 items-center justify-center rounded-full",
+          isOverviewActive ? "bg-sidebar-accent-foreground/20" : "bg-muted-foreground/20",
+        )}>
+          <Bot className={cn("size-5", isOverviewActive ? "text-sidebar-accent-foreground" : "text-muted-foreground")} />
         </div>
         <div className="min-w-0">
           <p className="text-sm font-semibold leading-tight truncate">{agent?.slug ?? agentId}</p>
-          <p className="text-xs text-muted-foreground">Agente</p>
+          <p className={cn("text-xs", isOverviewActive ? "text-sidebar-accent-foreground/70" : "text-muted-foreground")}>Agente</p>
         </div>
       </Link>
 
