@@ -7,11 +7,28 @@ import { BottomNav } from "@/components/layout/bottom-nav";
 import { BreadcrumbBar } from "@/components/layout/breadcrumb-bar";
 import { useSSE, useSSEEvent } from "@/hooks/use-sse";
 import { PushPermissionBanner } from "@/components/notifications/push-permission-banner";
+import { RouteError } from "@/components/layout/route-error";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated")({
   component: AuthenticatedLayout,
+  errorComponent: AuthenticatedError,
 });
+
+function AuthenticatedError({ error, reset }: { error: unknown; reset: () => void }) {
+  return (
+    <SidebarProvider>
+      <AppSidebar />
+      <SidebarInset>
+        <BreadcrumbBar />
+        <div className="flex-1 overflow-auto p-4 pb-18 md:pb-4">
+          <RouteError error={error} reset={reset} />
+        </div>
+      </SidebarInset>
+      <BottomNav />
+    </SidebarProvider>
+  );
+}
 
 function AuthenticatedLayout() {
   const token = useAuthStore((s) => s.token);

@@ -49,6 +49,7 @@ import { workflowQueryOptions, updateWorkflow, applyWorkflow, simulateWorkflow }
 import { queryClient } from "@/lib/query-client";
 import { agentsQueryOptions } from "@/api/agents";
 import type { WorkflowNode, WorkflowEdge, ConditionType, EdgeCondition, SimulateResult } from "@/api/workflows";
+import { RouteError } from "@/components/layout/route-error";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/workflows/$id")({
@@ -56,6 +57,7 @@ export const Route = createFileRoute("/_authenticated/workflows/$id")({
     const wf = await queryClient.ensureQueryData(workflowQueryOptions(params.id));
     return { title: wf.label, description: "Workflow" };
   },
+  errorComponent: RouteError,
   component: WorkflowCanvasPage,
 });
 
