@@ -25,6 +25,7 @@ import { executeServiceDirect } from "../services/executor.js";
 import { assemblePrompt } from "../context/index.js";
 import { runAgent } from "../agent/index.js";
 import { getAuthUser, filterByOwner, assertOwnership } from "./auth-helpers.js";
+import { composeAgentTools } from "../agent/tools.js";
 import { formatError } from "../utils/errors.js";
 import { collectAgentResult } from "../utils/agent-stream.js";
 import { parseBody } from "./helpers.js";
@@ -62,6 +63,19 @@ agentRoutes.get("/agents/:id", (c) => {
   const denied = assertOwnership(c, agent.owner);
   if (denied) return denied;
   return c.json(agent);
+});
+
+// --- Agent Tools ---
+
+agentRoutes.get("/agents/:id/tools", (c) => {
+  const id = c.req.param("id");
+  const agent = getAgent(id);
+  if (!agent) return c.json({ error: "not found" }, 404);
+  const denied = assertOwnership(c, agent.owner);
+  if (denied) return denied;
+  const tools = composeAgentTools(id, "conversation") ?? {};
+  const names = Object.keys(tools).sort();
+  return c.json({ agentId: id, count: names.length, tools: names });
 });
 
 // --- Create Agent ---
