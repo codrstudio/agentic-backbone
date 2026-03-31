@@ -315,8 +315,9 @@
     "id": "F-338",
     "name": "Evolution audioMessage save attachments",
     "description": "Melhorar handling de audioMessage/pttMessage em apps/backbone/src/connectors/evolution/routes.ts: manter caminho Whisper atual como default (retrocompatível). Adicionar: (1) baixar base64 da mídia; (2) gerar ID, salvar em {sessionDir}/attachments/ para referência futura; (3) continuar usando transcrição Whisper como conteúdo da mensagem (string). Tipos ignorados (videoMessage, stickerMessage): retornar silenciosamente sem logar warning. Não enviar FilePart nativo nesta fase — apenas salvar arquivo para histórico.",
-    "status": "pending",
+    "status": "passing",
     "priority": 14,
+    "completed_at": "2026-03-31T20:00:00.000Z",
     "agent": "coder",
     "task": "vibe-code",
     "dependencies": [

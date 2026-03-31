@@ -310,6 +310,11 @@ export function createEvolutionRoutes(deps: RouteDeps): Hono {
       return c.json({ status: "ignored_group" }, 200);
     }
 
+    // Silently ignore video and sticker messages (not supported by models)
+    if (rawMessage?.videoMessage || rawMessage?.stickerMessage) {
+      return c.json({ status: "ignored" }, 200);
+    }
+
     // Detect audio messages (audioMessage = encoded audio, pttMessage = voice note)
     const audioMsg = rawMessage?.audioMessage ?? rawMessage?.pttMessage;
     let messageText =
@@ -371,6 +376,23 @@ export function createEvolutionRoutes(deps: RouteDeps): Hono {
         console.log(`[evolution/webhook] audio transcribed: "${transcript}"`);
         messageText = `[🎙️ Áudio]: "${transcript}"`;
         isAudio = true;
+
+        // Save audio file to attachments/ for historical reference
+        const audioChannel = findChannelsByAdapter("whatsapp").find(
+          (ch) => ch.options["instance"] === instanceName
+        );
+        if (audioChannel?.agent && remoteJid) {
+          try {
+            const audioSenderId = remoteJid.split("@")[0]!;
+            const audioSession = findOrCreateSession(audioChannel.agent, audioSenderId, audioChannel.slug);
+            const audioSDir = join(agentDir(audioChannel.agent), "conversations", audioSession.session_id);
+            const audioFilename = generateAttachmentId(`audio.${ext}`);
+            await mkdir(join(audioSDir, "attachments"), { recursive: true });
+            await writeFile(join(audioSDir, "attachments", audioFilename), audioBuffer);
+          } catch (saveErr) {
+            console.error("[evolution/webhook] audio file save failed (non-fatal):", saveErr);
+          }
+        }
       } catch (err) {
         console.error("[evolution/webhook] audio transcription error:", err);
         return c.json({ status: "ignored_audio_error" }, 200);
