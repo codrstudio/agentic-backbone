@@ -160,7 +160,7 @@
     "id": "F-308",
     "name": "Domain tool gitlab_users",
     "description": "Criar apps/backbone/src/connectors/gitlab/tools/users.ts com domain tool gitlab_users agrupando 3 actions (me, get, search) via z.discriminatedUnion. Factory function createGitLabUsersTool(adapters). Copiar schemas dos user-*.ts existentes. Nenhuma acao de escrita (todas sao leitura).",
-    "status": "pending",
+    "status": "passing",
     "priority": 12,
     "agent": "coder",
     "task": "vibe-code",
@@ -172,7 +172,8 @@
       "Nenhum policy check necessario (todas leitura)",
       "TypeScript compila sem erros"
     ],
-    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab/wave-10/worktree/sprints/sprint-15/3-prps/PRP-18A-gitlab-domain-tools.md"
+    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab/wave-10/worktree/sprints/sprint-15/3-prps/PRP-18A-gitlab-domain-tools.md",
+    "completed_at": "2026-03-31T09:00:00Z"
   },
   {
     "id": "F-309",
