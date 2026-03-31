@@ -24,9 +24,9 @@ export async function resolveRefs(
         const buffer = await readFile(filePath);
         const base64 = buffer.toString("base64");
         if (p.type === "image") {
-          resolved.push({ type: "image", image: base64, mimeType: p.mimeType });
+          resolved.push({ type: "image", image: base64, mimeType: p.mimeType, _ref: p._ref });
         } else {
-          resolved.push({ type: "file", data: base64, mimeType: p.mimeType });
+          resolved.push({ type: "file", data: base64, mimeType: p.mimeType, _ref: p._ref });
         }
       } catch {
         resolved.push({ type: "text", text: `[arquivo removido: ${filename}]` });
@@ -63,6 +63,31 @@ export async function loadSession(dir: string): Promise<ModelMessage[]> {
   } catch {
     return [];
   }
+}
+
+export function filterOldMedia(messages: ModelMessage[], lastUserIndex: number): ModelMessage[] {
+  return messages.map((msg, i) => {
+    if (msg.role !== "user" || i === lastUserIndex) {
+      return msg;
+    }
+    if (!Array.isArray(msg.content)) {
+      return msg;
+    }
+    const filtered = (msg.content as unknown[]).map((part) => {
+      if (typeof part !== "object" || part === null) return part;
+      const p = part as Record<string, unknown>;
+      if (p.type === "image") {
+        const name = (p._ref as string | undefined) ?? "imagem";
+        return { type: "text", text: `[imagem enviada: ${name}]` };
+      }
+      if (p.type === "file" && p.data !== undefined) {
+        const name = (p._ref as string | undefined) ?? "arquivo";
+        return { type: "text", text: `[arquivo enviado: ${name}]` };
+      }
+      return part;
+    });
+    return { ...msg, content: filtered as ModelMessage["content"] };
+  });
 }
 
 export async function saveSession(

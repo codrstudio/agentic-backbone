@@ -219,8 +219,9 @@
     "id": "F-334",
     "name": "Filtro mídia antiga no replay",
     "description": "Criar filterOldMedia(messages, lastUserIndex): ModelMessage[] em apps/packages/ai-sdk/src/session.ts. Regras: última mensagem do usuário (i === lastUserIndex) — manter todos os parts intactos; mensagens anteriores do usuário com content array — ImagePart substituído por TextPart '[imagem enviada: {_ref ou \"imagem\"}]', FilePart com data substituído por TextPart '[arquivo enviado: {_ref ou \"arquivo\"}]', TextPart sempre mantido; mensagens do assistant — não alterar. Chamar após loadSession()+resolveRefs(), antes de passar previousMessages para runAgent()/streamText(). lastUserIndex é o índice da última mensagem com role 'user' no array.",
-    "status": "pending",
+    "status": "passing",
     "priority": 10,
+    "completed_at": "2026-03-31T15:30:00Z",
     "agent": "coder",
     "task": "vibe-code",
     "dependencies": [
