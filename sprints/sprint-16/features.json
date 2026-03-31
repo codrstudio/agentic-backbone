@@ -193,7 +193,7 @@
     "id": "F-333",
     "name": "Rota GET attachments",
     "description": "Adicionar rota GET /conversations/:sessionId/attachments/:filename em apps/backbone/src/routes/conversations.ts. Handler: (1) sanitizar filename — rejeitar '..', '/', '\\' com 400; (2) resolver caminho da sessão via resolveSessionDir(sessionId), 404 se inexistente; (3) verificar existência do arquivo em attachments/, 404 se inexistente; (4) derivar content-type da extensão via mapa de MIME types (.png→image/png, .jpg/.jpeg→image/jpeg, .gif→image/gif, .webp→image/webp, .pdf→application/pdf, .wav→audio/wav, .mp3→audio/mpeg, .ogg→audio/ogg, .webm→audio/webm, .txt→text/plain, .csv→text/csv, .json→application/json, .docx e .xlsx com MIME correto, fallback application/octet-stream); (5) retornar arquivo com headers Content-Type, Content-Length, Cache-Control: private, max-age=3600. Auth JWT obrigatória (mesmo middleware). Reusar resolveSessionDir existente.",
-    "status": "pending",
+    "status": "passing",
     "priority": 9,
     "agent": "coder",
     "task": "vibe-code",
@@ -212,7 +212,8 @@
       "Extensão desconhecida retorna application/octet-stream",
       "TypeScript compila sem erros"
     ],
-    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab/wave-12/worktree/sprints/sprint-16/3-prps/PRP-21C-content-array-rota-attachments.md"
+    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab/wave-12/worktree/sprints/sprint-16/3-prps/PRP-21C-content-array-rota-attachments.md",
+    "completed_at": "2026-03-31T14:50:00Z"
   },
   {
     "id": "F-334",

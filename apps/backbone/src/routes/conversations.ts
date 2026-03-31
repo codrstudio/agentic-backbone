@@ -18,7 +18,9 @@ import { getAuthUser, assertAgentAccess } from "./auth-helpers.js";
 import { getAgent } from "../agents/registry.js";
 import { parseBody } from "./helpers.js";
 import { db } from "../db/index.js";
-import { join } from "node:path";
+import { join, extname } from "node:path";
+import { existsSync, statSync } from "node:fs";
+import { readFile } from "node:fs/promises";
 import { agentDir } from "../context/paths.js";
 import {
   MIME_LIMITS,
@@ -27,6 +29,24 @@ import {
   MAX_FILES,
   saveAttachment,
 } from "../conversations/attachments.js";
+
+const ATTACHMENT_MIME_MAP: Record<string, string> = {
+  ".png": "image/png",
+  ".jpg": "image/jpeg",
+  ".jpeg": "image/jpeg",
+  ".gif": "image/gif",
+  ".webp": "image/webp",
+  ".pdf": "application/pdf",
+  ".wav": "audio/wav",
+  ".mp3": "audio/mpeg",
+  ".ogg": "audio/ogg",
+  ".webm": "audio/webm",
+  ".txt": "text/plain",
+  ".csv": "text/csv",
+  ".json": "application/json",
+  ".docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  ".xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+};
 
 export const conversationRoutes = new Hono();
 
@@ -354,6 +374,41 @@ conversationRoutes.post("/conversations/:sessionId/messages", async (c) => {
     for await (const event of sendMessage(auth.user, sessionId, effectiveMessage)) {
       await stream.writeSSE({ data: JSON.stringify(event) });
     }
+  });
+});
+
+// --- Get Attachment ---
+
+conversationRoutes.get("/conversations/:sessionId/attachments/:filename", async (c) => {
+  const sessionId = c.req.param("sessionId");
+  const filename = c.req.param("filename");
+
+  // Sanitize: reject path traversal attempts
+  if (filename.includes("..") || filename.includes("/") || filename.includes("\\")) {
+    return c.json({ error: "Invalid filename" }, 400);
+  }
+
+  const session = getSession(sessionId);
+  if (!session) return c.json({ error: "not found" }, 404);
+
+  const sessionDir = join(agentDir(session.agent_id), "conversations", sessionId);
+  const filePath = join(sessionDir, "attachments", filename);
+
+  if (!existsSync(filePath)) {
+    return c.json({ error: "not found" }, 404);
+  }
+
+  const ext = extname(filename).toLowerCase();
+  const contentType = ATTACHMENT_MIME_MAP[ext] ?? "application/octet-stream";
+  const stat = statSync(filePath);
+  const data = await readFile(filePath);
+
+  return new Response(data, {
+    headers: {
+      "Content-Type": contentType,
+      "Content-Length": String(stat.size),
+      "Cache-Control": "private, max-age=3600",
+    },
   });
 });
 
