@@ -103,7 +103,7 @@
     "id": "F-305",
     "name": "Domain tool gitlab_milestones",
     "description": "Criar apps/backbone/src/connectors/gitlab/tools/milestones.ts com domain tool gitlab_milestones agrupando 7 actions (list, get, create, update, delete, issues, mrs) via z.discriminatedUnion. Factory function createGitLabMilestonesTool(adapters). Copiar schemas dos milestone-*.ts existentes. Policy check readonly para create, update, delete.",
-    "status": "pending",
+    "status": "passing",
     "priority": 7,
     "agent": "coder",
     "task": "vibe-code",
@@ -115,7 +115,8 @@
       "Acoes de escrita verificam policy readonly",
       "TypeScript compila sem erros"
     ],
-    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab/wave-10/worktree/sprints/sprint-15/3-prps/PRP-18A-gitlab-domain-tools.md"
+    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab/wave-10/worktree/sprints/sprint-15/3-prps/PRP-18A-gitlab-domain-tools.md",
+    "completed_at": "2026-03-31T06:00:00Z"
   },
   {
     "id": "F-306",
