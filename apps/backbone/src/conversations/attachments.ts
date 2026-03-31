@@ -56,7 +56,11 @@ export async function saveAttachment(
 
 // ─── Classifier ───────────────────────────────────────────────────────────────
 
-export type ContentPart = TextPart | ImagePart | FilePart;
+// Runtime content parts — binary parts carry _ref for JSONL persistence
+export type ContentPart =
+  | TextPart
+  | (ImagePart & { _ref?: string })
+  | (FilePart & { _ref?: string });
 
 export interface AttachmentInfo {
   filePath: string;
@@ -81,14 +85,14 @@ export async function classifyAttachment(info: AttachmentInfo): Promise<Classifi
   if (IMAGE_MIMES.has(mimeType)) {
     const buffer = await readFile(filePath);
     const base64 = buffer.toString("base64");
-    const part: ImagePart = { type: "image", image: base64, mimeType };
+    const part: ImagePart & { _ref: string } = { type: "image", image: base64, mimeType, _ref: filename };
     return { part, ref: filename };
   }
 
   if (mimeType === "application/pdf" || AUDIO_MIMES.has(mimeType)) {
     const buffer = await readFile(filePath);
     const base64 = buffer.toString("base64");
-    const part: FilePart = { type: "file", data: base64, mimeType };
+    const part: FilePart & { _ref: string } = { type: "file", data: base64, mimeType, _ref: filename };
     return { part, ref: filename };
   }
 
