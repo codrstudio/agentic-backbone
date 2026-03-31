@@ -16,10 +16,9 @@ export interface MessageListProps {
   className?: string;
   error?: Error;
   onRetry?: () => void;
-  keepReasoning?: boolean;
 }
 
-export function MessageList({ messages, isLoading, displayRenderers, className, error, onRetry, keepReasoning }: MessageListProps) {
+export function MessageList({ messages, isLoading, displayRenderers, className, error, onRetry }: MessageListProps) {
   const viewportRef = useRef<HTMLDivElement>(null);
   const isFollowingRef = useRef(true);
 
@@ -114,7 +113,6 @@ export function MessageList({ messages, isLoading, displayRenderers, className, 
                     message={message}
                     isStreaming={virtualRow.index === lastAssistantIndex && isLoading && messages[messages.length - 1]?.role === "assistant"}
                     displayRenderers={displayRenderers}
-                    keepReasoning={keepReasoning}
                   />
                 </div>
               );
