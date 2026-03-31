@@ -296,10 +296,11 @@
     "id": "F-315",
     "name": "Ativar domain tools em gitlab/index.ts",
     "description": "Alterar apps/backbone/src/connectors/gitlab/index.ts: substituir ~89 imports individuais por 10 imports de domain tools (createGitLabIssuesTool, createGitLabMrsTool, createGitLabRepoTool, createGitLabCiTool, createGitLabLabelsTool, createGitLabMilestonesTool, createGitLabReleasesTool, createGitLabWikiTool, createGitLabUsersTool, createGitLabProjectsTool). Atualizar createTools(adapters) para retornar spread das 10 domain tools.",
-    "status": "pending",
+    "status": "passing",
     "priority": 17,
     "agent": "coder",
     "task": "vibe-code",
+    "completed_at": "2026-03-31T05:30:00Z",
     "dependencies": [
       "F-300",
       "F-301",
