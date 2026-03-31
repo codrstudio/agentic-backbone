@@ -3,7 +3,8 @@
     "id": "F-342",
     "name": "Reescrever display.ts com 4 domain tools",
     "description": "Substituir as 19 display tools individuais em apps/packages/ai-sdk/src/tools/display.ts por 4 domain tools (display_highlight, display_collection, display_card, display_visual) usando discriminated union no parametro action. Cada domain tool compoe schemas via spread de .shape dos schemas existentes em display-schemas.ts. Execute retorna { ...args, _display: true }. Usar inputSchema (nao parameters) para compatibilidade com a versao do AI SDK em uso.",
-    "status": "pending",
+    "status": "passing",
+    "completed_at": "2026-03-31T18:30:00Z",
     "priority": 1,
     "agent": "coder",
     "task": "vibe-code",
@@ -61,11 +62,13 @@
     "id": "F-345",
     "name": "Propagar rich ate assemblePrompt e injetar prompt",
     "description": "Em apps/backbone/src/conversations/index.ts, adicionar opts?: { rich?: boolean } como quarto parametro de sendMessage() e propagar rich para assemblePrompt(). Em apps/backbone/src/context/index.ts, adicionar rich?: boolean a AssemblePromptOpts, definir constante RICH_CONTENT_PROMPT com bloco <rich_content> listando as 4 domain tools e regras de uso, e concatenar ao system prompt quando opts.rich === true.",
-    "status": "pending",
+    "status": "blocked",
     "priority": 4,
     "agent": "coder",
     "task": "vibe-code",
-    "dependencies": ["F-344"],
+    "dependencies": [
+      "F-344"
+    ],
     "tests": [
       "sendMessage() aceita opts?: { rich?: boolean } sem quebrar callers existentes",
       "rich eh propagado na chamada a assemblePrompt() via opts",
@@ -81,11 +84,14 @@
     "id": "F-346",
     "name": "Passar disableDisplayTools ao ai-sdk",
     "description": "Em apps/backbone/src/conversations/index.ts, na chamada a instrumentedRunAgent(), passar disableDisplayTools: !(opts?.rich ?? false). Verificar se instrumentedRunAgent repassa options transparentemente para runAiAgent via spread — se filtra, ajustar o wrapper em apps/backbone/src/telemetry/instrumentor.ts para propagar disableDisplayTools.",
-    "status": "pending",
+    "status": "blocked",
     "priority": 5,
     "agent": "coder",
     "task": "vibe-code",
-    "dependencies": ["F-343", "F-345"],
+    "dependencies": [
+      "F-343",
+      "F-345"
+    ],
     "tests": [
       "Quando rich=true, disableDisplayTools eh false (display tools habilitadas)",
       "Quando rich=false ou ausente, disableDisplayTools eh true (display tools desabilitadas)",
@@ -98,11 +104,13 @@
     "id": "F-347",
     "name": "Migrar registry para action-based",
     "description": "Reescrever mapeamento em apps/packages/ai-chat/src/display/registry.ts. Criar tipo DisplayActionName com os 19 action names. Mudar defaultDisplayRenderers de Record<DisplayToolName, Component> para Record<DisplayActionName, Component> mapeando action names (metric, price, alert, etc.) para os mesmos renderers existentes. Atualizar resolveDisplayRenderer() para receber action: string em vez de toolName.",
-    "status": "pending",
+    "status": "blocked",
     "priority": 6,
     "agent": "coder",
     "task": "vibe-code",
-    "dependencies": ["F-342"],
+    "dependencies": [
+      "F-342"
+    ],
     "tests": [
       "Tipo DisplayActionName exportado com 19 action names",
       "defaultDisplayRenderers mapeia 19 action names para os 19 componentes existentes",
@@ -116,11 +124,13 @@
     "id": "F-348",
     "name": "Atualizar PartRenderer para resolver por action",
     "description": "Em apps/packages/ai-chat/src/parts/PartRenderer.tsx, na logica de display tool rendering, quando toolName.startsWith('display_') e state === 'result', extrair action de part.result.action e chamar resolveDisplayRenderer(action, displayRenderers) em vez de resolveDisplayRenderer(toolName, displayRenderers). Manter behavior existente durante streaming (loading/spinner).",
-    "status": "pending",
+    "status": "blocked",
     "priority": 8,
     "agent": "coder",
     "task": "vibe-code",
-    "dependencies": ["F-347"],
+    "dependencies": [
+      "F-347"
+    ],
     "tests": [
       "PartRenderer extrai action de part.result.action para resolver o renderer",
       "Prefixo display_ continua sendo usado para identificar display tools",
