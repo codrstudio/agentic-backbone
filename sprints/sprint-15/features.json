@@ -256,7 +256,7 @@
     "id": "F-313",
     "name": "Domain tool whatsapp_admin",
     "description": "Criar apps/backbone/src/connectors/evolution/tools/admin.ts com domain tool whatsapp_admin agrupando 5 actions (connection_state, list_instances, list_labels, handle_label, api_raw) via z.discriminatedUnion. Factory function createWhatsappAdminTool(slugs). A action api_raw absorve evolution-api.ts (parametros: method, endpoint, body?).",
-    "status": "pending",
+    "status": "passing",
     "priority": 14,
     "agent": "coder",
     "task": "vibe-code",
@@ -269,7 +269,8 @@
       "Execute despacha todas 5 actions corretamente",
       "TypeScript compila sem erros"
     ],
-    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab/wave-10/worktree/sprints/sprint-15/3-prps/PRP-18B-whatsapp-domain-tools.md"
+    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab/wave-10/worktree/sprints/sprint-15/3-prps/PRP-18B-whatsapp-domain-tools.md",
+    "completed_at": "2026-03-31T03:00:00Z"
   },
   {
     "id": "F-314",
@@ -294,7 +295,7 @@
     "id": "F-315",
     "name": "Ativar domain tools em gitlab/index.ts",
     "description": "Alterar apps/backbone/src/connectors/gitlab/index.ts: substituir ~89 imports individuais por 10 imports de domain tools (createGitLabIssuesTool, createGitLabMrsTool, createGitLabRepoTool, createGitLabCiTool, createGitLabLabelsTool, createGitLabMilestonesTool, createGitLabReleasesTool, createGitLabWikiTool, createGitLabUsersTool, createGitLabProjectsTool). Atualizar createTools(adapters) para retornar spread das 10 domain tools.",
-    "status": "blocked",
+    "status": "pending",
     "priority": 17,
     "agent": "coder",
     "task": "vibe-code",
@@ -363,7 +364,7 @@
     "id": "F-318",
     "name": "Ativar domain tools em implantacao/index.ts",
     "description": "Alterar apps/backbone/src/connectors/implantacao/index.ts: substituir 28 imports individuais do GitLab por imports das domain tools relevantes (createGitLabIssuesTool, createGitLabMrsTool, createGitLabRepoTool, createGitLabCiTool, etc. de ../gitlab/tools/). Implantacao passa a expor todas actions de cada dominio — comportamento expandido mas aceitavel.",
-    "status": "blocked",
+    "status": "pending",
     "priority": 20,
     "agent": "coder",
     "task": "vibe-code",
