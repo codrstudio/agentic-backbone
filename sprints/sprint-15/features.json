@@ -214,7 +214,7 @@
     "id": "F-311",
     "name": "Domain tool whatsapp_groups",
     "description": "Criar apps/backbone/src/connectors/evolution/tools/groups.ts com domain tool whatsapp_groups agrupando 11 actions (create, list, info, participants, invite_code, send_invite, update_participant, update_setting, update_subject, update_description, leave) via z.discriminatedUnion. Factory function createWhatsappGroupsTool(slugs). Campo instance.",
-    "status": "pending",
+    "status": "passing",
     "priority": 8,
     "agent": "coder",
     "task": "vibe-code",
@@ -226,7 +226,8 @@
       "Execute despacha todas 11 actions corretamente",
       "TypeScript compila sem erros"
     ],
-    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab/wave-10/worktree/sprints/sprint-15/3-prps/PRP-18B-whatsapp-domain-tools.md"
+    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab/wave-10/worktree/sprints/sprint-15/3-prps/PRP-18B-whatsapp-domain-tools.md",
+    "completed_at": "2026-03-31T07:00:00Z"
   },
   {
     "id": "F-312",
