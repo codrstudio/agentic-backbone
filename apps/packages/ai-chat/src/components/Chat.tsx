@@ -33,18 +33,19 @@ interface ChatContentProps {
 }
 
 function ChatContent({ displayRenderers, placeholder, endpoints, defaultAgent, enableAttachments = false, enableVoice = false }: ChatContentProps) {
-  const { messages, input, setInput, handleSubmit, isLoading, stop, error, reload } = useChatContext();
+  const { messages, input, setInput, handleSubmit, isLoading, isUploading, stop, error, reload, buildAttachmentUrl } = useChatContext();
   const [activeAgent, setActiveAgent] = React.useState(defaultAgent ?? endpoints?.[0]?.id ?? "");
 
   return (
     <>
-      <MessageList messages={messages} isLoading={isLoading} displayRenderers={displayRenderers} error={error ?? undefined} onRetry={reload} />
+      <MessageList messages={messages} isLoading={isLoading} displayRenderers={displayRenderers} attachmentUrl={buildAttachmentUrl} error={error ?? undefined} onRetry={reload} />
       <div className="px-4 pb-4">
         <MessageInput
           input={input}
           setInput={setInput}
-          handleSubmit={handleSubmit as unknown as (e: React.FormEvent, attachments?: unknown[]) => void}
+          handleSubmit={handleSubmit}
           isLoading={isLoading}
+          isUploading={isUploading}
           stop={stop}
           placeholder={placeholder}
           enableAttachments={enableAttachments}
