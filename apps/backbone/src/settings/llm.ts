@@ -1,5 +1,6 @@
 import { readdirSync, existsSync } from "node:fs";
 import { join } from "node:path";
+import { z } from "zod";
 import { plansDir, settingsPath } from "../context/paths.js";
 import { readYaml, writeYaml } from "../context/readers.js";
 
@@ -31,7 +32,21 @@ export interface RoutingRule {
 
 export interface ModelResult {
   model: string;
+  provider: LlmProvider;
   ruleName: string | null;
+}
+
+// --- Provider ---
+
+export type LlmProvider = "openrouter" | "groq";
+
+const PROVIDER_CONFIGS: Record<LlmProvider, { baseURL: string; apiKeyEnv: string }> = {
+  openrouter: { baseURL: "https://openrouter.ai/api/v1", apiKeyEnv: "OPENROUTER_API_KEY" },
+  groq:       { baseURL: "https://api.groq.com/openai/v1", apiKeyEnv: "GROQ_API_KEY" },
+};
+
+export function getProviderConfig(provider: LlmProvider): { baseURL: string; apiKeyEnv: string } {
+  return PROVIDER_CONFIGS[provider] ?? PROVIDER_CONFIGS.openrouter;
 }
 
 // --- Types ---
@@ -44,7 +59,7 @@ export interface SlugDef {
   slug: SlugName;
   class: SlugClass;
   effort: SlugEffort;
-  llm: { model: string; parameters: Record<string, unknown> };
+  llm: { provider: LlmProvider; model: string; parameters: Record<string, unknown> };
   tags: string[];
   title: string;
   description: string;
@@ -52,6 +67,7 @@ export interface SlugDef {
 
 export interface Plan {
   name: string;
+  tier: number;
   title: string;
   description: string;
   slugs: Record<SlugName, SlugDef>;
@@ -65,6 +81,39 @@ const SLUG_EFFORTS: SlugEffort[] = ["low", "mid", "high"];
 const ALL_SLUGS: SlugName[] = SLUG_CLASSES.flatMap((c) =>
   SLUG_EFFORTS.map((e) => `${c}.${e}` as SlugName)
 );
+
+// --- Zod Schema ---
+
+const llmProviderSchema = z.enum(["openrouter", "groq"]).default("openrouter");
+
+const slugDefRawSchema = z.object({
+  class: z.enum(["small", "medium", "large"]),
+  effort: z.enum(["low", "mid", "high"]),
+  llm: z.object({
+    provider: llmProviderSchema,
+    model: z.string().min(1, "llm.model is required"),
+    parameters: z.record(z.unknown()).default({}),
+  }),
+  tags: z.array(z.string()).default([]),
+  title: z.string().default(""),
+  description: z.string().default(""),
+});
+
+const slugsRawSchema = z.object(
+  Object.fromEntries(ALL_SLUGS.map((s) => [s, slugDefRawSchema])) as Record<SlugName, typeof slugDefRawSchema>,
+);
+
+const planRawSchema = z.object({
+  name: z.string().min(1, "name is required"),
+  tier: z.number({ required_error: "tier is required" }).int().min(0, "tier must be >= 0"),
+  title: z.string().min(1, "title is required"),
+  description: z.string().default(""),
+  slugs: slugsRawSchema,
+  roles: z.record(z.string()).refine(
+    (r) => Object.keys(r).length > 0,
+    "roles must have at least one entry",
+  ),
+});
 
 // --- Cache ---
 
@@ -127,7 +176,7 @@ export function getActivePlan(): Plan {
 }
 
 export function listPlans(): Plan[] {
-  return [...plans.values()];
+  return [...plans.values()].sort((a, b) => a.tier - b.tier);
 }
 
 export function setActivePlan(name: string): void {
@@ -218,17 +267,19 @@ export function resolveModelResult(
   context?: RoutingContext,
   agentRoutingRules?: RoutingRule[]
 ): ModelResult {
-  const fallbackModel = resolveSlug(role).llm.model;
+  const slug = resolveSlug(role);
+  const fallbackModel = slug.llm.model;
+  const fallbackProvider = slug.llm.provider;
 
   if (!context) {
-    return { model: fallbackModel, ruleName: null };
+    return { model: fallbackModel, provider: fallbackProvider, ruleName: null };
   }
 
   // Agent rules take priority over global rules — check them first (sorted by priority desc)
   const sortedAgentRules = [...(agentRoutingRules ?? [])].sort((a, b) => b.priority - a.priority);
   for (const rule of sortedAgentRules) {
     if (matchesRule(rule, context)) {
-      return { model: rule.model, ruleName: rule.id };
+      return { model: rule.model, provider: fallbackProvider, ruleName: rule.id };
     }
   }
 
@@ -236,11 +287,11 @@ export function resolveModelResult(
   const sortedGlobalRules = loadGlobalRoutingRules().sort((a, b) => b.priority - a.priority);
   for (const rule of sortedGlobalRules) {
     if (matchesRule(rule, context)) {
-      return { model: rule.model, ruleName: rule.id };
+      return { model: rule.model, provider: fallbackProvider, ruleName: rule.id };
     }
   }
 
-  return { model: fallbackModel, ruleName: null };
+  return { model: fallbackModel, provider: fallbackProvider, ruleName: null };
 }
 
 export function resolveModel(
@@ -258,42 +309,37 @@ export function resolveParameters(role: string): Record<string, unknown> {
 // --- Parser ---
 
 function parsePlan(raw: Record<string, unknown>, filename: string): Plan {
-  const name = raw.name as string;
-  if (!name) throw new Error(`[llm] plan in ${filename} missing "name"`);
+  const result = planRawSchema.safeParse(raw);
+  if (!result.success) {
+    const issues = result.error.issues.map((i) => `  ${i.path.join(".")}: ${i.message}`).join("\n");
+    throw new Error(`[llm] invalid plan "${filename}":\n${issues}`);
+  }
 
-  const rawSlugs = raw.slugs as Record<string, Record<string, unknown>> | undefined;
-  if (!rawSlugs) throw new Error(`[llm] plan "${name}" missing "slugs"`);
-
+  const parsed = result.data;
   const slugs: Record<string, SlugDef> = {};
   for (const slugName of ALL_SLUGS) {
-    const s = rawSlugs[slugName];
-    if (!s) throw new Error(`[llm] plan "${name}" missing slug "${slugName}"`);
-
-    const llm = s.llm as Record<string, unknown> | undefined;
-    if (!llm?.model) throw new Error(`[llm] plan "${name}" slug "${slugName}" missing llm.model`);
-
+    const s = parsed.slugs[slugName];
     slugs[slugName] = {
       slug: slugName,
-      class: s.class as SlugClass,
-      effort: s.effort as SlugEffort,
+      class: s.class,
+      effort: s.effort,
       llm: {
-        model: llm.model as string,
-        parameters: (llm.parameters as Record<string, unknown>) ?? {},
+        provider: s.llm.provider as LlmProvider,
+        model: s.llm.model,
+        parameters: s.llm.parameters,
       },
-      tags: (s.tags as string[]) ?? [],
-      title: (s.title as string) ?? slugName,
-      description: (s.description as string) ?? "",
+      tags: s.tags,
+      title: s.title || slugName,
+      description: s.description,
     };
   }
 
-  const roles = raw.roles as Record<string, string> | undefined;
-  if (!roles) throw new Error(`[llm] plan "${name}" missing "roles"`);
-
   return {
-    name,
-    title: (raw.title as string) ?? name,
-    description: (raw.description as string) ?? "",
+    name: parsed.name,
+    tier: parsed.tier,
+    title: parsed.title,
+    description: parsed.description,
     slugs: slugs as Record<SlugName, SlugDef>,
-    roles: roles as Record<string, SlugName>,
+    roles: parsed.roles as Record<string, SlugName>,
   };
 }

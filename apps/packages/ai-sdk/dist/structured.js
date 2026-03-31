@@ -2,10 +2,10 @@ import { generateText, streamObject, Output } from "ai";
 import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
 export async function aiGenerateObject(options) {
     const model = options.providers
-        ? options.providers.model(options.model)
+        ? options.providers.model(options.model, options.provider)
         : createOpenAICompatible({
-            name: "openrouter",
-            baseURL: "https://openrouter.ai/api/v1",
+            name: options.provider ?? "openrouter",
+            baseURL: options.baseURL ?? "https://openrouter.ai/api/v1",
             apiKey: options.apiKey,
         })(options.model);
     const result = await generateText({
@@ -19,10 +19,10 @@ export async function aiGenerateObject(options) {
 }
 export async function* aiStreamObject(options) {
     const model = options.providers
-        ? options.providers.model(options.model)
+        ? options.providers.model(options.model, options.provider)
         : createOpenAICompatible({
-            name: "openrouter",
-            baseURL: "https://openrouter.ai/api/v1",
+            name: options.provider ?? "openrouter",
+            baseURL: options.baseURL ?? "https://openrouter.ai/api/v1",
             apiKey: options.apiKey,
         })(options.model);
     const result = streamObject({

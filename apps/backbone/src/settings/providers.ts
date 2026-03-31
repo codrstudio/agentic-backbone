@@ -6,6 +6,7 @@ export interface ProvidersConfig {
   openrouter?: { api_key?: string };
   openai?: { api_key?: string };
   brave?: { api_key?: string };
+  groq?: { api_key?: string };
 }
 
 export function loadProvidersConfig(): ProvidersConfig {
@@ -29,6 +30,10 @@ export function loadProvidersConfig(): ProvidersConfig {
   if (providers.brave) {
     const b = providers.brave as Record<string, unknown>;
     result.brave = { api_key: b.api_key as string | undefined };
+  }
+  if (providers.groq) {
+    const g = providers.groq as Record<string, unknown>;
+    result.groq = { api_key: g.api_key as string | undefined };
   }
   return result;
 }

@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { aiGenerateObject } from "@agentic-backbone/ai-sdk";
-import { resolveModelResult } from "../settings/llm.js";
+import { resolveModelResult, getProviderConfig } from "../settings/llm.js";
 import { readMessages } from "../conversations/persistence.js";
 import {
   agentMemoryPath,
@@ -175,8 +175,9 @@ export async function flushMemory(options: {
     return { success: true, didWrite: false };
   }
 
-  const { model: modelId } = resolveModelResult("memory");
-  const apiKey = process.env.OPENROUTER_API_KEY!;
+  const { model: modelId, provider } = resolveModelResult("memory");
+  const providerConf = getProviderConfig(provider);
+  const apiKey = process.env[providerConf.apiKeyEnv]!;
 
   const system = [
     "Você é um assistente de extração de memória. Extraia fatos da conversa abaixo.",
@@ -202,6 +203,8 @@ export async function flushMemory(options: {
       extracted = await aiGenerateObject({
         model: modelId,
         apiKey,
+        provider,
+        baseURL: providerConf.baseURL,
         schema: MemoryExtractionSchema,
         system,
         prompt,

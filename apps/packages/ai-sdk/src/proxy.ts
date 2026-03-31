@@ -55,6 +55,8 @@ export async function* runAgent(raw: unknown): AsyncGenerator<AgentEvent> {
   for await (const event of runAiAgent(options.prompt, {
     model: options.model,
     apiKey: options.apiKey,
+    provider: options.provider,
+    providers: options.providers,
     sessionId: options.sessionId,
     sessionDir: options.sessionDir,
     messageMeta: options.messageMeta,

@@ -1,12 +1,17 @@
 export interface AiProviderConfig {
-    /** OpenRouter API key */
+    /** Default API key (used for openrouter) */
     apiKey: string;
     /** Aliases de modelo: nome amigavel → model ID completo */
     aliases?: Record<string, string>;
+    /** Additional providers by name (e.g. groq) */
+    providers?: Record<string, {
+        baseURL: string;
+        apiKey: string;
+    }>;
 }
 export declare function createAiProviderRegistry(config: AiProviderConfig): {
-    /** Resolve modelo por ID ou alias */
-    model(nameOrAlias: string): import("@ai-sdk/provider").LanguageModelV3;
+    /** Resolve modelo por ID ou alias, opcionalmente de um provider especifico */
+    model(nameOrAlias: string, provider?: string): import("@ai-sdk/provider").LanguageModelV3;
     /** Aliases registrados */
     aliases: {
         [x: string]: string;

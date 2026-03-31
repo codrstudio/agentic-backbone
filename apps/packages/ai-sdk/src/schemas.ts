@@ -48,6 +48,8 @@ export const AgentRunOptionsSchema = z.object({
   providerConfig: z.record(z.any()).optional(),
   system: z.string().optional(),
   messageMeta: z.record(z.unknown()).optional(),
+  provider: z.string().optional(),
+  providers: z.record(z.object({ baseURL: z.string(), apiKey: z.string() })).optional(),
 });
 
 export type AgentEvent = z.infer<typeof AgentEventSchema>;

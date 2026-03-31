@@ -3,7 +3,7 @@ import type { Context } from "hono";
 import { db } from "../db/index.js";
 import { parseBody } from "./helpers.js";
 import { runAgent } from "../agent/index.js";
-import { resolveModel } from "../settings/llm.js";
+import { resolveModelResult, getProviderConfig } from "../settings/llm.js";
 
 export const evaluationRoutes = new Hono();
 
@@ -192,9 +192,10 @@ async function runEvalPipeline(runId: number, agentId: string, cases: Array<{ id
       let score = 0;
       let reasoning = "";
       try {
-        const model = resolveModel("conversation");
-        const apiKey = process.env.OPENROUTER_API_KEY!;
-        const resp = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        const { model, provider } = resolveModelResult("conversation");
+        const conf = getProviderConfig(provider);
+        const apiKey = process.env[conf.apiKeyEnv]!;
+        const resp = await fetch(`${conf.baseURL}/chat/completions`, {
           method: "POST",
           headers: {
             "Authorization": `Bearer ${apiKey}`,

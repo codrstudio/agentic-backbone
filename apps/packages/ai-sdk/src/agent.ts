@@ -78,6 +78,7 @@ export async function* runAiAgent(
   const providers = createAiProviderRegistry({
     apiKey: options.apiKey,
     aliases: options.modelAliases,
+    providers: options.providers,
   });
 
   const sessionDir = options.sessionDir ?? DEFAULT_SESSION_DIR;
@@ -276,13 +277,13 @@ export async function* runAiAgent(
     // Tool repair: delegate to SDK's experimental_repairToolCall
     const experimentalRepairToolCall = (options.repairToolCalls !== false)
       ? createToolCallRepairHandler({
-          model: providers.model(options.model),
+          model: providers.model(options.model, options.provider),
           maxAttempts: options.maxRepairAttempts ?? 1,
         })
       : undefined;
 
     // prepareStep integration — call consumer's callback before streamText to get initial overrides
-    let stepModel = providers.model(options.model);
+    let stepModel = providers.model(options.model, options.provider);
     let stepActiveTools: string[] | undefined;
     let stepToolChoice: PrepareStepResult["toolChoice"] = undefined;
 

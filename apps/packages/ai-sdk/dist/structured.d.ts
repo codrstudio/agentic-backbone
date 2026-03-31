@@ -3,6 +3,10 @@ import type { createAiProviderRegistry } from "./providers.js";
 export interface AiObjectOptions<T extends z.ZodType> {
     model: string;
     apiKey: string;
+    /** Provider name (e.g. "openrouter", "groq"). Default: "openrouter" */
+    provider?: string;
+    /** Base URL override for the provider */
+    baseURL?: string;
     schema: T;
     system?: string;
     prompt: string;

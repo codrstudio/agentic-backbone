@@ -2,6 +2,7 @@ import { runAgent as runProxyAgent, type AgentEvent, type UsageData } from "@age
 import {
   resolveModelResult,
   resolveParameters,
+  getProviderConfig,
   type RoutingContext,
   type RoutingRule,
   type ModelResult,
@@ -42,17 +43,22 @@ export async function* runAgent(
   const role = options?.role ?? "conversation";
   const routingResult = resolveModelResult(role, options?.routingContext, options?.agentRoutingRules);
   const model = routingResult.model;
+  const provider = routingResult.provider;
   options?.onRoutingResolved?.(routingResult);
   const params = resolveParameters(role);
   const webSearch = loadWebSearchConfig();
 
+  const providerConf = getProviderConfig(provider);
+  const apiKey = process.env[providerConf.apiKeyEnv]!;
+
   const systemLen = options?.system?.length ?? 0;
   const promptPreview = prompt.slice(0, 120).replace(/\n/g, "\\n");
-  console.log(`[agent] role=${role} model=${model} system=${systemLen}ch prompt="${promptPreview}"`);
+  console.log(`[agent] role=${role} provider=${provider} model=${model} system=${systemLen}ch prompt="${promptPreview}"`);
 
   logAgentRun({
     ts: new Date().toISOString(),
     role,
+    provider,
     model,
     routingRule: routingResult.ruleName,
     systemChars: systemLen,
@@ -61,8 +67,6 @@ export async function* runAgent(
     hasInstructions: options?.system?.includes("<instructions>") ?? false,
     promptPreview: prompt.slice(0, 200),
   });
-
-  const apiKey = process.env.OPENROUTER_API_KEY!;
 
   // Read BRAVE_API_KEY: prefer process.env, fallback to reading .env file directly
   let braveApiKey = process.env.BRAVE_API_KEY;
@@ -75,9 +79,17 @@ export async function* runAgent(
       console.debug("[agent] .env read failed (BRAVE_API_KEY):", err);
     }
   }
+  // Build extra providers map for non-openrouter providers
+  const extraProviders: Record<string, { baseURL: string; apiKey: string }> = {};
+  if (provider !== "openrouter") {
+    extraProviders[provider] = { baseURL: providerConf.baseURL, apiKey };
+  }
+
   yield* runProxyAgent({
     model,
-    apiKey,
+    apiKey: process.env.OPENROUTER_API_KEY ?? apiKey,
+    provider,
+    ...(Object.keys(extraProviders).length > 0 ? { providers: extraProviders } : {}),
     prompt,
     sessionId: options?.sessionId,
     sessionDir: options?.sessionDir,

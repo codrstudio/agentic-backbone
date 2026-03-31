@@ -94,6 +94,10 @@ export interface AiTelemetryOptions {
 export interface AiAgentOptions {
   model: string;
   apiKey: string;
+  /** Provider name (e.g. "openrouter", "groq"). Default: "openrouter" */
+  provider?: string;
+  /** Additional provider configs by name (e.g. { groq: { baseURL, apiKey } }) */
+  providers?: Record<string, { baseURL: string; apiKey: string }>;
   sessionId?: string;
   sessionDir?: string;
   maxSteps?: number;

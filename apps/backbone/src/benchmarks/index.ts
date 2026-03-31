@@ -3,7 +3,7 @@ import { db } from "../db/index.js";
 import { eventBus } from "../events/index.js";
 import { getAgent } from "../agents/registry.js";
 import { runAgent } from "../agent/index.js";
-import { resolveModel } from "../settings/llm.js";
+import { resolveModelResult, getProviderConfig } from "../settings/llm.js";
 import { emitNotification } from "../notifications/index.js";
 
 // ── Benchmark config from AGENT.yml frontmatter ──────────────────────────────
@@ -74,9 +74,10 @@ async function judgeResponse(
   actual: string
 ): Promise<{ score: number; reasoning: string }> {
   try {
-    const model = resolveModel("conversation");
-    const apiKey = process.env.OPENROUTER_API_KEY!;
-    const resp = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+    const { model, provider } = resolveModelResult("conversation");
+    const conf = getProviderConfig(provider);
+    const apiKey = process.env[conf.apiKeyEnv]!;
+    const resp = await fetch(`${conf.baseURL}/chat/completions`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${apiKey}`,

@@ -18,6 +18,11 @@ export function bootstrapProviders(): void {
       process.env.BRAVE_API_KEY = config.brave.api_key;
       console.log("[providers] BRAVE_API_KEY loaded from settings.yml");
     }
+
+    if (config.groq?.api_key && !process.env.GROQ_API_KEY) {
+      process.env.GROQ_API_KEY = config.groq.api_key;
+      console.log("[providers] GROQ_API_KEY loaded from settings.yml");
+    }
   } catch (err) {
     console.warn("[providers] Failed to load providers config:", err);
   }
