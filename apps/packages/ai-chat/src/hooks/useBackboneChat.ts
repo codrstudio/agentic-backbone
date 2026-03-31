@@ -82,6 +82,11 @@ export function useBackboneChat(options: UseBackboneChatOptions) {
     },
   });
 
+  const buildAttachmentUrl = useCallback((ref: string) => {
+    const base = `${options.endpoint}/api/v1/ai/conversations/${options.sessionId}/attachments/${encodeURIComponent(ref)}`;
+    return options.token ? `${base}?token=${encodeURIComponent(options.token)}` : base;
+  }, [options.endpoint, options.sessionId, options.token]);
+
   const { isLoading, messages, stop } = chat;
 
   // --- Camada 2: timeout de resposta ---
@@ -137,5 +142,5 @@ export function useBackboneChat(options: UseBackboneChatOptions) {
     return chat.reload(...args);
   }, [chat.reload]);
 
-  return { ...chat, error, handleSubmit, reload, isUploading };
+  return { ...chat, error, handleSubmit, reload, isUploading, buildAttachmentUrl };
 }
