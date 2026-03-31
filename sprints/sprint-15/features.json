@@ -276,7 +276,7 @@
     "id": "F-314",
     "name": "Domain tool email",
     "description": "Criar apps/backbone/src/connectors/email/tools/email.ts com domain tool email agrupando 10 actions (send, search, read, download_attachment, manage_flags, move, delete, list_mailboxes, draft_create, draft_send) via z.discriminatedUnion. Factory function createEmailTool(slugs). Copiar schemas dos tool files individuais existentes. Policy check readonly para acoes de escrita (send, move, delete, manage_flags, draft_create, draft_send).",
-    "status": "pending",
+    "status": "passing",
     "priority": 15,
     "agent": "coder",
     "task": "vibe-code",
@@ -289,7 +289,8 @@
       "Execute despacha todas 10 actions corretamente",
       "TypeScript compila sem erros"
     ],
-    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab/wave-10/worktree/sprints/sprint-15/3-prps/PRP-18C-email-domain-tool.md"
+    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab/wave-10/worktree/sprints/sprint-15/3-prps/PRP-18C-email-domain-tool.md",
+    "completed_at": "2026-03-30T03:30:00Z"
   },
   {
     "id": "F-315",
@@ -324,7 +325,7 @@
     "id": "F-316",
     "name": "Ativar domain tools em evolution/tools/index.ts",
     "description": "Alterar apps/backbone/src/connectors/evolution/tools/index.ts: substituir ~37 imports individuais por 4 imports de domain tools (createWhatsappMessagingTool, createWhatsappGroupsTool, createWhatsappContactsTool, createWhatsappAdminTool). Manter assinatura de createEvolutionTools(slugs) identica.",
-    "status": "blocked",
+    "status": "pending",
     "priority": 18,
     "agent": "coder",
     "task": "vibe-code",
