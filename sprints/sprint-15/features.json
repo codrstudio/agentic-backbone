@@ -84,7 +84,7 @@
     "id": "F-304",
     "name": "Domain tool gitlab_labels",
     "description": "Criar apps/backbone/src/connectors/gitlab/tools/labels.ts com domain tool gitlab_labels agrupando 5 actions (list, get, create, update, delete) via z.discriminatedUnion. Factory function createGitLabLabelsTool(adapters). Copiar schemas dos label-*.ts existentes. Policy check readonly para create, update, delete.",
-    "status": "pending",
+    "status": "passing",
     "priority": 6,
     "agent": "coder",
     "task": "vibe-code",
@@ -96,7 +96,8 @@
       "Acoes de escrita verificam policy readonly",
       "TypeScript compila sem erros"
     ],
-    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab/wave-10/worktree/sprints/sprint-15/3-prps/PRP-18A-gitlab-domain-tools.md"
+    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab/wave-10/worktree/sprints/sprint-15/3-prps/PRP-18A-gitlab-domain-tools.md",
+    "completed_at": "2026-03-31T05:00:00Z"
   },
   {
     "id": "F-305",
