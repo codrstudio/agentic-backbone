@@ -91,7 +91,7 @@ export async function* runAiAgent(
   }
 
   const startMs = Date.now();
-  const userMsg: any = { role: "user", content: prompt };
+  const userMsg: any = { role: "user", content: options.contentParts ?? prompt };
   if (options.messageMeta) {
     userMsg._meta = { ts: new Date().toISOString(), ...options.messageMeta };
   }
