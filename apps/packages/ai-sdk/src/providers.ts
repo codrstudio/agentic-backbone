@@ -1,4 +1,5 @@
 import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
+import { createGroq } from "@ai-sdk/groq";
 
 export interface AiProviderConfig {
   /** Default API key (used for openrouter) */
@@ -25,6 +26,11 @@ export function createAiProviderRegistry(config: AiProviderConfig) {
 
     const extra = config.providers?.[name];
     if (extra) {
+      if (name === "groq") {
+        const p = createGroq({ apiKey: extra.apiKey });
+        instances.set(name, p as any);
+        return p;
+      }
       const p = createOpenAICompatible({ name, baseURL: extra.baseURL, apiKey: extra.apiKey });
       instances.set(name, p);
       return p;

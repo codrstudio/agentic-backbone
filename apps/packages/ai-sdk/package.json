@@ -9,6 +9,7 @@
     "dev": "tsc --watch"
   },
   "dependencies": {
+    "@ai-sdk/groq": "^3.0.31",
     "@ai-sdk/mcp": "^1.0.22",
     "@ai-sdk/openai-compatible": "^2",
     "ai": "^6",

@@ -1,4 +1,5 @@
 import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
+import { createGroq } from "@ai-sdk/groq";
 const DEFAULT_ALIASES = {
     "fast": "anthropic/claude-haiku-4.5",
     "balanced": "anthropic/claude-sonnet-4",
@@ -13,6 +14,11 @@ export function createAiProviderRegistry(config) {
             return cached;
         const extra = config.providers?.[name];
         if (extra) {
+            if (name === "groq") {
+                const p = createGroq({ apiKey: extra.apiKey });
+                instances.set(name, p);
+                return p;
+            }
             const p = createOpenAICompatible({ name, baseURL: extra.baseURL, apiKey: extra.apiKey });
             instances.set(name, p);
             return p;

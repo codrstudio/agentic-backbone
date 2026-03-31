@@ -17,6 +17,7 @@ interface ProvidersStatus {
   openrouter: ProviderKeyStatus;
   openai: ProviderKeyStatus;
   brave: ProviderKeyStatus;
+  groq: ProviderKeyStatus;
 }
 
 interface TestResult {
@@ -32,7 +33,7 @@ function providersQueryOptions() {
   };
 }
 
-type ProviderKey = "openrouter" | "openai" | "brave";
+type ProviderKey = "openrouter" | "openai" | "brave" | "groq";
 
 interface ProviderSectionProps {
   id: ProviderKey;
@@ -205,6 +206,14 @@ export function ProvidersSettings() {
         title="Brave Search"
         description="Usado para pesquisa web quando o provedor 'brave' está configurado."
         status={data.brave}
+        onSave={handleSave}
+      />
+
+      <ProviderSection
+        id="groq"
+        title="Groq"
+        description="Inferência ultra-rápida para modelos open-source (Llama, Mixtral, Gemma)."
+        status={data.groq}
         onSave={handleSave}
       />
     </div>

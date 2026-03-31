@@ -120,6 +120,7 @@ settingsRoutes.get("/settings/providers", (c) => {
     openrouter: maskKey(config.openrouter?.api_key),
     openai: maskKey(config.openai?.api_key),
     brave: maskKey(config.brave?.api_key),
+    groq: maskKey(config.groq?.api_key),
   });
 });
 
@@ -133,6 +134,7 @@ settingsRoutes.patch("/settings/providers", async (c) => {
     openrouter?: { api_key?: string };
     openai?: { api_key?: string };
     brave?: { api_key?: string };
+    groq?: { api_key?: string };
   }>();
 
   const current = loadProvidersConfig();
@@ -145,6 +147,9 @@ settingsRoutes.patch("/settings/providers", async (c) => {
   }
   if (body.brave !== undefined) {
     current.brave = { ...current.brave, ...body.brave };
+  }
+  if (body.groq !== undefined) {
+    current.groq = { ...current.groq, ...body.groq };
   }
 
   saveProvidersConfig(current);
@@ -164,6 +169,7 @@ settingsRoutes.post("/settings/providers/test/:provider", async (c) => {
   if (provider === "openrouter") api_key = config.openrouter?.api_key ?? process.env.OPENROUTER_API_KEY;
   else if (provider === "openai") api_key = config.openai?.api_key ?? process.env.OPENAI_API_KEY;
   else if (provider === "brave") api_key = config.brave?.api_key ?? process.env.BRAVE_API_KEY;
+  else if (provider === "groq") api_key = config.groq?.api_key ?? process.env.GROQ_API_KEY;
   else return c.json({ error: `Unknown provider: ${provider}` }, 400);
 
   if (!api_key) {
@@ -180,6 +186,9 @@ settingsRoutes.post("/settings/providers/test/:provider", async (c) => {
       headers = { Authorization: `Bearer ${api_key}` };
     } else if (provider === "openai") {
       url = "https://api.openai.com/v1/models";
+      headers = { Authorization: `Bearer ${api_key}` };
+    } else if (provider === "groq") {
+      url = "https://api.groq.com/openai/v1/models";
       headers = { Authorization: `Bearer ${api_key}` };
     } else {
       url = "https://api.search.brave.com/res/v1/web/search?q=test&count=1";
