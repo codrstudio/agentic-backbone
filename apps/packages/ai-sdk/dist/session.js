@@ -1,18 +1,61 @@
 import { readFile, writeFile, mkdir } from "node:fs/promises";
-import { join, dirname } from "node:path";
+import { join, dirname, basename } from "node:path";
 function sessionPath(dir) {
     return join(dir, "messages.jsonl");
+}
+export async function resolveRefs(content, attachmentsDir) {
+    const resolved = [];
+    for (const part of content) {
+        if (typeof part !== "object" || part === null) {
+            resolved.push(part);
+            continue;
+        }
+        const p = part;
+        if (p._ref && (p.type === "image" || p.type === "file")) {
+            const filename = basename(p._ref);
+            const filePath = join(attachmentsDir, filename);
+            try {
+                const buffer = await readFile(filePath);
+                const base64 = buffer.toString("base64");
+                if (p.type === "image") {
+                    resolved.push({ type: "image", image: base64, mimeType: p.mimeType });
+                }
+                else {
+                    resolved.push({ type: "file", data: base64, mimeType: p.mimeType });
+                }
+            }
+            catch {
+                resolved.push({ type: "text", text: `[arquivo removido: ${filename}]` });
+            }
+        }
+        else {
+            resolved.push(part);
+        }
+    }
+    return resolved;
 }
 export async function loadSession(dir) {
     try {
         const content = await readFile(sessionPath(dir), "utf-8");
-        return content
+        const messages = content
             .split("\n")
             .filter((line) => line.trim())
             .map((line) => {
             const { _meta, ...msg } = JSON.parse(line);
             return msg;
         });
+        const attachmentsDir = join(dir, "attachments");
+        const result = [];
+        for (const msg of messages) {
+            if (Array.isArray(msg.content)) {
+                const resolvedContent = await resolveRefs(msg.content, attachmentsDir);
+                result.push({ ...msg, content: resolvedContent });
+            }
+            else {
+                result.push(msg);
+            }
+        }
+        return result;
     }
     catch {
         return [];
