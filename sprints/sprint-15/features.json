@@ -122,7 +122,7 @@
     "id": "F-306",
     "name": "Domain tool gitlab_releases",
     "description": "Criar apps/backbone/src/connectors/gitlab/tools/releases.ts com domain tool gitlab_releases agrupando 5 actions (list, get, create, update, delete) via z.discriminatedUnion. Factory function createGitLabReleasesTool(adapters). Copiar schemas dos release-*.ts existentes. Policy check readonly para create, update, delete.",
-    "status": "pending",
+    "status": "passing",
     "priority": 9,
     "agent": "coder",
     "task": "vibe-code",
@@ -134,7 +134,8 @@
       "Acoes de escrita verificam policy readonly",
       "TypeScript compila sem erros"
     ],
-    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab/wave-10/worktree/sprints/sprint-15/3-prps/PRP-18A-gitlab-domain-tools.md"
+    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab/wave-10/worktree/sprints/sprint-15/3-prps/PRP-18A-gitlab-domain-tools.md",
+    "completed_at": "2026-03-31T07:30:00Z"
   },
   {
     "id": "F-307",
