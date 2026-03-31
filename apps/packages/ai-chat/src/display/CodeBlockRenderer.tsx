@@ -23,7 +23,7 @@ export function CodeBlockRenderer({ language, code, title, lineNumbers }: Displa
     : code;
 
   return (
-    <div className={cn("rounded-md border border-border bg-muted overflow-hidden")}>
+    <div className={cn("rounded-md border border-border bg-muted/30 overflow-hidden")}>
       <div className="flex items-center justify-between px-3 py-1.5 border-b border-border">
         <span className="text-xs text-muted-foreground font-mono">{title ?? language}</span>
         <Button

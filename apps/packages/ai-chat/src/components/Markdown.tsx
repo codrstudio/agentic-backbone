@@ -22,7 +22,7 @@ const components: Components = {
     return <h4 className="font-semibold" style={{ marginTop: "20px", marginBottom: "8px" }}>{children}</h4>;
   },
   p({ children }) {
-    return <p style={{ marginBottom: "16px" }}>{children}</p>;
+    return <p className="mb-4 last:mb-0">{children}</p>;
   },
   ul({ children }) {
     return <ul style={{ paddingLeft: "24px", marginTop: "8px", marginBottom: "8px", listStyleType: "disc" }}>{children}</ul>;

@@ -22,7 +22,7 @@ export function ChoiceButtonsRenderer({
   }
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-3 w-fit">
       {question && <p className="text-sm font-medium text-foreground">{question}</p>}
 
       <div

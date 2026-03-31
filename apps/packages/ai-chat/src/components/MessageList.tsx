@@ -3,6 +3,8 @@ import { useRef, useEffect, useMemo, useCallback } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import type { Message } from "@ai-sdk/react";
 import { MessageBubble } from "./MessageBubble.js";
+import { StreamingIndicator } from "./StreamingIndicator.js";
+import { ErrorNote } from "./ErrorNote.js";
 import type { DisplayRendererMap } from "../display/registry.js";
 import { ScrollBar } from "../ui/scroll-area.js";
 import { cn } from "../lib/utils.js";
@@ -12,9 +14,11 @@ export interface MessageListProps {
   isLoading?: boolean;
   displayRenderers?: DisplayRendererMap;
   className?: string;
+  error?: Error;
+  onRetry?: () => void;
 }
 
-export function MessageList({ messages, isLoading, displayRenderers, className }: MessageListProps) {
+export function MessageList({ messages, isLoading, displayRenderers, className, error, onRetry }: MessageListProps) {
   const viewportRef = useRef<HTMLDivElement>(null);
   const isFollowingRef = useRef(true);
 
@@ -56,6 +60,14 @@ export function MessageList({ messages, isLoading, displayRenderers, className }
       virtualizer.scrollToIndex(messages.length - 1, { align: "end" });
     }
   }, [messages, virtualizer]);
+
+  // Auto-scroll when error appears
+  useEffect(() => {
+    if (error && isFollowingRef.current) {
+      const viewport = viewportRef.current;
+      if (viewport) viewport.scrollTop = viewport.scrollHeight;
+    }
+  }, [error]);
 
   const virtualItems = virtualizer.getVirtualItems();
 
@@ -99,7 +111,7 @@ export function MessageList({ messages, isLoading, displayRenderers, className }
                 >
                   <MessageBubble
                     message={message}
-                    isStreaming={virtualRow.index === lastAssistantIndex && isLoading}
+                    isStreaming={virtualRow.index === lastAssistantIndex && isLoading && messages[messages.length - 1]?.role === "assistant"}
                     displayRenderers={displayRenderers}
                   />
                 </div>
@@ -107,6 +119,16 @@ export function MessageList({ messages, isLoading, displayRenderers, className }
             })}
           </div>
         </div>
+        {isLoading && messages[messages.length - 1]?.role !== "assistant" && (
+          <div className="px-4 pb-3">
+            <StreamingIndicator />
+          </div>
+        )}
+        {!isLoading && error && messages.length > 0 && messages[messages.length - 1]?.role !== "assistant" && (
+          <div className="px-4 pb-3">
+            <ErrorNote onRetry={onRetry} />
+          </div>
+        )}
       </ScrollAreaPrimitive.Viewport>
       <ScrollBar />
       <ScrollAreaPrimitive.Corner />

@@ -12,7 +12,7 @@ export function MetricCardRenderer({ label, value, unit, trend }: DisplayMetric)
   const trendConfig = trend ? TREND_CONFIG[trend.direction] : null;
 
   return (
-    <Card className="p-4">
+    <Card className="p-4 w-fit">
       <p className="text-sm text-muted-foreground">{label}</p>
       <div className="flex items-baseline gap-2 mt-1">
         <span className="text-2xl font-bold text-foreground">{value}</span>

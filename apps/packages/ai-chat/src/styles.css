@@ -1,0 +1,2 @@
+@import "tailwindcss/utilities" layer(utilities);
+@source "./**/*.tsx";

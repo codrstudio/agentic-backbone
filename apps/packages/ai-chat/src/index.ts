@@ -13,12 +13,14 @@ export type { ChatProviderProps } from "./hooks/ChatProvider.js";
 
 export { Markdown } from "./components/Markdown.js";
 export { StreamingIndicator } from "./components/StreamingIndicator.js";
+export { ErrorNote } from "./components/ErrorNote.js";
+export type { ErrorNoteProps } from "./components/ErrorNote.js";
 export { MessageBubble } from "./components/MessageBubble.js";
 export type { MessageBubbleProps } from "./components/MessageBubble.js";
 export { MessageList } from "./components/MessageList.js";
 export type { MessageListProps } from "./components/MessageList.js";
 export { MessageInput } from "./components/MessageInput.js";
-export type { MessageInputProps } from "./components/MessageInput.js";
+export type { MessageInputProps, Attachment, AgentEndpoint } from "./components/MessageInput.js";
 
 export { PartRenderer } from "./parts/PartRenderer.js";
 export type { PartRendererProps } from "./parts/PartRenderer.js";

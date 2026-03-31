@@ -50,7 +50,7 @@ export function ProductCardRenderer({
       : null;
 
   return (
-    <Card className="overflow-hidden">
+    <Card className="overflow-hidden w-fit max-w-sm">
       {image && !imgError && (
         <div className="relative">
           <img

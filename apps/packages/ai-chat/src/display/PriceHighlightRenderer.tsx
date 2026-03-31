@@ -12,7 +12,7 @@ function formatPrice(value: number, currency: string): string {
 
 export function PriceHighlightRenderer({ value, label, context, source, badge }: DisplayPrice) {
   return (
-    <Card className="p-4 space-y-1">
+    <Card className="p-4 space-y-1 w-fit">
       <p className="text-sm text-muted-foreground">{label}</p>
       <div className="flex items-baseline gap-2">
         <span className="text-2xl font-bold text-foreground">
