@@ -349,10 +349,11 @@
     "id": "F-317",
     "name": "Ativar domain tool em email/tools/index.ts",
     "description": "Alterar apps/backbone/src/connectors/email/tools/index.ts: substituir 10 exports individuais por 1 re-export da domain tool (export { createEmailTool } from './email.js'). Verificar como email/index.ts consome tools/index.ts e adaptar.",
-    "status": "pending",
+    "status": "passing",
     "priority": 19,
     "agent": "coder",
     "task": "vibe-code",
+    "completed_at": "2026-03-31T03:30:00Z",
     "dependencies": [
       "F-314"
     ],
@@ -454,7 +455,7 @@
     "id": "F-322",
     "name": "Remover tools individuais do WhatsApp",
     "description": "Remover 36 arquivos de apps/backbone/src/connectors/evolution/tools/: whatsapp-*.ts (35) + evolution-api.ts (1). Apos remocao o diretorio deve conter apenas: index.ts, messaging.ts, groups.ts, contacts.ts, admin.ts.",
-    "status": "blocked",
+    "status": "pending",
     "priority": 23,
     "agent": "coder",
     "task": "vibe-code",
