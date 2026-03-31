@@ -437,10 +437,11 @@
     "id": "F-321",
     "name": "Remover tools individuais do GitLab",
     "description": "Remover 89 tool files individuais de apps/backbone/src/connectors/gitlab/tools/: issue-*.ts (13), mr-*.ts (16), repo-*.ts (17), ci-*.ts (12), label-*.ts (5), milestone-*.ts (7), release-*.ts (5), wiki-*.ts (5), user-*.ts (3), project-*.ts (6). Apos remocao o diretorio deve conter apenas: issues.ts, mrs.ts, repo.ts, ci.ts, labels.ts, milestones.ts, releases.ts, wiki.ts, users.ts, projects.ts.",
-    "status": "pending",
+    "status": "passing",
     "priority": 22,
     "agent": "coder",
     "task": "vibe-code",
+    "completed_at": "2026-03-30T05:00:00Z",
     "dependencies": [
       "F-315",
       "F-318"
