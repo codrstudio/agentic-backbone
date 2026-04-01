@@ -12,7 +12,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@agentic-backbone/ai-chat": "*",
+    "@codrstudio/agentic-chat": "github:codrstudio/agentic-chat#v0.1.0",
     "@hookform/resolvers": "^5.0.0",
     "@phosphor-icons/react": "^2.1.10",
     "@tanstack/react-query": "^5.60.0",
@@ -20,6 +20,7 @@
     "@tanstack/react-table": "^8.20.0",
     "@workspace/ui": "*",
     "better-auth": "^1.5.5",
+    "framer-motion": "^11.18.0",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "react-hook-form": "^7.54.0",

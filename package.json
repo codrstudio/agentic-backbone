@@ -3,11 +3,12 @@
   "private": true,
   "workspaces": [
     "apps/*",
-    "apps/packages/*",
-    "apps/packages/gitlab/v4"
+    "packages/gitlab/v4",
+    "packages/ui"
   ],
   "scripts": {
     "printenv": "dotenv -o -e .env -- printenv",
+    "setup": "node scripts/setup.mjs",
     "killports": "node scripts/killports.mjs",
     "dev:all": "concurrently -n hub,backbone,chat -c blue,green,magenta \"npm run dev:hub\" \"npm run dev:backbone\" \"npm run dev:chat\" 2>&1 | tee .tmp/-run.log",
     "dev:backbone": "npm run dev --workspace=apps/backbone",
@@ -23,8 +24,8 @@
     "docker:down": "dotenv -o -e .env -- docker compose down",
     "docker:ps": "dotenv -o -e .env -- docker compose ps",
     "docker:logs": "dotenv -o -e .env -- docker compose logs -f",
-    "build": "npm run build --workspace=apps/packages/ai-sdk && npm run build --workspace=apps/packages/gitlab/v4 && npm run build --workspace=apps/backbone && npm run build --workspace=apps/hub && npm run build --workspace=apps/web",
-    "build:packages": "npm run build --workspace=apps/packages/ai-sdk && npm run build --workspace=apps/packages/gitlab/v4 && npm run build:css --workspace=apps/packages/ai-chat",
+    "build": "npm run build --workspace=packages/gitlab/v4 && npm run build --workspace=apps/backbone && npm run build --workspace=apps/hub && npm run build --workspace=apps/web",
+    "build:packages": "npm run build --workspace=packages/gitlab/v4",
     "build:hub": "npm run build --workspace=apps/hub",
     "build:web": "npm run build --workspace=apps/web",
     "test:conversation": "dotenv -o -e .env -- node tests/test-conversations.mjs",
@@ -40,8 +41,8 @@
     "secrets:decrypt": "node scripts/secrets.mjs decrypt",
     "secrets:encrypt": "node scripts/secrets.mjs encrypt",
     "ngrok:up": "dotenv -o -e .env -- npx ngrok http 6002",
-    "version:packages": "npm version patch --workspace=apps/packages/ai-sdk && npm version patch --workspace=apps/packages/ai-chat",
-    "publish:packages": "npm publish --workspace=apps/packages/ai-sdk && npm publish --workspace=apps/packages/ai-chat"
+    "version:packages": "echo 'Packages moved to codrstudio/agentic-sdk and codrstudio/agentic-chat'",
+    "publish:packages": "echo 'Packages moved to codrstudio/agentic-sdk and codrstudio/agentic-chat'"
   },
   "devDependencies": {
     "@playwright/test": "^1.58.2",

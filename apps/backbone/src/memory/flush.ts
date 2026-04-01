@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { aiGenerateObject } from "@agentic-backbone/ai-sdk";
+import { aiGenerateObject } from "@codrstudio/agentic-sdk";
 import { resolveModelResult, getProviderConfig } from "../settings/llm.js";
 import { readMessages } from "../conversations/persistence.js";
 import {

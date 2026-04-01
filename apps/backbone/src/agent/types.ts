@@ -1,1 +1,1 @@
-export type { AgentEvent, UsageData } from "@agentic-backbone/ai-sdk";
+export type { AgentEvent, UsageData } from "@codrstudio/agentic-sdk";

@@ -1,4 +1,4 @@
-import { runAgent as runProxyAgent, type AgentEvent, type UsageData } from "@agentic-backbone/ai-sdk";
+import { runAgent as runProxyAgent, type AgentEvent, type UsageData } from "@codrstudio/agentic-sdk";
 import {
   resolveModelResult,
   resolveParameters,

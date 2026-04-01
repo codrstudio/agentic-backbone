@@ -38,7 +38,7 @@ import {
   releaseConversation,
 } from "@/api/conversations";
 import { agentsQueryOptions } from "@/api/agents";
-import { Chat } from "@agentic-backbone/ai-chat";
+import { Chat } from "@codrstudio/agentic-chat";
 import { useAuthStore } from "@/lib/auth";
 import { TakeoverButton } from "@/components/conversations/takeover-button";
 import { TakeoverBanner } from "@/components/conversations/takeover-banner";
