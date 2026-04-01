@@ -3,7 +3,7 @@ import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router"
 import { z } from "zod"
 import { motion, AnimatePresence } from "framer-motion"
 import { LoginForm } from "@workspace/ui/components/login-form"
-import { signIn, signOut, getSession } from "@/lib/auth-client"
+import { loginWithPassword, logout, getSession } from "@/lib/auth-client"
 
 const TEAM_ROLES = ["admin", "manager", "attendant"] as const
 
@@ -21,10 +21,9 @@ function validateReturnUrl(url: string | undefined): string {
 export const Route = createFileRoute("/login")({
   validateSearch: searchSchema,
   beforeLoad: async ({ search }) => {
-    const session = await getSession()
-    if (session?.data?.user) {
-      const role = (session.data.user as { role?: string }).role
-      const isTeam = TEAM_ROLES.includes(role as (typeof TEAM_ROLES)[number])
+    const user = await getSession()
+    if (user) {
+      const isTeam = TEAM_ROLES.includes(user.role as (typeof TEAM_ROLES)[number])
       if (isTeam) {
         throw redirect({ to: validateReturnUrl((search as { returnUrl?: string }).returnUrl) as "/" })
       }
@@ -47,20 +46,12 @@ function LoginPage() {
     setIsLoading(true)
 
     try {
-      const result = await signIn.email({ email, password })
+      const user = await loginWithPassword(email, password)
 
-      if (result.error) {
-        setError("E-mail ou senha incorretos")
-        return
-      }
-
-      const session = await getSession()
-      const role = (session?.data?.user as { role?: string } | null)?.role
-
-      const isTeam = TEAM_ROLES.includes(role as (typeof TEAM_ROLES)[number])
+      const isTeam = TEAM_ROLES.includes(user.role as (typeof TEAM_ROLES)[number])
 
       if (!isTeam) {
-        await signOut()
+        await logout()
         setAccessDenied(true)
         return
       }

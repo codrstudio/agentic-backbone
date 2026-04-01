@@ -64,8 +64,8 @@ export default defineConfig({
   server: {
     port: Number(process.env.CHAT_PORT) || 5173,
     proxy: {
-      "/api/auth": {
-        target: `http://localhost:${process.env.API_PORT || 2201}`,
+      "/api/v1/ai": {
+        target: `http://localhost:${process.env.BACKBONE_PORT || 6002}`,
         changeOrigin: true,
       },
       "/api/v1/chat": {
