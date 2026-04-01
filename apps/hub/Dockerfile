@@ -10,8 +10,8 @@ RUN npm ci --workspace=apps/hub --include=optional \
 
 COPY apps/hub/ apps/hub/
 COPY tsconfig.base.json .
-COPY .env .env
-RUN cd apps/hub && npx vite build
+COPY .env* .
+RUN touch .env && cd apps/hub && npx vite build
 
 FROM nginx:alpine
 COPY --from=builder /app/apps/hub/dist /usr/share/nginx/html/hub

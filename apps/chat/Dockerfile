@@ -12,8 +12,8 @@ RUN npm ci --workspace=apps/chat --workspace=packages/ui --include=optional \
 COPY apps/chat/ apps/chat/
 COPY packages/ui/ packages/ui/
 COPY tsconfig.base.json .
-COPY .env .env
-RUN npm run build --workspace=apps/chat
+COPY .env* .
+RUN touch .env && npm run build --workspace=apps/chat
 
 FROM nginx:alpine
 RUN printf 'server {\n\
