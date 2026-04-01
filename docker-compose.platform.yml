@@ -4,6 +4,37 @@
 name: ab-platform-${ENVIRONMENT}
 
 services:
+
+  # ===========================================================================
+  # Caddy — Reverse proxy (ponto de entrada unificado)
+  # PROXY_UPSTREAM: vazio = aliases Docker (prod)
+  #                 host.docker.internal = apps rodam no host (dev)
+  # ===========================================================================
+  caddy:
+    image: caddy:alpine
+    restart: unless-stopped
+    environment:
+      PUBLIC_PORT: ${PUBLIC_PORT}
+      BACKBONE_HOST: ${PROXY_UPSTREAM:-backbone.internal}
+      BACKBONE_PORT: ${BACKBONE_PORT}
+      HUB_HOST: ${PROXY_UPSTREAM:-hub.internal}
+      HUB_PORT: ${HUB_PORT}
+      CHAT_HOST: ${PROXY_UPSTREAM:-chat.internal}
+      CHAT_PORT: ${CHAT_PORT}
+      ADMINER_HOST: ${PROXY_UPSTREAM:-adminer.internal}
+      ADMINER_PORT: ${ADMINER_PORT}
+    volumes:
+      - ./docker/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+    networks:
+      internal:
+        aliases:
+          - caddy.internal
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:${PUBLIC_PORT}/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
   init:
     image: busybox:1.37
     command: ["sh", "-c", "mkdir -p /data/postgres /data/redis /data/evolution/instances /data/evolution/store && chown -R 999:999 /data/postgres && chown -R 999:999 /data/redis"]
@@ -100,28 +131,6 @@ services:
       retries: 5
       start_period: 120s  # modelo demora para carregar
     restart: unless-stopped
-
-  # ===========================================================================
-  # Adminer (Database GUI)
-  # ===========================================================================
-  adminer:
-    image: adminer:latest
-    restart: unless-stopped
-    depends_on:
-      postgres:
-        condition: service_healthy
-    environment:
-      POSTGRES_HOST: postgres.internal
-      POSTGRES_PORT: 5432
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: postgres
-    volumes:
-      - ./docker/adminer/auto-login.php:/var/www/html/plugins-enabled/auto-login.php
-    networks:
-      internal:
-        aliases:
-          - adminer.internal
 
 networks:
   internal:

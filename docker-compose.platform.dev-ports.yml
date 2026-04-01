@@ -2,6 +2,12 @@
 # Usage: docker compose -f docker-compose.platform.yml -f docker-compose.platform.dev-ports.yml up -d
 
 services:
+  caddy:
+    ports:
+      - "${PUBLIC_PORT}:${PUBLIC_PORT}"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
   postgres:
     ports:
       - "${POSTGRES_PORT}:5432"
@@ -29,10 +35,6 @@ services:
   whisper:
     ports:
       - "${WHISPER_PORT}:8000"
-
-  adminer:
-    ports:
-      - "${ADMINER_PORT}:8080"
 
 networks:
   internal:
