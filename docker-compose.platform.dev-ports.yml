@@ -36,5 +36,9 @@ services:
     ports:
       - "${WHISPER_PORT}:8000"
 
+  adminer:
+    ports:
+      - "${ADMINER_PORT}:8080"
+
 networks:
   internal:
