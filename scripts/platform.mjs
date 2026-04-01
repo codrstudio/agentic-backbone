@@ -78,7 +78,12 @@ function decryptObj(obj, key) {
     if (typeof v === "object" && v !== null) {
       result[k] = decryptObj(v, key);
     } else if (typeof v === "string" && v.startsWith(PREFIX)) {
-      result[k] = decrypt(v, key);
+      try {
+        result[k] = decrypt(v, key);
+      } catch {
+        console.warn(`⚠️  Failed to decrypt field '${k}' — skipping`);
+        result[k] = v;
+      }
     } else {
       result[k] = v;
     }
@@ -88,12 +93,12 @@ function decryptObj(obj, key) {
 
 // ── Read settings.yml ────────────────────────────────────────────────
 
-function loadSettings(contextFolder, jwtSecret) {
+function loadSettings(contextFolder, encryptionKey) {
   const settingsPath = join(contextFolder, "settings.yml");
   if (!existsSync(settingsPath)) return {};
   const raw = readFileSync(settingsPath, "utf-8");
   const parsed = yamlLoad(raw) ?? {};
-  const key = deriveKey(jwtSecret);
+  const key = deriveKey(encryptionKey);
   return decryptObj(parsed, key);
 }
 
@@ -116,14 +121,14 @@ function settingsToEnv(settings) {
 const dotenv = loadDotenv(ENV_FILE);
 const merged = { ...process.env, ...dotenv };
 
-const jwtSecret = merged.JWT_SECRET;
-if (!jwtSecret) {
-  console.error("❌ JWT_SECRET não encontrado no .env");
+const encryptionKey = merged.ENCRYPTION_KEY;
+if (!encryptionKey) {
+  console.error("❌ ENCRYPTION_KEY não encontrado no .env");
   process.exit(1);
 }
 
 const contextFolder = resolve(ROOT, merged.CONTEXT_FOLDER ?? "context");
-const settings = loadSettings(contextFolder, jwtSecret);
+const settings = loadSettings(contextFolder, encryptionKey);
 const settingsEnv = settingsToEnv(settings);
 
 const finalEnv = { ...merged, ...settingsEnv };
