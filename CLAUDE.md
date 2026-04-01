@@ -13,11 +13,12 @@ npm run dev:backbone          # backbone only (from root)
 npm run dev:hub               # hub only (from root)
 npm run dev:chat              # chat only (from root)
 
-# Build (sequential: ai-sdk → backbone → hub)
+# Build (sequential: gitlab → backbone → hub → web)
 npm run build                 # all packages
-npm run build:packages        # ai-sdk only
+npm run build:packages        # gitlab only
 
 # Start production
+npm run setup                 # gera JWT_SECRET e ENCRYPTION_KEY seguros (obrigatorio em production/staging)
 npm run start --workspace=apps/backbone
 
 # Install dependencies
@@ -87,9 +88,9 @@ All env vars are in the root `.env` file — single source of truth. **Never use
 | `@agentic-backbone/backbone` | `apps/backbone` | Autonomous multi-agent runtime (Node.js, Hono, Vercel AI SDK) |
 | `@agentic-backbone/hub` | `apps/hub` | React admin UI (Vite + TanStack Router) |
 | `@agentic-backbone/chat` | `apps/chat` | Standalone chat UI |
-| `@agentic-backbone/ai-sdk` | `apps/packages/ai-sdk` | Agent runtime via Vercel AI SDK + OpenRouter |
-| `@agentic-backbone/ai-chat` | `apps/packages/ai-chat` | Shared chat UI components |
-| `@agentic-backbone/ui` | `apps/packages/ui` | Shared UI component library (shadcn) |
+| `@codrstudio/agentic-sdk` | **external** ([codrstudio/agentic-sdk](https://github.com/codrstudio/agentic-sdk)) | Agent runtime via Vercel AI SDK + OpenRouter |
+| `@codrstudio/agentic-chat` | **external** ([codrstudio/agentic-chat](https://github.com/codrstudio/agentic-chat)) | Shared chat UI components |
+| `@agentic-backbone/ui` | `packages/ui` | Shared UI component library (shadcn) |
 
 ### Core Flow
 
@@ -165,10 +166,11 @@ Structure and file types defined in `context/.skeleton.md` (single source of tru
 
 - **Sensitive field masking** — `utils/sensitive.ts` masks secrets in API responses. Use `maskSensitiveFields()` instead of inline masking.
 
-### ai-sdk Package (`apps/packages/ai-sdk/`)
+### agentic-sdk (external: `@codrstudio/agentic-sdk`)
 
+- **Repo:** https://github.com/codrstudio/agentic-sdk
+- Installed via git dependency: `"@codrstudio/agentic-sdk": "github:codrstudio/agentic-sdk#v0.1.0"`
 - `runAiAgent()` — async generator using `streamText()`, same `AgentEvent` output
-- Exports `dist/index.js` (compiled) — `tsc` build may OOM on constrained machines; edit `dist/` directly as workaround
 - Context compaction: auto-compacts when context window threshold exceeded
 - MCP support: stdio and http transports
 - Built-in tools: `Read`, `Glob`, `Grep`, `Bash`, `Write`, `Edit`, `MultiEdit`, `ApplyPatch`, `AskUser`, `WebSearch`, `WebFetch`, `CodeSearch`, `Task`, `Batch`, `ListDir`
@@ -183,7 +185,7 @@ Each connector in `src/connectors/{slug}/`:
 - Sensitive fields in `.yml` (keys matching `key|secret|token|password|pass`) are auto-encrypted via AES-256-GCM
 - Supports env var interpolation: `${VAR}`
 
-Available connectors: `mysql`, `postgres`, `evolution` (WhatsApp), `twilio` (voice).
+Available connectors: `discord`, `elevenlabs`, `email`, `evolution` (WhatsApp), `github`, `gitlab`, `http`, `implantacao`, `mcp`, `mysql`, `postgres`, `slack`, `teams`, `twilio` (voice), `whatsapp-cloud`.
 
 ### Auth
 
