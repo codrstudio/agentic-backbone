@@ -1,10 +1,24 @@
 import { Hono } from "hono";
 import { sign } from "hono/jwt";
+import { setCookie, deleteCookie } from "hono/cookie";
 import { getUser, getUserByEmail, getUserCredential, getUserByIdentifier, updateUserCredentialPassword } from "../users/manager.js";
 import { verifyPassword, hashPassword } from "../users/password.js";
 import { rateLimit } from "../middleware/rate-limit.js";
 import { sendOtp, verifyOtp } from "../otp/sender.js";
 import { isOtpEnabled } from "../settings/otp.js";
+
+const isProduction = process.env.NODE_ENV === "production";
+
+// Shared helper: set JWT as HttpOnly cookie
+function setCookieToken(c: Parameters<typeof setCookie>[0], token: string): void {
+  setCookie(c, "token", token, {
+    httpOnly: true,
+    secure: isProduction,
+    sameSite: "Strict",
+    path: "/api",
+    maxAge: 24 * 60 * 60, // 24h
+  });
+}
 
 // Shared helper: generate JWT for authenticated user
 async function createAuthToken(slug: string, configRole: string): Promise<string> {
@@ -45,7 +59,12 @@ authPublicRoutes.post("/auth/login", rateLimit(), async (c) => {
   }
 
   const token = await createAuthToken(record.slug, record.config.role ?? "user");
-  return c.json({ token });
+  const userConfig = getUser(record.slug);
+  setCookieToken(c, token);
+  return c.json({
+    success: true,
+    user: { id: record.slug, role: record.config.role ?? "user", displayName: userConfig?.displayName ?? record.slug },
+  });
 });
 
 // POST /auth/identify — public (step 1 of login wizard, rate limited)
@@ -168,7 +187,17 @@ authPublicRoutes.post("/auth/otp-verify", rateLimit(), async (c) => {
   }
 
   const token = await createAuthToken(resolved.slug, resolved.config.role ?? "user");
-  return c.json({ token });
+  setCookieToken(c, token);
+  return c.json({
+    success: true,
+    user: { id: resolved.slug, role: resolved.config.role ?? "user", displayName: resolved.config.displayName ?? resolved.slug },
+  });
+});
+
+// POST /auth/logout — public
+authPublicRoutes.post("/auth/logout", (c) => {
+  deleteCookie(c, "token", { path: "/api" });
+  return c.json({ success: true });
 });
 
 // GET /auth/me — protected (mounted after JWT middleware)
