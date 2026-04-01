@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { sign } from "hono/jwt";
-import { getUser, getUserByEmail, getUserCredential, getUserByIdentifier } from "../users/manager.js";
-import { verifyPassword } from "../users/password.js";
+import { getUser, getUserByEmail, getUserCredential, getUserByIdentifier, updateUserCredentialPassword } from "../users/manager.js";
+import { verifyPassword, hashPassword } from "../users/password.js";
 
 export const authPublicRoutes = new Hono();
 export const authProtectedRoutes = new Hono();
@@ -25,8 +25,13 @@ authPublicRoutes.post("/auth/login", async (c) => {
   if (!record) {
     return c.json({ error: "invalid credentials" }, 401);
   }
-  if (!verifyPassword(password, record.password)) {
+  const { valid, needsRehash } = await verifyPassword(password, record.password);
+  if (!valid) {
     return c.json({ error: "invalid credentials" }, 401);
+  }
+  if (needsRehash) {
+    const hashed = await hashPassword(password);
+    updateUserCredentialPassword(record.slug, hashed);
   }
 
   const role: "sysuser" | "user" = record.config.role === "sysadmin" ? "sysuser" : "user";

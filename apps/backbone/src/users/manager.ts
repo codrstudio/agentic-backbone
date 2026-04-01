@@ -21,6 +21,7 @@ import {
   DEFAULT_PERMISSIONS,
   SYSTEM_USER,
 } from "./types.js";
+import { hashPassword } from "./password.js";
 
 function parseUserConfig(slug: string): UserConfig | null {
   const mdPath = userMdPath(slug);
@@ -155,7 +156,16 @@ export function getUserByIdentifier(
   return null;
 }
 
-export function createUser(
+export function updateUserCredentialPassword(slug: string, hashedPassword: string): void {
+  const credPath = userCredentialPath(slug);
+  if (existsSync(credPath)) {
+    patchYamlAs(credPath, { password: hashedPassword }, UserCredentialYmlSchema);
+  } else {
+    writeYamlAs(credPath, { type: "user-password", password: hashedPassword }, UserCredentialYmlSchema);
+  }
+}
+
+export async function createUser(
   slug: string,
   displayName: string,
   password: string,
@@ -163,7 +173,7 @@ export function createUser(
   email?: string,
   phoneNumber?: string,
   address?: UserAddress
-): UserConfig {
+): Promise<UserConfig> {
   const dir = userDir(slug);
   mkdirSync(dir, { recursive: true });
   mkdirSync(join(dir, "channels"), { recursive: true });
@@ -183,15 +193,16 @@ export function createUser(
     address: address ?? undefined,
   }, `# ${displayName}\n`, UserMdSchema);
 
+  const hashed = await hashPassword(password);
   writeYamlAs(userCredentialPath(slug), {
     type: "user-password",
-    password,
+    password: hashed,
   }, UserCredentialYmlSchema);
 
   return { slug, displayName, email: userEmail, phoneNumber, permissions: perms, address };
 }
 
-export function updateUser(
+export async function updateUser(
   slug: string,
   updates: {
     displayName?: string;
@@ -202,7 +213,7 @@ export function updateUser(
     address?: UserAddress;
     permissions?: Partial<UserPermissions>;
   }
-): UserConfig | null {
+): Promise<UserConfig | null> {
   if (!userExists(slug)) return null;
 
   const profilePatch: Record<string, unknown> = {};
@@ -224,12 +235,8 @@ export function updateUser(
   const { metadata: updated } = patchMarkdownAs(userMdPath(slug), profilePatch, UserMdSchema);
 
   if (updates.password) {
-    const credPath = userCredentialPath(slug);
-    if (existsSync(credPath)) {
-      patchYamlAs(credPath, { password: updates.password }, UserCredentialYmlSchema);
-    } else {
-      writeYamlAs(credPath, { type: "user-password", password: updates.password }, UserCredentialYmlSchema);
-    }
+    const hashed = await hashPassword(updates.password);
+    updateUserCredentialPassword(slug, hashed);
   }
 
   return {
