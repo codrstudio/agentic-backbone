@@ -86,7 +86,7 @@ export function getUserCredential(
   const credPath = userCredentialPath(slug);
   if (!existsSync(credPath)) return null;
 
-  let cred: ReturnType<typeof UserCredentialYmlSchema.parse>;
+  let cred: { type?: "user-password"; password?: string };
   try {
     cred = readYamlAs(credPath, UserCredentialYmlSchema);
   } catch {
@@ -111,7 +111,7 @@ export function getUserByEmail(
     const mdPath = userMdPath(slug);
     if (!existsSync(mdPath)) continue;
 
-    let data: ReturnType<typeof UserMdSchema.parse>;
+    let data: { email?: string; [key: string]: unknown };
     try {
       data = readMarkdownAs(mdPath, UserMdSchema).metadata;
     } catch {
@@ -137,7 +137,7 @@ export function getUserByIdentifier(
     for (const slug of readdirSync(dir)) {
       const mdPath = userMdPath(slug);
       if (!existsSync(mdPath)) continue;
-      let data: ReturnType<typeof UserMdSchema.parse>;
+      let data: { email?: string; [key: string]: unknown };
       try {
         data = readMarkdownAs(mdPath, UserMdSchema).metadata;
       } catch {
@@ -242,13 +242,13 @@ export async function updateUser(
   return {
     slug: updated.slug ?? slug,
     displayName: updated.displayName ?? slug,
-    email: updated.email,
+    email: updated.email ?? "",
     phoneNumber: updated.phoneNumber,
     role: updated.role,
     permissions: {
-      canCreateAgents: updated.canCreateAgents,
-      canCreateChannels: updated.canCreateChannels,
-      maxAgents: updated.maxAgents,
+      canCreateAgents: updated.canCreateAgents ?? DEFAULT_PERMISSIONS.canCreateAgents,
+      canCreateChannels: updated.canCreateChannels ?? DEFAULT_PERMISSIONS.canCreateChannels,
+      maxAgents: updated.maxAgents ?? DEFAULT_PERMISSIONS.maxAgents,
     },
     address: updated.address,
   };
