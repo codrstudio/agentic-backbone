@@ -283,7 +283,7 @@
     "id": "F-363",
     "name": "Hub settings OTP — configurar instância Evolution dedicada para OTP",
     "description": "Criar interface de configuração OTP no Hub settings. Backbone: adicionar GET /settings/otp e PUT /settings/otp em routes/settings.ts que lê/grava a seção 'otp' de settings.yml via readYaml/patchYamlAs. Hub: criar componente OtpSettings em apps/hub/src/components/settings/otp-settings.tsx com campos: toggle 'Habilitado', 'Host' (URL), 'API Key' (password input), 'Instância' (nome da instância). Registrar em settings.tsx como nova aba 'OTP' no grupo 'Infraestrutura'. A config de Evolution para OTP é dedicada (independente do conector Evolution global) pois uma instância separada é utilizada exclusivamente para envio de OTPs.",
-    "status": "pending",
+    "status": "passing",
     "priority": 14,
     "agent": "coder",
     "task": "vibe-code",
@@ -299,7 +299,8 @@
       "Salvar configuração exibe toast de sucesso",
       "Build compila sem erros"
     ],
-    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab/wave-18/worktree/sprints/sprint-18/3-prps/PRP-24B-otp-pipeline.md"
+    "prp_path": "D:/sources/_unowned/agentic-workflow/context/workspaces/ab/wave-18/worktree/sprints/sprint-18/3-prps/PRP-24B-otp-pipeline.md",
+    "completed_at": "2026-04-01T00:00:00Z"
   },
   {
     "id": "F-362",
