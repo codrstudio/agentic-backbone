@@ -71,7 +71,12 @@ export function processYamlFields(
         // Encrypt non-string values by converting to string first
         result[key] = encryptValue(strValue);
       } else if (direction === "decrypt" && typeof value === "string" && isEncrypted(value)) {
-        result[key] = decryptValue(value);
+        try {
+          result[key] = decryptValue(value);
+        } catch {
+          console.warn(`[encryption] failed to decrypt field '${key}' — keeping encrypted value`);
+          result[key] = value;
+        }
       } else {
         result[key] = value;
       }

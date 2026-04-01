@@ -27,6 +27,9 @@ npm install                   # installs all workspaces
 # Platform services (Docker)
 npm run platform:up           # start infra (MySQL, Redis, etc.)
 npm run platform:down         # stop infra
+
+# Deploy — ver guides/vps-deploy/GUIDE.md
+npm run docker:build          # build imagens (local/CI, nunca na VPS)
 ```
 
 ### Testing

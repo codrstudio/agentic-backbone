@@ -1,329 +1,283 @@
-# Guia: Deploy na VPS
+# Deploy — Agentic Backbone
 
-Referência para publicar o agentic-backbone (e projetos similares) em staging e production na VPS compartilhada. Baseado no modelo operacional do projeto pneu-sos.
+## Infraestrutura
 
----
+| Item | Valor |
+|------|-------|
+| Production | `ab.codr.studio` — `/srv/apps/ab.codr.studio` |
+| Staging | `h.ab.codr.studio` — `/srv/apps/h.ab.codr.studio` |
+| Registry | `ghcr.io/codrstudio/agentic-backbone/{backbone,hub,chat}` |
+| CI | GitHub Actions (`build.yml`) — builda no push de `develop` e `main` |
+| Proxy | Traefik global (TLS via Let's Encrypt) → Caddy por stack |
 
-## Arquitetura Geral
+Convenção de domínio staging: `h.{domain}` (ex: `h.ab.codr.studio`).
 
-```
-GitHub (push) → GitHub Actions (build) → ghcr.io (registry) → VPS (pull + up)
-```
+## Princípio
 
-**Princípio:** a VPS nunca builda. Só faz pull de imagens prontas do registry.
-
----
-
-## Branches e Imagens
-
-| Branch | Trigger | Tags no ghcr.io |
-|--------|---------|-----------------|
-| `develop` | push | `:staging` |
-| `main` | push (merge de develop) | `:latest` + `:release-{n}` |
-
-Imagens por app:
-- `ghcr.io/{org}/agentic-backbone-backbone:staging`
-- `ghcr.io/{org}/agentic-backbone-hub:staging`
-- `ghcr.io/{org}/agentic-backbone-chat:staging`
-
----
-
-## Dockerização
-
-### Um Dockerfile por app
-
-Ficam em `infra/docker/{backbone,hub,chat}/Dockerfile`. O build context é sempre a **raiz do monorepo** — necessário para acessar os packages compartilhados (`packages/ai-sdk`, `packages/ai-chat`, `packages/ui`).
-
-### Backbone (Node.js runtime)
-
-```dockerfile
-FROM node:20-alpine AS deps
-WORKDIR /app
-COPY package.json package-lock.json ./
-COPY apps/backbone/package.json apps/backbone/
-COPY apps/packages/ai-sdk/package.json apps/packages/ai-sdk/
-COPY apps/packages/ai-chat/package.json apps/packages/ai-chat/
-COPY apps/packages/ui/package.json apps/packages/ui/
-RUN npm ci
-
-FROM node:20-alpine
-WORKDIR /app
-COPY --from=deps /app/node_modules ./node_modules
-COPY tsconfig.json ./
-COPY apps/backbone/ apps/backbone/
-COPY apps/packages/ apps/packages/
-CMD ["/app/node_modules/.bin/tsx", "apps/backbone/src/index.ts"]
-```
-
-### Hub / Chat (Vite — build estático)
-
-```dockerfile
-FROM node:20-alpine AS build
-WORKDIR /app
-COPY package.json package-lock.json ./
-COPY apps/hub/package.json apps/hub/
-COPY apps/packages/ai-chat/package.json apps/packages/ai-chat/
-COPY apps/packages/ui/package.json apps/packages/ui/
-RUN npm ci
-COPY tsconfig.json ./
-COPY apps/hub/ apps/hub/
-COPY apps/packages/ apps/packages/
-RUN npm run build --workspace=apps/hub
-
-FROM nginx:alpine
-COPY --from=build /app/apps/hub/dist /usr/share/nginx/html
-```
-
-**Multi-stage:** deps numa camada, código na outra. O `npm ci` usa cache de camada porque os `package.json` mudam pouco.
-
----
-
-## Estrutura na VPS
-
-O compose de deploy fica no próprio repo. Na VPS, cada ambiente é um clone:
+**A VPS nunca builda.** Build é pesado e compete por recursos com produção. A VPS só faz `pull` de imagens prontas e `up`.
 
 ```
-/srv/apps/h.backbone.chega.la/   ← git clone, branch develop (staging)
-/srv/apps/backbone.chega.la/     ← git clone, branch main (production)
+push → GitHub Actions (build) → ghcr.io → VPS (pull + up)
 ```
 
 ---
 
-## Proxy: Traefik + Caddy
+## Branches e Tags
 
-Dois níveis de reverse proxy com separação de responsabilidades:
+| Branch | Propósito | Tag no ghcr.io |
+|--------|-----------|----------------|
+| `develop` | Trabalho diário | `:staging` |
+| `main` | Código aprovado | `:latest` + `:release-{n}` |
 
-| Camada | Escopo | Responsabilidade |
-|--------|--------|------------------|
-| **Traefik** | Global na VPS | TLS (Let's Encrypt), roteamento por domínio |
-| **Caddy** | Local da stack | Roteamento por path (`/api/*` → backbone, `/hub/*` → hub) |
-
-- Traefik: "qual domínio?" → encaminha pro Caddy certo
-- Caddy: "qual path?" → encaminha pro serviço certo
-
-Se houver apenas um projeto na VPS, Traefik sozinho resolve (rotas por path direto nele).
+Tags `release-{n}` marcam versões promovidas a produção e servem para rollback.
 
 ---
 
-## Secrets: dotenvx
+## Estrutura do projeto
 
-Criptografa `.env.staging` e `.env.production` direto no repo com chave simétrica.
+### Dockerfiles (build)
 
-- `.env.keys` fica na VPS (raiz do clone) e localmente — **nunca no git**
-- Decrypt: `npx dotenvx decrypt`
-- Zero dependências extras (vs SOPS/age que precisam de binários)
-- Suficiente para projetos pequenos/médios. Para KMS ou rotação de chaves, usar SOPS.
+Ficam junto das apps. Build context é sempre a **raiz do monorepo**.
 
----
+| App | Dockerfile | Base | Porta interna |
+|-----|-----------|------|---------------|
+| backbone | `apps/backbone/Dockerfile` | node:22-slim | `${BACKBONE_PORT}` |
+| hub | `apps/hub/Dockerfile` | nginx:alpine | 80 |
+| chat | `apps/chat/Dockerfile` | nginx:alpine | 80 |
 
-## Portas: PREFIX para multi-tenant
+### `deploy/` (VPS)
 
-Cada instância usa um `PREFIX` numérico no `.env`. Portas derivam dele:
+Pasta commitada no repo. Na VPS, `docker compose` roda de dentro dela.
 
-```env
-PREFIX=60
-BACKBONE_PORT=6002
-HUB_PORT=6005
-CHAT_PORT=6006
+```
+deploy/
+  docker-compose.yml   ← compose de VPS (pull-only, sem build:)
+  Caddyfile            ← roteamento por path
+  env/
+    staging.env        ← template .env staging (sem secrets reais)
+    production.env     ← template .env production (sem secrets reais)
+  GUIDE.md             ← (este arquivo, movido para cá no futuro)
 ```
 
-No compose, usar `${BACKBONE_PORT}`, `${HUB_PORT}`, etc. Cada instância de cliente usa PREFIX diferente → portas nunca colidem.
+### `docker-compose.yml` (raiz)
 
-As portas ficam na rede interna Docker (não expostas no host). Caddy fala com `backbone.internal:${BACKBONE_PORT}`.
+Compose de **desenvolvimento/CI**. Tem `build:` + `image:`. Usado por:
+- `npm run docker:build` — build local ou CI
+- `npm run docker:up` — teste local com containers
 
 ---
 
-## Health Checks
+## Arquitetura Docker (VPS)
 
-### Docker healthcheck (compose)
-
-```yaml
-healthcheck:
-  test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:${BACKBONE_PORT}/api/v1/ai/health"]
-  interval: 10s
-  retries: 5
+```
+Traefik (*.codr.studio, TLS)
+  └─ Caddy :80 (único serviço na codr-net)
+       ├─ /api/*    → backbone.internal:${BACKBONE_PORT}
+       ├─ /hub/*    → hub.internal:80
+       ├─ /chat/*   → chat.internal:80
+       ├─ /health   → "OK"
+       └─ /         → redirect /hub/
 ```
 
-Garante `depends_on: condition: service_healthy` — Caddy só sobe quando backbone está healthy.
+Todos os serviços na rede `internal`. Caddy é a única ponte com `codr-net` (Traefik).
 
-### Validação manual pós-deploy
+---
+
+## Fluxos
+
+### 1. Deploy em Staging
+
+**Pré-requisitos (one-time):**
+1. Repo no GitHub com Actions configurado (`build.yml`)
+2. VPS com Traefik rodando, `codr-net` criada
+3. Repo clonado em `/srv/apps/h.ab.codr.studio`
+4. `deploy/.env` com secrets reais
+5. `docker login ghcr.io` feito na VPS
+
+**Fluxo:**
+
+```
+1. Developer faz push em develop
+       ↓
+2. GitHub Actions dispara build.yml:
+   - Checkout do repo
+   - Login no ghcr.io
+   - Build das 3 imagens em paralelo (matrix):
+     - apps/backbone/Dockerfile → ghcr.io/.../backbone:staging
+     - apps/hub/Dockerfile      → ghcr.io/.../hub:staging
+     - apps/chat/Dockerfile     → ghcr.io/.../chat:staging
+   - Push para ghcr.io
+       ↓
+3. SSH na VPS:
+   cd /srv/apps/h.ab.codr.studio
+   git pull origin develop
+       ↓
+4. cd deploy
+   docker compose pull
+       ↓
+5. docker compose up -d
+       ↓
+6. Validação:
+   curl -sk https://h.ab.codr.studio/health
+   curl -sk https://h.ab.codr.studio/api/v1/ai/health
+   curl -sk https://h.ab.codr.studio/hub/ -o /dev/null -w "%{http_code}"
+   curl -sk https://h.ab.codr.studio/chat/ -o /dev/null -w "%{http_code}"
+```
+
+### 2. Promover para Production
 
 ```bash
-curl -sk https://backbone.chega.la/api/v1/ai/health
-```
-
----
-
-## SQLite: Cuidados Específicos
-
-Diferente de Postgres (que roda em container próprio), SQLite é arquivo no filesystem.
-
-### Volume persistente obrigatório
-
-```yaml
-volumes:
-  - backbone-data:/app/data
-```
-
-O diretório `data/` (onde ficam `backbone.sqlite`, sessions, memory DBs) **não pode ficar dentro da imagem** — seria perdido no `docker compose up -d` com nova imagem.
-
-### Context directory
-
-O `context/` (agentes, channels, adapters) é filesystem. Duas opções:
-1. **Volume montado** — dados persistem entre deploys
-2. **No repo** — `git pull` atualiza junto com o código
-
-### Limitação de concorrência
-
-SQLite não suporta acesso concorrente de múltiplos processos. Single instance obrigatório (WAL mode já ativo). Para escalar horizontalmente, migrar para Postgres.
-
----
-
-## GitHub Actions: Workflow com Matrix Strategy
-
-Um workflow único builda todas as imagens em paralelo via matrix:
-
-```yaml
-# .github/workflows/build.yml
-name: Build & Push
-
-on:
-  push:
-    branches: [develop, main]
-    tags: ['release-*']
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        service:
-          - name: backbone
-            dockerfile: infra/docker/backbone/Dockerfile
-          - name: hub
-            dockerfile: infra/docker/hub/Dockerfile
-          - name: chat
-            dockerfile: infra/docker/chat/Dockerfile
-    steps:
-      - uses: actions/checkout@v4
-      - uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-      - uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: ${{ matrix.service.dockerfile }}
-          push: true
-          tags: # lógica de tags abaixo
-```
-
-Lógica de tags:
-- `refs/heads/develop` → `:staging`
-- `refs/heads/main` → `:latest`
-- `refs/tags/release-*` → `:release-N` + `:latest`
-
-No Actions, a auth para ghcr.io é automática via `${{ secrets.GITHUB_TOKEN }}` (já vem com `packages:write`).
-
-### Auth na VPS (ghcr.io pull)
-
-PAT com scope `read:packages`. Login uma vez:
-
-```bash
-docker login ghcr.io -u <github-user> -p <PAT>
-```
-
-Docker salva credenciais em `~/.docker/config.json`. `docker compose pull` funciona sem re-autenticar.
-
----
-
-## Traefik: Labels no Compose
-
-Traefik detecta serviços automaticamente via Docker provider. Labels no serviço Caddy do compose:
-
-```yaml
-caddy:
-  labels:
-    - "traefik.enable=true"
-    - "traefik.docker.network=codr-net"
-    - "traefik.http.routers.backbone-${ENVIRONMENT}.rule=Host(`${PUBLIC_DOMAIN}`)"
-    - "traefik.http.routers.backbone-${ENVIRONMENT}.entrypoints=websecure"
-    - "traefik.http.routers.backbone-${ENVIRONMENT}.tls.certresolver=letsencrypt"
-    - "traefik.http.services.backbone-${ENVIRONMENT}.loadbalancer.server.port=80"
-```
-
-Cada stack se auto-registra no Traefik. Zero config central — sobe o compose e o Traefik já roteia.
-
----
-
-## Zero Downtime
-
-Atualmente: nenhum mecanismo. `docker compose up -d` recria containers com alguns segundos de gap. Aceitável para apps B2B com poucos usuários simultâneos.
-
-Opções futuras se necessário:
-- `docker compose up -d --no-deps --wait <servico>` — recria um serviço por vez
-- Blue-green com dois stacks alternando no Traefik
-
----
-
-## Fluxos de Deploy
-
-### Staging
-
-1. Dev faz push em `develop`
-2. GitHub Actions builda imagens e publica com tag `:staging`
-3. Na VPS:
-```bash
-cd /srv/apps/h.backbone.chega.la
-git pull
-docker compose pull
-docker compose up -d
-curl -sk https://h.backbone.chega.la/api/v1/ai/health
-```
-
-### Production
-
-1. Merge `develop` → `main`, push, criar tag:
-```bash
+# Local:
 git checkout main
 git merge develop
 git push origin main
 git tag release-{n}
-git push origin release-{n}
-```
-2. Actions builda `:latest` + `:release-{n}`
-3. Na VPS:
-```bash
-cd /srv/apps/backbone.chega.la
-git pull
+git push --tags
+
+# Aguardar Actions buildar :latest + :release-{n}
+
+# Na VPS:
+cd /srv/apps/ab.codr.studio
+git pull origin main
+cd deploy
 docker compose pull
 docker compose up -d
-curl -sk https://backbone.chega.la/api/v1/ai/health
+
+# Validação:
+curl -sk https://ab.codr.studio/health
+curl -sk https://ab.codr.studio/api/v1/ai/health
 ```
 
-### Rollback
-
-Imagens versionadas ficam no ghcr.io. Rollback = trocar a tag:
+### 3. Rollback
 
 ```bash
-cd /srv/apps/backbone.chega.la
+cd /srv/apps/ab.codr.studio
+git checkout release-{n-1}
+cd deploy
 TAG=release-{n-1} docker compose pull
 TAG=release-{n-1} docker compose up -d
 ```
 
-O compose usa `image: ghcr.io/.../backbone:${TAG:-latest}` para aceitar override.
+Imagens anteriores ficam no ghcr.io. Rollback é só trocar a tag.
+
+### 4. Validação pós-deploy
+
+```bash
+/health                  → OK
+/api/v1/ai/health        → {"status":"ok"}
+/hub/                    → 200
+/chat/                   → 200
+```
 
 ---
 
-## Checklist de Setup Inicial
+## GitHub Actions
 
-- [ ] Criar Dockerfiles em `infra/docker/{backbone,hub,chat}/Dockerfile`
-- [ ] Criar `deploy/docker-compose.yml` com serviços, volumes e healthchecks
-- [ ] Criar `deploy/Caddyfile` com rotas por path
-- [ ] Criar `.github/workflows/build.yml` (CI — build + push para ghcr.io)
-- [ ] Configurar `.env.staging` e `.env.production` com dotenvx
-- [ ] Na VPS: clonar repo em `/srv/apps/{dominio}/`, colocar `.env.keys`
-- [ ] Na VPS: configurar Traefik labels ou arquivo estático para o domínio
-- [ ] Na VPS: `docker login ghcr.io` com PAT (scope `read:packages`)
-- [ ] Testar fluxo completo: push develop → staging → validar → merge main → production
+CI builda as 3 imagens em paralelo via matrix strategy no push de `develop` e `main`.
+
+Lógica de tags:
+- `refs/heads/develop` → `:staging`
+- `refs/heads/main` → `:latest`
+- `refs/tags/release-*` → `:release-{n}` + `:latest`
+
+Auth na VPS (uma vez):
+
+```bash
+docker login ghcr.io -u <github-user> -p <PAT-com-read:packages>
+```
+
+---
+
+## Secrets
+
+`.env` na VPS contém todos os secrets. **Nunca commitar no git.**
+
+Variáveis críticas:
+- `JWT_SECRET` — gerado via `npm run setup`
+- `ENCRYPTION_KEY` — gerado via `npm run setup`
+- `OPENROUTER_API_KEY` — acesso à API de LLM
+
+**Importante:** a `ENCRYPTION_KEY` deve ser a mesma que encriptou os YAMLs em `context/credentials/`. Se trocar a chave, os valores `ENC(...)` precisam ser re-encriptados.
+
+Templates sem secrets reais ficam em `deploy/env/`.
+
+---
+
+## Portas (PREFIX)
+
+Cada instância usa um `PREFIX` numérico. Portas derivam dele:
+
+```env
+PREFIX=60
+PUBLIC_PORT=6000    # Caddy (entry point via Traefik)
+BACKBONE_PORT=6002  # porta real do Node.js
+HUB_PORT=6001       # usado no dev; em Docker hub serve na 80
+CHAT_PORT=6003      # usado no dev; em Docker chat serve na 80
+```
+
+Portas ficam na rede interna Docker — não expostas no host.
+
+---
+
+## Notas técnicas (Dockerfiles)
+
+- **Backbone**: `tsconfig.build.json` com `noCheck: true` (transpila sem type-checking)
+- **Hub/Chat**: `npm i @rollup/rollup-linux-x64-gnu` após `npm ci` (fix de rollup cross-platform)
+- **Hub/Chat**: `.env` copiado para builder (necessário para `VITE_*` em build time)
+- **Hub/Chat**: output vai para `/usr/share/nginx/html/{hub,chat}/` (subdiretório)
+- **SQLite**: volume `data/` obrigatório — sem ele, DB é perdido no recreate
+- **Context**: volume `context/` — agentes, channels, credentials
+
+---
+
+## Guardrails
+
+1. **Staging primeiro, sempre.** Nunca deployar direto em prod.
+2. **Não derrubar prod** sem autorização explícita.
+3. **Avançar por etapas.** Cada etapa validada antes de avançar.
+
+---
+
+## Setup inicial da VPS (one-time)
+
+```bash
+# 1. Rede (se ainda não existir)
+docker network create codr-net
+
+# 2. Clonar
+git clone git@github.com:codrstudio/agentic-backbone.git /srv/apps/<dominio>
+cd /srv/apps/<dominio>
+git checkout <branch>
+
+# 3. Secrets
+cp deploy/env/<ambiente>.env deploy/.env
+# Editar deploy/.env com secrets reais
+
+# 4. Registry
+docker login ghcr.io -u <github-user> -p <PAT>
+
+# 5. Subir
+cd deploy
+docker compose pull
+docker compose up -d
+
+# 6. DNS
+# Criar registro A apontando <dominio> para a VPS
+# Traefik gera TLS automaticamente via Let's Encrypt
+```
+
+---
+
+## Checklist
+
+- [ ] Dockerfiles em `apps/{backbone,hub,chat}/Dockerfile`
+- [ ] `.dockerignore` na raiz
+- [ ] `deploy/docker-compose.yml` (pull-only, sem build)
+- [ ] `deploy/Caddyfile`
+- [ ] `deploy/env/` com templates
+- [ ] `.github/workflows/build.yml` (CI)
+- [ ] `image:` no `docker-compose.yml` raiz (para tagear no build)
+- [ ] `.env` de produção na VPS
+- [ ] Traefik labels no Caddy
+- [ ] `docker login ghcr.io` na VPS
+- [ ] DNS apontando para a VPS
