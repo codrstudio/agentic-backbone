@@ -58,3 +58,20 @@ export { ChoiceButtonsRenderer } from "./display/ChoiceButtonsRenderer.js";
 // Display Registry
 export { defaultDisplayRenderers, resolveDisplayRenderer } from "./display/registry.js";
 export type { DisplayRendererMap, DisplayActionName } from "./display/registry.js";
+
+// Conversation management
+export {
+  ConversationList,
+  ConversationBar,
+  formatRelativeTime,
+  buildInitialMessages,
+  groupConversations,
+} from "./conversations/index.js";
+export type {
+  ConversationListProps,
+  ConversationBarProps,
+  Conversation,
+  BackendMessage,
+} from "./conversations/index.js";
+
+export { useIsMobile } from "./hooks/useIsMobile.js";
