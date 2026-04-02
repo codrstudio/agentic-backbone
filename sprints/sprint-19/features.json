@@ -3,7 +3,8 @@
     "id": "F-364",
     "name": "Primitivos shadcn — Input, DropdownMenu, Skeleton",
     "description": "Adicionar 3 primitivos shadcn ao @codrstudio/agentic-chat em src/ui/: input.tsx (input HTML puro com cn()), dropdown-menu.tsx (baseado em @radix-ui/react-dropdown-menu com exports DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator), skeleton.tsx (div com animate-pulse). Adicionar @radix-ui/react-dropdown-menu: ^2 ao package.json. Seguir padrao shadcn ja adotado no pacote.",
-    "status": "pending",
+    "status": "passing",
+    "completed_at": "2026-04-01T00:00:00.000Z",
     "priority": 1,
     "agent": "coder",
     "task": "vibe-code",
@@ -40,11 +41,13 @@
     "id": "F-366",
     "name": "Hook useConversations standalone",
     "description": "Criar src/conversations/useConversations.ts: hook standalone (sem TanStack Query) com UseConversationsOptions (endpoint, token, fetcher, autoFetch) e UseConversationsReturn (conversations, isLoading, error, refresh, create, rename, star com optimistic update, remove, exportUrl). Usa useState + useCallback + fetch. Paths /api/v1/ai/conversations/*. star() faz update otimista com rollback em erro. remove() remove do estado local apos DELETE bem-sucedido. create() adiciona ao estado local apos POST bem-sucedido. exportUrl() retorna URL com ?token= para download direto.",
-    "status": "pending",
+    "status": "blocked",
     "priority": 3,
     "agent": "coder",
     "task": "vibe-code",
-    "dependencies": ["F-365"],
+    "dependencies": [
+      "F-365"
+    ],
     "tests": [
       "useConversations hook exportado de src/conversations/useConversations.ts",
       "fetch lista de conversas no mount quando autoFetch=true",
@@ -62,11 +65,14 @@
     "id": "F-367",
     "name": "Componentes internos — CollapsibleGroup, ConversationListItem, RenameDialog, DeleteDialog",
     "description": "Criar 4 componentes internos em src/conversations/ (nao exportados publicamente). CollapsibleGroup: label, icon, open, onToggle, children — chevron rotaciona 90deg quando aberto, label em text-xs font-medium text-muted-foreground. ConversationListItem: conversation, agentLabel, isActive, isRenaming, renameValue, callbacks, badgesExtra slot — star icon a esquerda (amarelo quando starred), area clicavel central com badges + timestamp + titulo, pencil icon a direita no hover, inline rename input. RenameDialog: dialog modal com Enter confirma, botao desabilitado quando vazio ou isPending, labels customizaveis. DeleteDialog: dialog de confirmacao com botao variant=destructive, labels customizaveis.",
-    "status": "pending",
+    "status": "blocked",
     "priority": 4,
     "agent": "coder",
     "task": "vibe-code",
-    "dependencies": ["F-364", "F-365"],
+    "dependencies": [
+      "F-364",
+      "F-365"
+    ],
     "tests": [
       "CollapsibleGroup renderiza label + chevron, colapsa/expande ao clicar",
       "ConversationListItem renderiza star, badges, titulo, timestamp, pencil no hover",
@@ -84,11 +90,13 @@
     "id": "F-368",
     "name": "ConversationList — sidebar principal",
     "description": "Criar src/conversations/ConversationList.tsx: componente controlado principal da sidebar. Props: conversations, activeId, isLoading, search/onSearchChange, favorites/history override, labels i18n (searchPlaceholder, favoritesLabel, historyLabel, loadMoreLabel), hasMore/onLoadMore/remainingCount, callbacks (onSelect, onRename, onStar, onCreateRequest), getAgentLabel resolver, slots (headerExtra, filterExtra, itemBadgesExtra como funcao), emptyIcon/emptyTitle/emptyDescription. Estado interno: renamingId/renameValue, favoritesOpen/historyOpen. Loading: 8 Skeletons h-16. Empty state: icone centralizado + titulo + descricao. Se favorites/history nao fornecidos, deriva de conversations via groupConversations. ScrollArea para overflow.",
-    "status": "pending",
+    "status": "blocked",
     "priority": 5,
     "agent": "coder",
     "task": "vibe-code",
-    "dependencies": ["F-367"],
+    "dependencies": [
+      "F-367"
+    ],
     "tests": [
       "ConversationList renderiza com dados mockados (favorites + history)",
       "Input de busca visivel e dispara onSearchChange",
@@ -109,11 +117,13 @@
     "id": "F-369",
     "name": "ConversationBar — barra de contexto",
     "description": "Criar src/conversations/ConversationBar.tsx: componente controlado para barra de contexto no topo do chat. Props: title, agentLabel, isLoading, onRename/onExport/onDelete/onBack, controlled/uncontrolled dialog states (renameOpen/onRenameOpenChange, deleteOpen/onDeleteOpenChange), isPendingRename/isPendingDelete, labels i18n (renameLabel, exportLabel, deleteLabel, untitledLabel), slots (actionsExtra antes do dropdown, menuItemsExtra dentro do dropdown, afterBar abaixo da barra). Dropdown com DropdownMenu: Renomear (Pencil), Exportar (Download), menuItemsExtra, Separator, Excluir (Trash2, text-destructive). Se renameOpen/onRenameOpenChange nao fornecidos, gerencia dialogs internamente (uncontrolled mode). Loading: Skeleton no titulo.",
-    "status": "pending",
+    "status": "blocked",
     "priority": 6,
     "agent": "coder",
     "task": "vibe-code",
-    "dependencies": ["F-367"],
+    "dependencies": [
+      "F-367"
+    ],
     "tests": [
       "ConversationBar mostra titulo + agent badge",
       "Dropdown menu: Renomear abre RenameDialog, Exportar dispara callback, Excluir abre DeleteDialog",
@@ -133,11 +143,15 @@
     "id": "F-370",
     "name": "Barrel exports — API publica do pacote",
     "description": "Criar src/conversations/index.ts com barrel exports: ConversationList, ConversationListProps, ConversationBar, ConversationBarProps, useConversations, UseConversationsOptions, UseConversationsReturn, useIsMobile, formatRelativeTime, buildInitialMessages, groupConversations, Conversation, BackendMessage. Atualizar src/index.ts adicionando re-exports de ./conversations/index.js. Componentes internos (CollapsibleGroup, ConversationListItem, RenameDialog, DeleteDialog) NAO sao exportados. Extensoes .js nos imports (ESM). Manter exports existentes do pacote intactos.",
-    "status": "pending",
+    "status": "blocked",
     "priority": 7,
     "agent": "coder",
     "task": "vibe-code",
-    "dependencies": ["F-366", "F-368", "F-369"],
+    "dependencies": [
+      "F-366",
+      "F-368",
+      "F-369"
+    ],
     "tests": [
       "src/conversations/index.ts criado com todos os exports publicos",
       "src/index.ts atualizado com re-exports de conversations",
@@ -152,11 +166,13 @@
     "id": "F-371",
     "name": "Hub conversations-layout refactor",
     "description": "Refatorar apps/hub/src/components/conversations/conversations-layout.tsx de ~565 para ~120 linhas: importar ConversationList e groupConversations de @codrstudio/agentic-chat. Remover CollapsibleGroup, ConversationListItem, formatRelativeTime locais, toda logica de renderizacao de items e grupos, estado de rename inline. Manter TanStack Query (useQuery, mutations com optimistic update), filtering hub-specific (agentFilter, operatorFilter, search), dialog de nova conversa (agent selector), layout flex com sidebar + Outlet. Passar features hub-specific via slots: headerExtra (operator filter button), filterExtra (agent Select), itemBadgesExtra (badge de operador). Labels em pt-BR.",
-    "status": "pending",
+    "status": "blocked",
     "priority": 8,
     "agent": "coder",
     "task": "vibe-code",
-    "dependencies": ["F-370"],
+    "dependencies": [
+      "F-370"
+    ],
     "tests": [
       "Sidebar de conversas funciona identico ao atual",
       "Busca por titulo funciona",
@@ -176,11 +192,13 @@
     "id": "F-372",
     "name": "Hub conversation-chat refactor + mapper",
     "description": "Refatorar apps/hub/src/components/conversations/conversation-chat.tsx de ~460 para ~100 linhas: importar ConversationBar e buildInitialMessages de @codrstudio/agentic-chat. Remover buildInitialMessages local, RenameDialog/DeleteDialog inline, header bar manual, dropdown menu manual. Manter TanStack Query, mutations, TakeoverButton/TakeoverBanner/ApprovalInlineActions, OrchestrationSidebar. Passar via slots: actionsExtra (TakeoverButton), afterBar (TakeoverBanner + ApprovalInlineActions). Labels em pt-BR. Atualizar apps/hub/src/api/conversations.ts: sessionToConversation inclui metadata: { takeover_by, takeover_at } mantendo campos diretos para compatibilidade.",
-    "status": "pending",
+    "status": "blocked",
     "priority": 9,
     "agent": "coder",
     "task": "vibe-code",
-    "dependencies": ["F-370"],
+    "dependencies": [
+      "F-370"
+    ],
     "tests": [
       "Barra de contexto mostra titulo + agente",
       "Menu: Renomear, Exportar, Excluir funcionam",
