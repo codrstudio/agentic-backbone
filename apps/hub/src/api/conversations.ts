@@ -10,6 +10,7 @@ export interface Conversation {
   starred: boolean;
   takeover_by: string | null;
   takeover_at: string | null;
+  metadata?: Record<string, unknown>;
 }
 
 export interface Session {
@@ -48,6 +49,10 @@ function sessionToConversation(s: Session): Conversation {
     starred: s.starred === 1,
     takeover_by: s.takeover_by,
     takeover_at: s.takeover_at,
+    metadata: {
+      takeover_by: s.takeover_by,
+      takeover_at: s.takeover_at,
+    },
   };
 }
 
