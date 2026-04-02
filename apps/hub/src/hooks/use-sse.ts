@@ -35,12 +35,13 @@ const MAX_DELAY = 30_000;
 export function useSSE(options?: UseSSEOptions): UseSSEResult {
   const enabled = options?.enabled ?? true;
   const token = useAuthStore((s) => s.token);
+  const user = useAuthStore((s) => s.user);
   const [connected, setConnected] = useState(false);
   const [lastEvent, setLastEvent] = useState<SystemEvent | null>(null);
   const retryDelay = useRef(MIN_DELAY);
 
   useEffect(() => {
-    if (!enabled || !token) {
+    if (!enabled || !user) {
       setConnected(false);
       return;
     }
@@ -52,7 +53,11 @@ export function useSSE(options?: UseSSEOptions): UseSSEResult {
     function connect() {
       if (disposed) return;
 
-      es = new EventSource(`/api/v1/ai/system/events?token=${encodeURIComponent(token!)}`);
+      // Use token param if available, otherwise rely on Authelia cookie
+      const sseUrl = token
+        ? `/api/v1/ai/system/events?token=${encodeURIComponent(token)}`
+        : `/api/v1/ai/system/events`;
+      es = new EventSource(sseUrl, { withCredentials: true });
 
       es.onopen = () => {
         retryDelay.current = MIN_DELAY;
@@ -90,7 +95,7 @@ export function useSSE(options?: UseSSEOptions): UseSSEResult {
       if (retryTimer) clearTimeout(retryTimer);
       setConnected(false);
     };
-  }, [enabled, token]);
+  }, [enabled, user, token]);
 
   return { connected, lastEvent };
 }

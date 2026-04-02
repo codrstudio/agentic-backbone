@@ -51,6 +51,9 @@ authProtectedRoutes.get("/auth/me", (c) => {
   return c.json({
     user: payload.sub,
     role: payload.role,
-    displayName: userConfig?.displayName ?? payload.sub,
+    displayName: userConfig?.displayName ?? payload.displayName ?? payload.sub,
+    authSource: payload.jwtSource ?? "backbone",
+    ...(payload.email ? { email: payload.email } : {}),
+    ...(payload.groups ? { groups: payload.groups } : {}),
   });
 });

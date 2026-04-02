@@ -84,6 +84,23 @@ routes.use("*", async (c, next) => {
     return next();
   }
 
+  // ── Authelia header auth (trusted — set by nginx after auth_request) ──
+  const remoteUser = c.req.header("Remote-User");
+  if (remoteUser) {
+    const remoteEmail = c.req.header("Remote-Email") ?? "";
+    const remoteGroups = c.req.header("Remote-Groups") ?? "";
+    const remoteName = c.req.header("Remote-Name") ?? remoteUser;
+    c.set("jwtPayload", {
+      sub: remoteUser.toLowerCase(),
+      role: "sysuser",
+      displayName: remoteName,
+      email: remoteEmail,
+      groups: remoteGroups.split(",").map((g: string) => g.trim()).filter(Boolean),
+      jwtSource: "authelia",
+    });
+    return next();
+  }
+
   const secret = process.env.JWT_SECRET!;
 
   // Try Authorization header first

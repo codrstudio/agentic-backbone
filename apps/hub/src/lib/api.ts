@@ -29,7 +29,11 @@ export async function request<T>(
     headers.set("Content-Type", "application/json");
   }
 
-  const res = await fetch(`${BASE_PATH}${path}`, { ...options, headers });
+  const res = await fetch(`${BASE_PATH}${path}`, {
+    ...options,
+    headers,
+    credentials: "include",
+  });
 
   if (res.status === 401) {
     useAuthStore.getState().logout();

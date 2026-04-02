@@ -1,5 +1,5 @@
-import { useCallback } from "react";
-import { createFileRoute, Outlet, Navigate } from "@tanstack/react-router";
+import { useCallback, useEffect, useState } from "react";
+import { createFileRoute, Outlet } from "@tanstack/react-router";
 import { useAuthStore } from "@/lib/auth";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/layout/app-sidebar";
@@ -31,8 +31,24 @@ function AuthenticatedError({ error, reset }: { error: unknown; reset: () => voi
 }
 
 function AuthenticatedLayout() {
-  const token = useAuthStore((s) => s.token);
-  useSSE({ enabled: !!token });
+  const { token, user, checkSession } = useAuthStore();
+  const [checking, setChecking] = useState(!user);
+
+  useEffect(() => {
+    if (user) {
+      setChecking(false);
+      return;
+    }
+    checkSession().then((ok) => {
+      if (!ok) {
+        const rd = encodeURIComponent(window.location.href);
+        window.location.href = `https://proxy.processa.info/?rd=${rd}`;
+      }
+      setChecking(false);
+    });
+  }, [user, checkSession]);
+
+  useSSE({ enabled: !!user });
 
   useSSEEvent(
     "agent:quota-exceeded",
@@ -56,8 +72,16 @@ function AuthenticatedLayout() {
     }, []),
   );
 
-  if (!token) {
-    return <Navigate to="/login" />;
+  if (checking) {
+    return (
+      <div className="flex min-h-svh items-center justify-center bg-background">
+        <p className="text-sm text-muted-foreground">Verificando sessão...</p>
+      </div>
+    );
+  }
+
+  if (!user && !token) {
+    return null;
   }
 
   return (
