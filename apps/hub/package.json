@@ -9,7 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@codrstudio/agentic-chat": "github:codrstudio/agentic-chat#v0.1.0",
+    "@codrstudio/agentic-chat": "github:codrstudio/agentic-chat#main",
     "@base-ui/react": "^1.2.0",
     "@fontsource-variable/inter": "^5.2.8",
     "@fontsource-variable/jetbrains-mono": "^5.2.8",

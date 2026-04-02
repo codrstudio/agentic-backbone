@@ -12,7 +12,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@codrstudio/agentic-chat": "github:codrstudio/agentic-chat#v0.1.0",
+    "@codrstudio/agentic-chat": "github:codrstudio/agentic-chat#main",
     "@hookform/resolvers": "^5.0.0",
     "@phosphor-icons/react": "^2.1.10",
     "@tanstack/react-query": "^5.60.0",

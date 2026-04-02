@@ -84,7 +84,7 @@ services:
   # BACKBONE — Node.js runtime
   # ============================================================================
   backbone:
-    image: ghcr.io/gugacoder/agentic-backbone/backbone:${TAG:-staging}
+    image: ghcr.io/codrstudio/agentic-backbone/backbone:${TAG:-staging}
     restart: unless-stopped
     depends_on:
       postgres:
@@ -114,7 +114,7 @@ services:
   # HUB — Vite React SPA (nginx)
   # ============================================================================
   hub:
-    image: ghcr.io/gugacoder/agentic-backbone/hub:${TAG:-staging}
+    image: ghcr.io/codrstudio/agentic-backbone/hub:${TAG:-staging}
     restart: unless-stopped
     networks:
       internal:
@@ -130,7 +130,7 @@ services:
   # CHAT — Vite React SPA (nginx)
   # ============================================================================
   chat:
-    image: ghcr.io/gugacoder/agentic-backbone/chat:${TAG:-staging}
+    image: ghcr.io/codrstudio/agentic-backbone/chat:${TAG:-staging}
     restart: unless-stopped
     networks:
       internal:

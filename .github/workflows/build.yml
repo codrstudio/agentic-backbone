@@ -15,7 +15,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_PREFIX: ghcr.io/gugacoder/agentic-backbone
+  IMAGE_PREFIX: ghcr.io/codrstudio/agentic-backbone
 
 jobs:
   build:

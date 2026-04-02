@@ -5,7 +5,7 @@ include:
 
 services:
   backbone:
-    image: ghcr.io/gugacoder/agentic-backbone/backbone:${TAG:-staging}
+    image: ghcr.io/codrstudio/agentic-backbone/backbone:${TAG:-staging}
     build:
       context: .
       dockerfile: apps/backbone/Dockerfile
@@ -26,7 +26,7 @@ services:
       shared-net:
 
   hub:
-    image: ghcr.io/gugacoder/agentic-backbone/hub:${TAG:-staging}
+    image: ghcr.io/codrstudio/agentic-backbone/hub:${TAG:-staging}
     build:
       context: .
       dockerfile: apps/hub/Dockerfile
@@ -45,7 +45,7 @@ services:
       shared-net:
 
   chat:
-    image: ghcr.io/gugacoder/agentic-backbone/chat:${TAG:-staging}
+    image: ghcr.io/codrstudio/agentic-backbone/chat:${TAG:-staging}
     build:
       context: .
       dockerfile: apps/chat/Dockerfile
