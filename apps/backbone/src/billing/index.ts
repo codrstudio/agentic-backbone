@@ -34,10 +34,22 @@ function getMsUntilNextConsolidation(): number {
   return next.getTime() - now.getTime();
 }
 
+const MAX_TIMEOUT = 2_147_483_647; // 2^31 - 1 ms (~24.8 days)
+
 function scheduleNextConsolidation(): void {
   if (_cronTimer) clearTimeout(_cronTimer);
 
   const delayMs = getMsUntilNextConsolidation();
+
+  // setTimeout overflows at 2^31-1 ms — if delay is larger, set an
+  // intermediate wake-up that re-calculates the remaining time.
+  if (delayMs > MAX_TIMEOUT) {
+    _cronTimer = setTimeout(() => scheduleNextConsolidation(), MAX_TIMEOUT);
+    if (_cronTimer.unref) _cronTimer.unref();
+    const nextDate = new Date(Date.now() + delayMs);
+    console.log(`[billing] auto-consolidation scheduled for ${nextDate.toISOString()}`);
+    return;
+  }
 
   _cronTimer = setTimeout(() => {
     const now = new Date();
