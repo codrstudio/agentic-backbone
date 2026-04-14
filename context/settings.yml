@@ -1,9 +1,9 @@
-active-plan: free
+active-plan: sandbox
 otp:
   enabled: false
   evolution:
     host: https://evo.example.com
-    api-key: ${EVOLUTION_OTP_API_KEY}
+    api-key: null
     instance: otp-instance
 security:
   message-filter: false
@@ -32,7 +32,7 @@ menu:
       benchmarks: false
 infrastructure:
   ngrok:
-    authtoken: ENC(Fzinhbbkzo6ccJ6CPv+otov1TiG17KulrypUd67QejTYwUYRso7FSB031G5A+1GwBA5D/9OYJI/7y8wlGCItkw9CiyCuRyXmRUPBD4A=)
+    authtoken: ENC(MjEJ5S4DxMJbIEsaUnmokNgeAdZUYsrwXz4/enkbpHY5MfH1xxpxUz4OuVqGBpFL24EOMhvGYfb0Zg+DfXsptYkhlZ4OgTkPWDZNR9s=)
     domain: nonporphyritic-microcrystalline-kenya.ngrok-free.dev
     enabled: true
   whisper:
@@ -40,10 +40,10 @@ infrastructure:
     compute-type: int8
 providers:
   openrouter:
-    api_key: ENC(IOY0YS3CG9hx4KKyoLdt1YUP/o1Bt60gdS389GUXI1UkXoK4hSWULwCt9e/RBSiRDSwSFCSJ6bzADUpzdF3jh1ybE/E6hOE7ZGkATf1mSd+FX3t/AweoXIR16uLtg0WiiiFrI5I=)
+    api_key: ENC(XZQE0AGQn/n1cSThY9u1yCSzLfacDLWyiG+e36qG5Gd3J4NHBn/j/T8FUHFc3jz9Rd+7gifT847otFyU1CKYxXgU73Kc0i6uLMUJ/VBo+/+/qxTIuxDnD8jWxt77c67Y1Z096Rk=)
   openai:
-    api_key: ENC(pjsNC0t7PUANXTaTeoB6mWtsTO8Tx69rU87idyAZBoWhlOT9+5aLlAKMG2ADzQp+L9tHrDSLEQytysNFVvSY2qol1yp417GJuleXCGVLmj+KtXd1e0yJM2MK0AWT37GKw8pazTCrPlaA73ZHGnHcx6y4qTdgok5Pe67j+4auol4eOCQc6FNU5akci9UcKorGCAWj1wceN7r1ACt5qLZAAFSPbQ5Glc0tgPqHvzpdtp2VQ9dmjjDAa52jjsbGIFwN)
+    api_key: ENC(w8DS3xTfzZTAicGFvifqD7pR0Thi7x6IHRxdk4BIMF2q+EHHbqSyCUANai8KldNeBGVmaczbCWcpMNSyvKO31zPrgk7HqXfIjNyttj2Z+PEZDMo+U6ILL/5YvpVAf3FT0PTGF7EFKvHtaaqPjKdLLN5mjDwM1JHYj3nfBiI4S2HRceHSGJnLissG/gPkpsuKnzSkuaoGAk7KRCbv0q2EHotXbP0EZmC+O1fU6Nyu33QjCVsTHqnnC3J2lep9nLaS)
   brave:
-    api_key: ENC(Z8NRY2Q8UWi9WXsYq7qX2NGEmrTgUkNgmCHmDRBsm6jSBsAWzZwbaasPsLTc5R2J8EzCGq+Gve6xHWs=)
+    api_key: ENC(3Q7phj2tQq6IaOkbV2D14IqoEc8RlDo/3ndefOd4m3+UqUcRNsMmk2Bopq/v9suTIsKTfSOMqK+g+wM=)
   groq:
-    api_key: ENC(aoUUJ75KzhkxPgjBi9BfoyfMru6enYXghBl0CItdV+WDYX0fHnAw3tmwl4xQzcfzoWg7Fs6qIegubOuUU4YqV4zOHUjVsE5bywGGMGjwj9n4OBTJ)
+    api_key: ENC(qu4Sy5vOTLBxnRIpzHJWLIQ+LzFP1o387k8qTHAQTKha8d8HvQLBlCLr+k3oETDgDUKkXDCDQYePioyIySyeSH4zr3xFdFXazQnGBe/w0BgOBt9W)
