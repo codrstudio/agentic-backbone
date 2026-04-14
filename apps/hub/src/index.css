@@ -1,7 +1,7 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
-@source "../../packages/ai-chat/src/**/*.tsx";
+@source "../../../node_modules/@codrstudio/openclaude-chat/dist/**/*.js";
 @import "@fontsource-variable/plus-jakarta-sans";
 @import "@fontsource/lora";
 @import "@fontsource/roboto-mono";

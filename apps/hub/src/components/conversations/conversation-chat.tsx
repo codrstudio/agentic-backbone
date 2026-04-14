@@ -5,129 +5,14 @@ import { GitMerge } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   conversationQueryOptions,
-  conversationMessagesQueryOptions,
   sessionQueryOptions,
   takeoverConversation,
   releaseConversation,
 } from "@/api/conversations";
-import { Chat, defaultDisplayRenderers } from "@agentic-backbone/ai-chat";
+import { Chat, defaultDisplayRenderers } from "@codrstudio/openclaude-chat";
 import { TakeoverButton } from "@/components/conversations/takeover-button";
 import { TakeoverBanner } from "@/components/conversations/takeover-banner";
 import { ApprovalInlineActions } from "@/components/approvals/approval-inline-actions";
-
-type BackendMessage = import("@/api/conversations").ConversationMessage;
-
-function buildInitialMessages(messages?: BackendMessage[]) {
-  if (!messages || !Array.isArray(messages) || messages.length === 0) return undefined;
-
-  type Part = { type?: string; text?: string; toolCallId?: string; toolName?: string; input?: Record<string, unknown>; output?: unknown };
-
-  const toolResults = new Map<string, { toolName: string; result: unknown }>();
-  for (const m of messages) {
-    if (m.role === "tool" && Array.isArray(m.content)) {
-      for (const part of m.content as Part[]) {
-        if (part.type === "tool-result" && part.toolCallId) {
-          const raw = part.output as { type?: string; value?: unknown } | unknown;
-          const value = (typeof raw === "object" && raw !== null && "type" in (raw as Record<string, unknown>) && (raw as Record<string, unknown>).type === "json")
-            ? (raw as { value: unknown }).value
-            : raw;
-          toolResults.set(part.toolCallId, { toolName: part.toolName ?? "", result: value });
-        }
-      }
-    }
-  }
-
-  const result: { id: string; role: "user" | "assistant"; content: string; parts?: unknown[] }[] = [];
-  let i = 0;
-
-  while (i < messages.length) {
-    const m = messages[i]!;
-
-    if (m.role === "user") {
-      let content = "";
-      const parts: unknown[] = [];
-
-      if (typeof m.content === "string") {
-        content = m.content;
-      } else if (Array.isArray(m.content)) {
-        for (const p of m.content as Record<string, unknown>[]) {
-          if (p["type"] === "text") {
-            const text = String(p["text"] ?? "");
-            if (!text.startsWith("[📎") && !content) content = text;
-            parts.push(p);
-          } else if (p["type"] === "image" || p["type"] === "file") {
-            parts.push({ type: p["type"], _ref: p["_ref"], mimeType: p["mimeType"] });
-          } else {
-            parts.push(p);
-          }
-        }
-      }
-
-      result.push({
-        id: m._meta?.id ?? m.id ?? `msg-${i}`,
-        role: "user",
-        content,
-        ...(parts.length > 0 ? { parts } : {}),
-      });
-      i++;
-      continue;
-    }
-
-    if (m.role === "tool") {
-      i++;
-      continue;
-    }
-
-    if (m.role === "assistant") {
-      const parts: unknown[] = [];
-      let textContent = "";
-      const id = m._meta?.id ?? m.id ?? `msg-${i}`;
-
-      while (i < messages.length && (messages[i]!.role === "assistant" || messages[i]!.role === "tool")) {
-        const cur = messages[i]!;
-
-        if (cur.role === "tool") {
-          i++;
-          continue;
-        }
-
-        if (typeof cur.content === "string") {
-          if (cur.content) {
-            parts.push({ type: "text", text: cur.content });
-            textContent += cur.content;
-          }
-        } else if (Array.isArray(cur.content)) {
-          for (const p of cur.content as Part[]) {
-            if (p.type === "text" && p.text) {
-              parts.push({ type: "text", text: p.text });
-              textContent += p.text;
-            } else if (p.type === "tool-call" && p.toolCallId) {
-              const tr = toolResults.get(p.toolCallId);
-              parts.push({
-                type: "tool-invocation",
-                toolInvocation: {
-                  toolName: p.toolName ?? "",
-                  toolCallId: p.toolCallId,
-                  state: tr ? "result" : "call",
-                  args: p.input,
-                  result: tr?.result,
-                },
-              });
-            }
-          }
-        }
-        i++;
-      }
-
-      result.push({ id, role: "assistant", content: textContent, parts });
-      continue;
-    }
-
-    i++;
-  }
-
-  return result;
-}
 
 interface ConversationChatPageProps {
   id: string;
@@ -141,9 +26,6 @@ export function ConversationChatPage({ id, basePath }: ConversationChatPageProps
     conversationQueryOptions(id),
   );
   const { data: session } = useQuery(sessionQueryOptions(id));
-  const { data: existingMessages, isLoading: msgsLoading } = useQuery(
-    conversationMessagesQueryOptions(id),
-  );
 
   const takeoverMutation = useMutation({
     mutationFn: () => takeoverConversation(id),
@@ -160,9 +42,8 @@ export function ConversationChatPage({ id, basePath }: ConversationChatPageProps
   });
 
   const isUnderTakeover = session?.takeover_by != null;
-  const token = ""; // auth via HttpOnly cookie — no token needed in header
 
-  if (convLoading || msgsLoading) {
+  if (convLoading) {
     return (
       <div className="flex h-full flex-col gap-4 p-4">
         <Skeleton className="h-10 w-64" />
@@ -200,7 +81,7 @@ export function ConversationChatPage({ id, basePath }: ConversationChatPageProps
   return (
     <div className="flex h-full gap-3">
       <div className="flex flex-1 flex-col overflow-hidden">
-        {/* Takeover controls (thin bar, only when relevant) */}
+        {/* Takeover controls */}
         {!isUnderTakeover && (
           <div className="flex items-center justify-end border-b px-3 py-1.5">
             <TakeoverButton
@@ -224,14 +105,14 @@ export function ConversationChatPage({ id, basePath }: ConversationChatPageProps
         {/* Inline approval requests */}
         <ApprovalInlineActions sessionId={id} />
 
-        {/* Chat — rich content enabled */}
+        {/* Chat — uses openclaude-chat with /conversations/* routes */}
         <Chat
-          endpoint=""
-          token={token}
+          endpoint="/api/v1/ai"
           sessionId={id}
-          initialMessages={buildInitialMessages(existingMessages)}
           displayRenderers={defaultDisplayRenderers}
           enableRichContent
+          locale="pt-BR"
+          enableLocaleSelect={false}
           className="flex-1 flex flex-col overflow-hidden"
         />
       </div>

@@ -39,7 +39,6 @@ const ROUTE_TO_KEY: Record<string, string> = {
   "/": "dashboard",
   "/agents": "agentes",
   "/workflows": "workflows",
-  "/conversations": "conversas",
   "/channels": "canais",
   "/transcription": "transcricao",
   "/inbox": "inbox",
@@ -62,7 +61,6 @@ const navItemsCore = [
   { label: "Dashboard", icon: LayoutDashboard, to: "/" as const },
   { label: "Agentes", icon: Bot, to: "/agents" as const },
   { label: "Workflows", icon: GitBranch, to: "/workflows" as const },
-  { label: "Conversas", icon: MessageSquare, to: "/conversations" as const },
   { label: "Canais", icon: Radio, to: "/channels" as const },
   { label: "Transcrição", icon: Mic, to: "/transcription" as const },
 ] as const;

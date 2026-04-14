@@ -1,16 +1,7 @@
 import { queryOptions } from "@tanstack/react-query";
 import { request } from "@/lib/api";
 
-export interface Conversation {
-  id: string;
-  agentId: string;
-  title?: string;
-  lastMessage?: string;
-  updatedAt: string;
-  starred: boolean;
-  takeover_by: string | null;
-  takeover_at: string | null;
-}
+// ── Types ────────────────────────────────────────────────────
 
 export interface Session {
   session_id: string;
@@ -39,6 +30,18 @@ export interface ReleaseResult {
   released: boolean;
 }
 
+export interface Conversation {
+  id: string;
+  agentId: string;
+  title?: string;
+  updatedAt: string;
+  starred: boolean;
+  takeover_by: string | null;
+  takeover_at: string | null;
+}
+
+// ── Query options (kept for takeover metadata) ──────────────
+
 function sessionToConversation(s: Session): Conversation {
   return {
     id: s.session_id,
@@ -51,16 +54,6 @@ function sessionToConversation(s: Session): Conversation {
   };
 }
 
-export function conversationsQueryOptions() {
-  return queryOptions({
-    queryKey: ["conversations"],
-    queryFn: async () => {
-      const sessions = await request<Session[]>("/conversations");
-      return sessions.map(sessionToConversation);
-    },
-  });
-}
-
 export function conversationQueryOptions(id: string) {
   return queryOptions({
     queryKey: ["conversations", id],
@@ -71,54 +64,10 @@ export function conversationQueryOptions(id: string) {
   });
 }
 
-export interface MessageFeedback {
-  rating: "up" | "down";
-  reason: string | null;
-}
-
-export interface ConversationMessage {
-  id?: string;
-  role: string;
-  content: string | unknown[];
-  _meta?: { id?: string; ts?: string; userId?: string; metadata?: Record<string, unknown> };
-  timestamp?: string;
-  metadata?: Record<string, unknown>;
-  feedback?: MessageFeedback;
-}
-
-export function conversationMessagesQueryOptions(id: string) {
+export function sessionQueryOptions(sessionId: string) {
   return queryOptions({
-    queryKey: ["conversations", id, "messages"],
-    queryFn: () =>
-      request<ConversationMessage[]>(`/conversations/${id}/messages`),
-  });
-}
-
-export async function createConversation(agentId: string): Promise<Conversation> {
-  const session = await request<Session>("/conversations", {
-    method: "POST",
-    body: JSON.stringify({ agentId }),
-  });
-  return sessionToConversation(session);
-}
-
-export async function renameConversation(id: string, title: string): Promise<void> {
-  await request(`/conversations/${id}`, {
-    method: "PATCH",
-    body: JSON.stringify({ title }),
-  });
-}
-
-export async function starConversation(id: string, starred: boolean): Promise<void> {
-  await request(`/conversations/${id}`, {
-    method: "PATCH",
-    body: JSON.stringify({ starred }),
-  });
-}
-
-export async function deleteConversation(id: string): Promise<void> {
-  await request(`/conversations/${id}`, {
-    method: "DELETE",
+    queryKey: ["conversations", sessionId, "session"],
+    queryFn: () => request<Session>(`/conversations/${sessionId}`),
   });
 }
 
@@ -132,12 +81,7 @@ export function agentConversationsQueryOptions(agentId: string) {
   });
 }
 
-export function sessionQueryOptions(sessionId: string) {
-  return queryOptions({
-    queryKey: ["conversations", sessionId, "session"],
-    queryFn: () => request<Session>(`/conversations/${sessionId}`),
-  });
-}
+// ── Takeover mutations ──────────────────────────────────────
 
 export async function takeoverConversation(sessionId: string): Promise<TakeoverResult> {
   return request<TakeoverResult>(`/conversations/${sessionId}/takeover`, {

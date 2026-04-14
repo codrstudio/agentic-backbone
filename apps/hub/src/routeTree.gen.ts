@@ -20,7 +20,6 @@ import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authen
 import { Route as AuthenticatedJobsRouteImport } from './routes/_authenticated/jobs'
 import { Route as AuthenticatedCronRouteImport } from './routes/_authenticated/cron'
 import { Route as AuthenticatedCostsRouteImport } from './routes/_authenticated/costs'
-import { Route as AuthenticatedConversationsRouteImport } from './routes/_authenticated/conversations'
 import { Route as AuthenticatedChannelsRouteImport } from './routes/_authenticated/channels'
 import { Route as AuthenticatedAnalyticsRouteImport } from './routes/_authenticated/analytics'
 import { Route as AuthenticatedAgentsRouteImport } from './routes/_authenticated/agents'
@@ -30,7 +29,6 @@ import { Route as AuthenticatedWorkflowsIndexRouteImport } from './routes/_authe
 import { Route as AuthenticatedSecurityIndexRouteImport } from './routes/_authenticated/security/index'
 import { Route as AuthenticatedInboxIndexRouteImport } from './routes/_authenticated/inbox/index'
 import { Route as AuthenticatedFleetIndexRouteImport } from './routes/_authenticated/fleet/index'
-import { Route as AuthenticatedConversationsIndexRouteImport } from './routes/_authenticated/conversations/index'
 import { Route as AuthenticatedComplianceIndexRouteImport } from './routes/_authenticated/compliance/index'
 import { Route as AuthenticatedChannelsIndexRouteImport } from './routes/_authenticated/channels/index'
 import { Route as AuthenticatedApprovalsIndexRouteImport } from './routes/_authenticated/approvals/index'
@@ -39,8 +37,6 @@ import { Route as AuthenticatedWorkflowsNewRouteImport } from './routes/_authent
 import { Route as AuthenticatedWorkflowsIdRouteImport } from './routes/_authenticated/workflows.$id'
 import { Route as AuthenticatedSettingsOtelRouteImport } from './routes/_authenticated/settings_.otel'
 import { Route as AuthenticatedJobsIdRouteImport } from './routes/_authenticated/jobs.$id'
-import { Route as AuthenticatedConversationsNewRouteImport } from './routes/_authenticated/conversations/new'
-import { Route as AuthenticatedConversationsIdRouteImport } from './routes/_authenticated/conversations/$id'
 import { Route as AuthenticatedChannelsNewRouteImport } from './routes/_authenticated/channels/new'
 import { Route as AuthenticatedChannelsSlugRouteImport } from './routes/_authenticated/channels.$slug'
 import { Route as AuthenticatedAgentsNewRouteImport } from './routes/_authenticated/agents.new'
@@ -133,12 +129,6 @@ const AuthenticatedCostsRoute = AuthenticatedCostsRouteImport.update({
   path: '/costs',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const AuthenticatedConversationsRoute =
-  AuthenticatedConversationsRouteImport.update({
-    id: '/conversations',
-    path: '/conversations',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
 const AuthenticatedChannelsRoute = AuthenticatedChannelsRouteImport.update({
   id: '/channels',
   path: '/channels',
@@ -186,12 +176,6 @@ const AuthenticatedFleetIndexRoute = AuthenticatedFleetIndexRouteImport.update({
   path: '/fleet/',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const AuthenticatedConversationsIndexRoute =
-  AuthenticatedConversationsIndexRouteImport.update({
-    id: '/',
-    path: '/',
-    getParentRoute: () => AuthenticatedConversationsRoute,
-  } as any)
 const AuthenticatedComplianceIndexRoute =
   AuthenticatedComplianceIndexRouteImport.update({
     id: '/compliance/',
@@ -239,18 +223,6 @@ const AuthenticatedJobsIdRoute = AuthenticatedJobsIdRouteImport.update({
   path: '/$id',
   getParentRoute: () => AuthenticatedJobsRoute,
 } as any)
-const AuthenticatedConversationsNewRoute =
-  AuthenticatedConversationsNewRouteImport.update({
-    id: '/new',
-    path: '/new',
-    getParentRoute: () => AuthenticatedConversationsRoute,
-  } as any)
-const AuthenticatedConversationsIdRoute =
-  AuthenticatedConversationsIdRouteImport.update({
-    id: '/$id',
-    path: '/$id',
-    getParentRoute: () => AuthenticatedConversationsRoute,
-  } as any)
 const AuthenticatedChannelsNewRoute =
   AuthenticatedChannelsNewRouteImport.update({
     id: '/new',
@@ -468,7 +440,6 @@ export interface FileRoutesByFullPath {
   '/agents': typeof AuthenticatedAgentsRouteWithChildren
   '/analytics': typeof AuthenticatedAnalyticsRoute
   '/channels': typeof AuthenticatedChannelsRouteWithChildren
-  '/conversations': typeof AuthenticatedConversationsRouteWithChildren
   '/costs': typeof AuthenticatedCostsRoute
   '/cron': typeof AuthenticatedCronRoute
   '/jobs': typeof AuthenticatedJobsRouteWithChildren
@@ -482,8 +453,6 @@ export interface FileRoutesByFullPath {
   '/agents/new': typeof AuthenticatedAgentsNewRoute
   '/channels/$slug': typeof AuthenticatedChannelsSlugRoute
   '/channels/new': typeof AuthenticatedChannelsNewRoute
-  '/conversations/$id': typeof AuthenticatedConversationsIdRoute
-  '/conversations/new': typeof AuthenticatedConversationsNewRoute
   '/jobs/$id': typeof AuthenticatedJobsIdRoute
   '/settings/otel': typeof AuthenticatedSettingsOtelRoute
   '/workflows/$id': typeof AuthenticatedWorkflowsIdRoute
@@ -492,7 +461,6 @@ export interface FileRoutesByFullPath {
   '/approvals/': typeof AuthenticatedApprovalsIndexRoute
   '/channels/': typeof AuthenticatedChannelsIndexRoute
   '/compliance/': typeof AuthenticatedComplianceIndexRoute
-  '/conversations/': typeof AuthenticatedConversationsIndexRoute
   '/fleet/': typeof AuthenticatedFleetIndexRoute
   '/inbox/': typeof AuthenticatedInboxIndexRoute
   '/security/': typeof AuthenticatedSecurityIndexRoute
@@ -545,8 +513,6 @@ export interface FileRoutesByTo {
   '/agents/new': typeof AuthenticatedAgentsNewRoute
   '/channels/$slug': typeof AuthenticatedChannelsSlugRoute
   '/channels/new': typeof AuthenticatedChannelsNewRoute
-  '/conversations/$id': typeof AuthenticatedConversationsIdRoute
-  '/conversations/new': typeof AuthenticatedConversationsNewRoute
   '/jobs/$id': typeof AuthenticatedJobsIdRoute
   '/settings/otel': typeof AuthenticatedSettingsOtelRoute
   '/workflows/$id': typeof AuthenticatedWorkflowsIdRoute
@@ -555,7 +521,6 @@ export interface FileRoutesByTo {
   '/approvals': typeof AuthenticatedApprovalsIndexRoute
   '/channels': typeof AuthenticatedChannelsIndexRoute
   '/compliance': typeof AuthenticatedComplianceIndexRoute
-  '/conversations': typeof AuthenticatedConversationsIndexRoute
   '/fleet': typeof AuthenticatedFleetIndexRoute
   '/inbox': typeof AuthenticatedInboxIndexRoute
   '/security': typeof AuthenticatedSecurityIndexRoute
@@ -598,7 +563,6 @@ export interface FileRoutesById {
   '/_authenticated/agents': typeof AuthenticatedAgentsRouteWithChildren
   '/_authenticated/analytics': typeof AuthenticatedAnalyticsRoute
   '/_authenticated/channels': typeof AuthenticatedChannelsRouteWithChildren
-  '/_authenticated/conversations': typeof AuthenticatedConversationsRouteWithChildren
   '/_authenticated/costs': typeof AuthenticatedCostsRoute
   '/_authenticated/cron': typeof AuthenticatedCronRoute
   '/_authenticated/jobs': typeof AuthenticatedJobsRouteWithChildren
@@ -613,8 +577,6 @@ export interface FileRoutesById {
   '/_authenticated/agents/new': typeof AuthenticatedAgentsNewRoute
   '/_authenticated/channels/$slug': typeof AuthenticatedChannelsSlugRoute
   '/_authenticated/channels/new': typeof AuthenticatedChannelsNewRoute
-  '/_authenticated/conversations/$id': typeof AuthenticatedConversationsIdRoute
-  '/_authenticated/conversations/new': typeof AuthenticatedConversationsNewRoute
   '/_authenticated/jobs/$id': typeof AuthenticatedJobsIdRoute
   '/_authenticated/settings_/otel': typeof AuthenticatedSettingsOtelRoute
   '/_authenticated/workflows/$id': typeof AuthenticatedWorkflowsIdRoute
@@ -623,7 +585,6 @@ export interface FileRoutesById {
   '/_authenticated/approvals/': typeof AuthenticatedApprovalsIndexRoute
   '/_authenticated/channels/': typeof AuthenticatedChannelsIndexRoute
   '/_authenticated/compliance/': typeof AuthenticatedComplianceIndexRoute
-  '/_authenticated/conversations/': typeof AuthenticatedConversationsIndexRoute
   '/_authenticated/fleet/': typeof AuthenticatedFleetIndexRoute
   '/_authenticated/inbox/': typeof AuthenticatedInboxIndexRoute
   '/_authenticated/security/': typeof AuthenticatedSecurityIndexRoute
@@ -669,7 +630,6 @@ export interface FileRouteTypes {
     | '/agents'
     | '/analytics'
     | '/channels'
-    | '/conversations'
     | '/costs'
     | '/cron'
     | '/jobs'
@@ -683,8 +643,6 @@ export interface FileRouteTypes {
     | '/agents/new'
     | '/channels/$slug'
     | '/channels/new'
-    | '/conversations/$id'
-    | '/conversations/new'
     | '/jobs/$id'
     | '/settings/otel'
     | '/workflows/$id'
@@ -693,7 +651,6 @@ export interface FileRouteTypes {
     | '/approvals/'
     | '/channels/'
     | '/compliance/'
-    | '/conversations/'
     | '/fleet/'
     | '/inbox/'
     | '/security/'
@@ -746,8 +703,6 @@ export interface FileRouteTypes {
     | '/agents/new'
     | '/channels/$slug'
     | '/channels/new'
-    | '/conversations/$id'
-    | '/conversations/new'
     | '/jobs/$id'
     | '/settings/otel'
     | '/workflows/$id'
@@ -756,7 +711,6 @@ export interface FileRouteTypes {
     | '/approvals'
     | '/channels'
     | '/compliance'
-    | '/conversations'
     | '/fleet'
     | '/inbox'
     | '/security'
@@ -798,7 +752,6 @@ export interface FileRouteTypes {
     | '/_authenticated/agents'
     | '/_authenticated/analytics'
     | '/_authenticated/channels'
-    | '/_authenticated/conversations'
     | '/_authenticated/costs'
     | '/_authenticated/cron'
     | '/_authenticated/jobs'
@@ -813,8 +766,6 @@ export interface FileRouteTypes {
     | '/_authenticated/agents/new'
     | '/_authenticated/channels/$slug'
     | '/_authenticated/channels/new'
-    | '/_authenticated/conversations/$id'
-    | '/_authenticated/conversations/new'
     | '/_authenticated/jobs/$id'
     | '/_authenticated/settings_/otel'
     | '/_authenticated/workflows/$id'
@@ -823,7 +774,6 @@ export interface FileRouteTypes {
     | '/_authenticated/approvals/'
     | '/_authenticated/channels/'
     | '/_authenticated/compliance/'
-    | '/_authenticated/conversations/'
     | '/_authenticated/fleet/'
     | '/_authenticated/inbox/'
     | '/_authenticated/security/'
@@ -944,13 +894,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCostsRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/conversations': {
-      id: '/_authenticated/conversations'
-      path: '/conversations'
-      fullPath: '/conversations'
-      preLoaderRoute: typeof AuthenticatedConversationsRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
     '/_authenticated/channels': {
       id: '/_authenticated/channels'
       path: '/channels'
@@ -1014,13 +957,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedFleetIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/conversations/': {
-      id: '/_authenticated/conversations/'
-      path: '/'
-      fullPath: '/conversations/'
-      preLoaderRoute: typeof AuthenticatedConversationsIndexRouteImport
-      parentRoute: typeof AuthenticatedConversationsRoute
-    }
     '/_authenticated/compliance/': {
       id: '/_authenticated/compliance/'
       path: '/compliance'
@@ -1076,20 +1012,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/jobs/$id'
       preLoaderRoute: typeof AuthenticatedJobsIdRouteImport
       parentRoute: typeof AuthenticatedJobsRoute
-    }
-    '/_authenticated/conversations/new': {
-      id: '/_authenticated/conversations/new'
-      path: '/new'
-      fullPath: '/conversations/new'
-      preLoaderRoute: typeof AuthenticatedConversationsNewRouteImport
-      parentRoute: typeof AuthenticatedConversationsRoute
-    }
-    '/_authenticated/conversations/$id': {
-      id: '/_authenticated/conversations/$id'
-      path: '/$id'
-      fullPath: '/conversations/$id'
-      preLoaderRoute: typeof AuthenticatedConversationsIdRouteImport
-      parentRoute: typeof AuthenticatedConversationsRoute
     }
     '/_authenticated/channels/new': {
       id: '/_authenticated/channels/new'
@@ -1494,24 +1416,6 @@ const AuthenticatedChannelsRouteWithChildren =
     AuthenticatedChannelsRouteChildren,
   )
 
-interface AuthenticatedConversationsRouteChildren {
-  AuthenticatedConversationsIdRoute: typeof AuthenticatedConversationsIdRoute
-  AuthenticatedConversationsNewRoute: typeof AuthenticatedConversationsNewRoute
-  AuthenticatedConversationsIndexRoute: typeof AuthenticatedConversationsIndexRoute
-}
-
-const AuthenticatedConversationsRouteChildren: AuthenticatedConversationsRouteChildren =
-  {
-    AuthenticatedConversationsIdRoute: AuthenticatedConversationsIdRoute,
-    AuthenticatedConversationsNewRoute: AuthenticatedConversationsNewRoute,
-    AuthenticatedConversationsIndexRoute: AuthenticatedConversationsIndexRoute,
-  }
-
-const AuthenticatedConversationsRouteWithChildren =
-  AuthenticatedConversationsRoute._addFileChildren(
-    AuthenticatedConversationsRouteChildren,
-  )
-
 interface AuthenticatedJobsRouteChildren {
   AuthenticatedJobsIdRoute: typeof AuthenticatedJobsIdRoute
 }
@@ -1565,7 +1469,6 @@ interface AuthenticatedRouteChildren {
   AuthenticatedAgentsRoute: typeof AuthenticatedAgentsRouteWithChildren
   AuthenticatedAnalyticsRoute: typeof AuthenticatedAnalyticsRoute
   AuthenticatedChannelsRoute: typeof AuthenticatedChannelsRouteWithChildren
-  AuthenticatedConversationsRoute: typeof AuthenticatedConversationsRouteWithChildren
   AuthenticatedCostsRoute: typeof AuthenticatedCostsRoute
   AuthenticatedCronRoute: typeof AuthenticatedCronRoute
   AuthenticatedJobsRoute: typeof AuthenticatedJobsRouteWithChildren
@@ -1590,7 +1493,6 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedAgentsRoute: AuthenticatedAgentsRouteWithChildren,
   AuthenticatedAnalyticsRoute: AuthenticatedAnalyticsRoute,
   AuthenticatedChannelsRoute: AuthenticatedChannelsRouteWithChildren,
-  AuthenticatedConversationsRoute: AuthenticatedConversationsRouteWithChildren,
   AuthenticatedCostsRoute: AuthenticatedCostsRoute,
   AuthenticatedCronRoute: AuthenticatedCronRoute,
   AuthenticatedJobsRoute: AuthenticatedJobsRouteWithChildren,

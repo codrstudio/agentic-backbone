@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { toggleAgentEnabled, triggerHeartbeat } from "@/api/agents";
-import { createConversation } from "@/api/conversations";
+import { request } from "@/lib/api";
 import type { Agent } from "@/api/agents";
 
 interface AgentActionsProps {
@@ -29,9 +29,15 @@ export function AgentActions({ agent }: AgentActionsProps) {
   });
 
   const conversationMutation = useMutation({
-    mutationFn: () => createConversation(agent.id),
-    onSuccess: (conversation) => {
-      navigate({ to: `/conversations/${conversation.id}` as string });
+    mutationFn: async () => {
+      const result = await request<{ session_id: string }>("/conversations", {
+        method: "POST",
+        body: JSON.stringify({ agentId: agent.id }),
+      });
+      return result;
+    },
+    onSuccess: (result) => {
+      navigate({ to: `/agents/${agent.id}/conversations/${result.session_id}` as string });
     },
   });
 
