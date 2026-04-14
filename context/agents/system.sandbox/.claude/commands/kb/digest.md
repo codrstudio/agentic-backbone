@@ -1,6 +1,6 @@
 Digere as notes brutas de `kb/calendar/notes/` em artigos de conhecimento no `kb/atlas/`.
 
-Executa `uv run python scripts/kb/compile.py` a partir da raiz do projeto.
+Executa `uv run --directory .systems python memory/scripts/kb/compile.py` a partir da raiz do projeto.
 
 Aceita argumentos opcionais:
 - `--all` — recompila tudo, mesmo notes já digeridas

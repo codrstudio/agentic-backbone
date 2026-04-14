@@ -1,6 +1,6 @@
 Checa a saúde do knowledge base.
 
-Executa `uv run python scripts/kb/lint.py` a partir da raiz do projeto.
+Executa `uv run --directory .systems python memory/scripts/kb/lint.py` a partir da raiz do projeto.
 
 Aceita argumento opcional:
 - `--structural-only` — pula o check de contradições (LLM), mais rápido e gratuito

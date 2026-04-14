@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "uv run python scripts/hooks/session-start.py",
+            "command": "node .systems/memory/scripts/hooks/session-start.js",
             "timeout": 15
           }
         ]
@@ -18,7 +18,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "uv run python scripts/hooks/pre-compact.py",
+            "command": "node .systems/memory/scripts/hooks/pre-compact.js",
             "timeout": 10
           }
         ]
@@ -30,7 +30,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "uv run python scripts/hooks/session-end.py",
+            "command": "node .systems/memory/scripts/hooks/session-end.js",
             "timeout": 10
           }
         ]
