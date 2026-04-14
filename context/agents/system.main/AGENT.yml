@@ -1,0 +1,6 @@
+id: system.main
+owner: system
+slug: main
+enabled: true
+heartbeat-enabled: false
+description: Agente principal do sistema

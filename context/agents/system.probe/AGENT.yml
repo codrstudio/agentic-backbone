@@ -1,0 +1,6 @@
+id: system.probe
+owner: system
+slug: probe
+enabled: true
+heartbeat-enabled: false
+description: Agente de monitoramento e probes
