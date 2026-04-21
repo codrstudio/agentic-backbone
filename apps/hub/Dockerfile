@@ -14,7 +14,7 @@
 FROM node:22-slim AS builder
 WORKDIR /app
 
-# Lockfile + package.jsons pra cachear npm ci
+# Lockfile + package.jsons
 COPY package.json package-lock.json ./
 COPY apps/hub/package.json ./apps/hub/
 COPY apps/backbone/package.json ./apps/backbone/
@@ -22,7 +22,12 @@ COPY apps/backbone/package.json ./apps/backbone/
 # Vendor (pacotes internos em .tgz referenciados via file:)
 COPY vendor ./vendor
 
-RUN npm ci
+# `npm install --include=optional` em vez de `npm ci` porque o lockfile do
+# repo foi gerado em Windows e nao contem as optional deps platform-specific
+# do Linux (ex: @rollup/rollup-linux-x64-gnu). npm ci nao baixa optional
+# deps ausentes do lockfile; npm install resolve na hora.
+# Long-term: regenerar o lockfile em Linux e voltar pra npm ci.
+RUN npm install --include=optional --no-audit --no-fund
 
 # Codigo do hub + tsconfig base (necessario pro tsc --noEmit do script build)
 COPY tsconfig.base.json ./
