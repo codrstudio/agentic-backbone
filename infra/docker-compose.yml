@@ -18,7 +18,7 @@ services:
   # Commit B futuro remove web_network daqui — so depois que admin trocar
   # o vhost da nginx-proxy pra apontar pro caddy (1 upstream).
   backbone:
-    image: ${IMAGE_REGISTRY:-ghcr.io/codrstudio/agentic-backbone}/backbone:${TAG:-staging}
+    image: ${IMAGE_REGISTRY:-registry.codrstudio.dev/agentic-backbone}/backbone:${TAG:-staging}
     build:
       context: ..
       dockerfile: apps/backbone/Dockerfile
@@ -39,7 +39,7 @@ services:
       shared-net:
 
   hub:
-    image: ${IMAGE_REGISTRY:-ghcr.io/codrstudio/agentic-backbone}/hub:${TAG:-staging}
+    image: ${IMAGE_REGISTRY:-registry.codrstudio.dev/agentic-backbone}/hub:${TAG:-staging}
     build:
       context: ..
       dockerfile: apps/hub/Dockerfile

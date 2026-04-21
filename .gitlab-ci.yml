@@ -30,8 +30,8 @@ build:
   image: docker:26
   script:
     - REGISTRY_HOST=$(echo "$DOCKER_REGISTRY_URL" | sed -E 's|https?://||; s|/.*||')
-    - HUB_IMG="${REGISTRY_HOST}/codrstudio/agentic-backbone/hub"
-    - BE_IMG="${REGISTRY_HOST}/codrstudio/agentic-backbone/backbone"
+    - HUB_IMG="${REGISTRY_HOST}/agentic-backbone/hub"
+    - BE_IMG="${REGISTRY_HOST}/agentic-backbone/backbone"
     - SHA_TAG="ab-${CI_COMMIT_SHORT_SHA}"
     - LATEST_TAG="ab-latest"
     - echo "===== Login em $REGISTRY_HOST ====="
