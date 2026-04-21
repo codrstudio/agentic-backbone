@@ -93,6 +93,7 @@ export interface ConnectorCredential {
 }
 
 export interface EmailOptions {
+  agent_id?: string;
   mailbox?: string;
   poll_interval_seconds?: number;
   mark_seen?: boolean;

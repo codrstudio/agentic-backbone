@@ -212,7 +212,7 @@ function SummaryCards() {
 
 // ─── Sort Button ──────────────────────────────────────────────────────────────
 
-type SortBy = FleetQueryParams["sortBy"];
+type SortBy = NonNullable<FleetQueryParams["sortBy"]>;
 type SortDir = "asc" | "desc";
 
 function SortButton({
@@ -259,17 +259,17 @@ function AgentActions({
 }) {
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
-          <MoreHorizontal className="size-4" />
-        </Button>
+      <DropdownMenuTrigger
+        render={<Button variant="ghost" size="sm" className="h-7 w-7 p-0" />}
+      >
+        <MoreHorizontal className="size-4" />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuItem asChild>
-          <Link to="/agents/$id" params={{ id: agent.id }}>
-            <ExternalLink className="mr-2 size-3.5" />
-            Ver agente
-          </Link>
+        <DropdownMenuItem
+          render={<Link to="/agents/$id" params={{ id: agent.id }} />}
+        >
+          <ExternalLink className="mr-2 size-3.5" />
+          Ver agente
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         {agent.enabled ? (
@@ -749,7 +749,7 @@ function FleetPage() {
           />
         </div>
 
-        <Select value={ownerFilter || "all"} onValueChange={(v) => setOwnerFilter(v === "all" ? "" : v)}>
+        <Select value={ownerFilter || "all"} onValueChange={(v) => setOwnerFilter(v === "all" || !v ? "" : v)}>
           <SelectTrigger className="h-8 w-40">
             <SelectValue placeholder="Owner" />
           </SelectTrigger>

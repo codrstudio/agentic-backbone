@@ -567,7 +567,7 @@ export function ComplianceTab({ agentId }: ComplianceTabProps) {
         <div className="rounded-lg border divide-y">
           <div className="grid grid-cols-2 items-center px-4 py-3">
             <Label className="text-sm">Tipo de trace</Label>
-            <Select value={traceType} onValueChange={setTraceType}>
+            <Select value={traceType} onValueChange={(v) => v && setTraceType(v)}>
               <SelectTrigger className="h-8 w-40">
                 <SelectValue />
               </SelectTrigger>

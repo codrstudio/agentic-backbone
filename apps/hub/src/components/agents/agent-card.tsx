@@ -88,7 +88,9 @@ export function AgentCard({
           />
           {agent.slug}
           {CbIcon && (
-            <CbIcon className={`size-3.5 shrink-0 ml-auto ${cbClass}`} title={cbTitle} />
+            <span title={cbTitle} className="ml-auto inline-flex">
+              <CbIcon className={`size-3.5 shrink-0 ${cbClass}`} />
+            </span>
           )}
         </CardTitle>
         <CardAction>

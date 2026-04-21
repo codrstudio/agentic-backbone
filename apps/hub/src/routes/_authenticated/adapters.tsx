@@ -61,7 +61,9 @@ const CONNECTOR_GROUPS = [
 type ConnectorFilter = (typeof CONNECTOR_GROUPS)[number]["items"][number]["value"];
 
 const FILTER_LABELS = Object.fromEntries(
-  CONNECTOR_GROUPS.flatMap((g) => g.items).map((i) => [i.value, i.label])
+  CONNECTOR_GROUPS.flatMap(
+    (g) => g.items as readonly { value: string; label: string }[],
+  ).map((i) => [i.value, i.label]),
 ) as Record<ConnectorFilter, string>;
 
 function AdaptersLayout() {

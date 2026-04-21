@@ -130,7 +130,7 @@ export function AgentNavMenu({ agentId, onNavigate }: AgentNavMenuProps) {
   }
 
   const isOverviewActive = !!matchRoute({
-    to: "/agents/$id/",
+    to: "/agents/$id",
     params: { id: agentId },
     fuzzy: false,
   });

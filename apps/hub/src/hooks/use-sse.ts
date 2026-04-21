@@ -34,13 +34,13 @@ const MAX_DELAY = 30_000;
 
 export function useSSE(options?: UseSSEOptions): UseSSEResult {
   const enabled = options?.enabled ?? true;
-  const token = useAuthStore((s) => s.token);
+  const user = useAuthStore((s) => s.user);
   const [connected, setConnected] = useState(false);
   const [lastEvent, setLastEvent] = useState<SystemEvent | null>(null);
   const retryDelay = useRef(MIN_DELAY);
 
   useEffect(() => {
-    if (!enabled || !token) {
+    if (!enabled || !user) {
       setConnected(false);
       return;
     }
@@ -52,7 +52,7 @@ export function useSSE(options?: UseSSEOptions): UseSSEResult {
     function connect() {
       if (disposed) return;
 
-      es = new EventSource(`/api/v1/ai/system/events?token=${encodeURIComponent(token!)}`);
+      es = new EventSource(`/api/v1/ai/system/events`, { withCredentials: true });
 
       es.onopen = () => {
         retryDelay.current = MIN_DELAY;
@@ -90,7 +90,7 @@ export function useSSE(options?: UseSSEOptions): UseSSEResult {
       if (retryTimer) clearTimeout(retryTimer);
       setConnected(false);
     };
-  }, [enabled, token]);
+  }, [enabled, user]);
 
   return { connected, lastEvent };
 }
@@ -133,6 +133,15 @@ function invalidateByEvent(event: SystemEvent) {
       const sessionId = event.data?.sessionId as string | undefined;
       queryClient.invalidateQueries({ queryKey: ["conversations"] });
       if (sessionId) {
+        queryClient.invalidateQueries({ queryKey: ["conversations", sessionId, "session"] });
+      }
+      break;
+    }
+    case "session:titled": {
+      const sessionId = event.data?.sessionId as string | undefined;
+      queryClient.invalidateQueries({ queryKey: ["conversations"] });
+      if (sessionId) {
+        queryClient.invalidateQueries({ queryKey: ["conversations", sessionId] });
         queryClient.invalidateQueries({ queryKey: ["conversations", sessionId, "session"] });
       }
       break;

@@ -33,20 +33,12 @@ export async function uploadKnowledgeDoc(
   agentId: string,
   file: File,
 ): Promise<KnowledgeDoc> {
-  const { useAuthStore } = await import("@/lib/auth");
-  const token = useAuthStore.getState().token;
-
   const form = new FormData();
   form.append("file", file);
 
-  const headers = new Headers();
-  if (token) {
-    headers.set("Authorization", `Bearer ${token}`);
-  }
-
   const res = await fetch(`/api/v1/ai/agents/${agentId}/knowledge`, {
     method: "POST",
-    headers,
+    credentials: "include",
     body: form,
   });
 

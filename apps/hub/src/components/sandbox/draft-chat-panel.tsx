@@ -2,7 +2,6 @@ import { useState, useRef, useCallback } from "react";
 import { Send, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useAuthStore } from "@/lib/auth";
 
 interface DraftChatPanelProps {
   agentId: string;
@@ -33,8 +32,6 @@ export function DraftChatPanel({ agentId, draftId, onClose }: DraftChatPanelProp
     abortRef.current = new AbortController();
     setStreaming(true);
 
-    const token = useAuthStore.getState().token;
-
     try {
       const res = await fetch(
         `${BASE_PATH}/agents/${agentId}/drafts/${draftId}/chat`,
@@ -42,8 +39,8 @@ export function DraftChatPanel({ agentId, draftId, onClose }: DraftChatPanelProp
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            ...(token ? { Authorization: `Bearer ${token}` } : {}),
           },
+          credentials: "include",
           body: JSON.stringify({ message: text }),
           signal: abortRef.current.signal,
         },
