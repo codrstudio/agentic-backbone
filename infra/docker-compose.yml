@@ -1,0 +1,62 @@
+name: ab-${ENVIRONMENT}
+
+include:
+  - docker-compose.platform.yml
+
+services:
+  # Caddy override (service declarado em platform.yml) — em prod ganha web_network
+  # pra ser alcançável pela nginx-proxy compartilhada do host.
+  caddy:
+    networks:
+      internal:
+        aliases:
+          - caddy.internal
+      web_network:
+
+  # Variant A da migracao (ver chat com nic 2026-04-21):
+  # apps CONTINUAM em web_network no commit A (caddy soma paralelo).
+  # Commit B futuro remove web_network daqui — so depois que admin trocar
+  # o vhost da nginx-proxy pra apontar pro caddy (1 upstream).
+  backbone:
+    image: ${IMAGE_REGISTRY:-ghcr.io/codrstudio/agentic-backbone}/backbone:${TAG:-staging}
+    build:
+      context: ..
+      dockerfile: apps/backbone/Dockerfile
+    restart: unless-stopped
+    env_file:
+      - ../.env
+    environment:
+      CONTEXT_FOLDER: /app/context
+      SERVER_HOST: 0.0.0.0
+    volumes:
+      - ../context:/app/context
+      - ../data:/app/apps/backbone/data
+    networks:
+      internal:
+        aliases:
+          - backbone.internal
+      web_network:
+      shared-net:
+
+  hub:
+    image: ${IMAGE_REGISTRY:-ghcr.io/codrstudio/agentic-backbone}/hub:${TAG:-staging}
+    build:
+      context: ..
+      dockerfile: apps/hub/Dockerfile
+    restart: unless-stopped
+    env_file:
+      - ../.env
+    depends_on:
+      - backbone
+    networks:
+      internal:
+        aliases:
+          - hub.internal
+      web_network:
+      shared-net:
+
+networks:
+  shared-net:
+    external: true
+  web_network:
+    external: true

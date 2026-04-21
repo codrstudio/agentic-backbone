@@ -1,0 +1,88 @@
+# .gitlab-ci.yml — build+push (GHCR) + deploy (SSH ia-web).
+# Baseado em processa-deploy/templates/gitlab-ci.yml.
+#
+# Stages:
+#   build   — builda imagens hub/backbone, push pro registry (GHCR por default)
+#   deploy  — SSH no ia-web, git pull, docker compose pull+up, restart caddy
+#
+# Roda somente em push no branch "ab" (source-of-truth deste projeto).
+#
+# Vars herdadas do GitLab group NIC (admin setou uma vez):
+#   DOCKER_REGISTRY_URL/USER/PASSWORD   (registry; pra GHCR: https://ghcr.io + PAT com write:packages)
+#   SSH_DEPLOY_KEY                       (FILE — chave priv -> ia-web)
+#   VPS_IAWEB_HOST/USER/DEPLOY_FOLDER    (alvo do deploy)
+#
+# Ver vars: projeto no GitLab → Settings → CI/CD → Variables.
+
+stages:
+  - build
+  - deploy
+
+variables:
+  # Runner sem privileged → DinD não funciona; usa docker.sock do host
+  DOCKER_HOST: unix:///var/run/docker.sock
+
+build:
+  stage: build
+  tags: [docker, compose, build]
+  rules:
+    - if: $CI_COMMIT_BRANCH == "ab"
+  image: docker:26
+  script:
+    - REGISTRY_HOST=$(echo "$DOCKER_REGISTRY_URL" | sed -E 's|https?://||; s|/.*||')
+    - HUB_IMG="${REGISTRY_HOST}/codrstudio/agentic-backbone/hub"
+    - BE_IMG="${REGISTRY_HOST}/codrstudio/agentic-backbone/backbone"
+    - SHA_TAG="ab-${CI_COMMIT_SHORT_SHA}"
+    - LATEST_TAG="ab-latest"
+    - echo "===== Login em $REGISTRY_HOST ====="
+    - echo "$DOCKER_REGISTRY_PASSWORD" | docker login "$REGISTRY_HOST" -u "$DOCKER_REGISTRY_USER" --password-stdin
+    - echo "===== Build hub ====="
+    - docker build -f apps/hub/Dockerfile -t "${HUB_IMG}:${SHA_TAG}" -t "${HUB_IMG}:${LATEST_TAG}" .
+    - docker push "${HUB_IMG}:${SHA_TAG}"
+    - docker push "${HUB_IMG}:${LATEST_TAG}"
+    - echo "===== Build backbone ====="
+    - docker build -f apps/backbone/Dockerfile -t "${BE_IMG}:${SHA_TAG}" -t "${BE_IMG}:${LATEST_TAG}" .
+    - docker push "${BE_IMG}:${SHA_TAG}"
+    - docker push "${BE_IMG}:${LATEST_TAG}"
+    - echo "PUSHED ${HUB_IMG}:${SHA_TAG} e ${BE_IMG}:${SHA_TAG}"
+
+deploy:
+  stage: deploy
+  tags: [docker, compose, build]
+  rules:
+    - if: $CI_COMMIT_BRANCH == "ab"
+  needs: [build]
+  image: alpine:3.19
+  before_script:
+    - apk add --no-cache openssh-client
+    - mkdir -p ~/.ssh && chmod 700 ~/.ssh
+    # File var de chave privada perde newline final / ganha CRLF — normalize
+    - tr -d '\r' < "$SSH_DEPLOY_KEY" > /tmp/deploy_key
+    - printf '\n' >> /tmp/deploy_key
+    - chmod 600 /tmp/deploy_key
+    - ssh-keyscan -H "$VPS_IAWEB_HOST" >> ~/.ssh/known_hosts 2>/dev/null
+  script:
+    - |
+      ssh -i /tmp/deploy_key -o IdentitiesOnly=yes "${VPS_IAWEB_USER}@${VPS_IAWEB_HOST}" \
+        DEPLOY_DIR="${VPS_IAWEB_DEPLOY_FOLDER}/agentic-backbone" \
+        BRANCH="ab" \
+        bash -s << 'EOSSH'
+        set -e
+        cd "$DEPLOY_DIR"
+        echo "===== git pull ====="
+        git fetch origin "$BRANCH"
+        git reset --hard "origin/$BRANCH"
+        echo "===== check .env ====="
+        if [ ! -f .env ]; then
+          echo "ERRO: .env nao existe em $DEPLOY_DIR. Operador precisa criar (ver .env.example)."
+          exit 2
+        fi
+        echo "===== docker compose pull ====="
+        docker compose -f infra/docker-compose.yml --env-file .env pull
+        echo "===== docker compose up -d (--remove-orphans: dropa chat legado) ====="
+        docker compose -f infra/docker-compose.yml --env-file .env up -d --remove-orphans
+        echo "===== restart caddy (pickup mudanças no Caddyfile bind-mounted) ====="
+        docker compose -f infra/docker-compose.yml --env-file .env restart caddy
+        echo "===== status ====="
+        docker compose -f infra/docker-compose.yml --env-file .env ps
+      EOSSH
