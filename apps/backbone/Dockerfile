@@ -19,7 +19,9 @@ RUN npm ci
 COPY tsconfig.base.json .
 COPY apps/backbone/src apps/backbone/src
 COPY apps/backbone/tsconfig.json apps/backbone/
-RUN npm run build --workspace=apps/backbone
+# tsc em monorepo grande consome >2GB de heap (default do V8 ~1.5GB).
+# Aumenta limite pro tsc nao cair com "heap out of memory" code=134.
+RUN NODE_OPTIONS=--max-old-space-size=4096 npm run build --workspace=apps/backbone
 
 FROM node:22-slim
 WORKDIR /app
