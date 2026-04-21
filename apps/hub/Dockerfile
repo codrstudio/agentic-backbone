@@ -22,12 +22,15 @@ COPY apps/backbone/package.json ./apps/backbone/
 # Vendor (pacotes internos em .tgz referenciados via file:)
 COPY vendor ./vendor
 
-# `npm install --include=optional` em vez de `npm ci` porque o lockfile do
-# repo foi gerado em Windows e nao contem as optional deps platform-specific
-# do Linux (ex: @rollup/rollup-linux-x64-gnu). npm ci nao baixa optional
-# deps ausentes do lockfile; npm install resolve na hora.
-# Long-term: regenerar o lockfile em Linux e voltar pra npm ci.
-RUN npm install --include=optional --no-audit --no-fund
+# O package-lock.json do repo foi gerado em Windows e cacheia optional
+# deps platform-specific daquele SO. npm install (mesmo com
+# --include=optional) preserva o lockfile existente e nao baixa os
+# optional deps do Linux (ex: @rollup/rollup-linux-x64-gnu).
+# Bug conhecido: https://github.com/npm/cli/issues/4828
+# Fix: remover o lockfile antes de npm install, forcando regeneracao
+# no env atual (Linux). Long-term: regenerar e commitar o lockfile em
+# Linux no repo, voltar pra npm ci.
+RUN rm -f package-lock.json && npm install --include=optional --no-audit --no-fund
 
 # Codigo do hub + tsconfig base (necessario pro tsc --noEmit do script build)
 COPY tsconfig.base.json ./
