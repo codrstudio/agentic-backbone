@@ -25,7 +25,8 @@ import { resolve, join } from "node:path";
 import { spawnSync } from "node:child_process";
 import { load as yamlLoad } from "js-yaml";
 
-const ROOT = resolve(import.meta.dirname, "..");
+const ROOT = resolve(import.meta.dirname, "../..");
+const INFRA = resolve(import.meta.dirname, "..");
 const ENV_FILE = resolve(ROOT, ".env");
 
 // ── Load .env ────────────────────────────────────────────────────────
@@ -141,7 +142,7 @@ const composeArgs = [
 const result = spawnSync("docker", composeArgs, {
   stdio: "inherit",
   env: finalEnv,
-  cwd: ROOT,
+  cwd: INFRA,
 });
 
 process.exit(result.status ?? 0);

@@ -4,11 +4,33 @@
 name: ab-platform-${ENVIRONMENT}
 
 services:
+  # Proxy reverso INTERNO do projeto — unifica backbone/hub/adminer numa PUBLIC_PORT.
+  # Em prod ganha web_network via override em docker-compose.yml.
+  caddy:
+    image: caddy:alpine
+    restart: unless-stopped
+    ports:
+      - "${PUBLIC_PORT}:${PUBLIC_PORT}"
+    volumes:
+      - ./docker/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+    environment:
+      PUBLIC_PORT: ${PUBLIC_PORT}
+      BACKBONE_HOST: ${PROXY_UPSTREAM:-backbone.internal}
+      BACKBONE_PORT: ${BACKBONE_PORT}
+      HUB_HOST: ${PROXY_UPSTREAM:-hub.internal}
+      HUB_PORT: ${HUB_PORT}
+      ADMINER_HOST: ${PROXY_UPSTREAM:-adminer.internal}
+      ADMINER_PORT: ${ADMINER_PORT_INTERNAL:-8080}
+    networks:
+      internal:
+        aliases:
+          - caddy.internal
+
   init:
     image: busybox:1.37
     command: ["sh", "-c", "mkdir -p /data/postgres /data/redis /data/evolution/instances /data/evolution/store && chown -R 999:999 /data/postgres && chown -R 999:999 /data/redis"]
     volumes:
-      - ./data:/data
+      - ../data:/data
     networks:
       - internal
 
@@ -23,7 +45,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${PROJECT}
     volumes:
-      - ./data/postgres:/var/lib/postgresql/data
+      - ../data/postgres:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${PROJECT}"]
       interval: 10s
@@ -42,7 +64,7 @@ services:
         condition: service_completed_successfully
     command: redis-server --appendonly yes
     volumes:
-      - ./data/redis:/data
+      - ../data/redis:/data
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
@@ -71,8 +93,8 @@ services:
       AUTHENTICATION_API_KEY: ${EVOLUTION_API_KEY}
       AUTHENTICATION_INSTANCE_MODE: container
     volumes:
-      - ./data/evolution/instances:/evolution/instances
-      - ./data/evolution/store:/evolution/store
+      - ../data/evolution/instances:/evolution/instances
+      - ../data/evolution/store:/evolution/store
     networks:
       internal:
         aliases:
@@ -88,7 +110,7 @@ services:
       - WHISPER__DEVICE=cpu
       - WHISPER__COMPUTE_TYPE=${WHISPER_COMPUTE_TYPE:-int8}
     volumes:
-      - ./data/whisper:/root/.cache/huggingface
+      - ../data/whisper:/root/.cache/huggingface
     networks:
       internal:
         aliases:

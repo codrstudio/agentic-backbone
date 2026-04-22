@@ -1,0 +1,38 @@
+# Proxy reverso interno do projeto agentic-backbone.
+# Cristalizado em 2026-04-21 a partir do container ab-development-caddy-1.
+#
+# Unifica backbone/hub/adminer numa porta publica ($PUBLIC_PORT).
+# Edge (nginx-proxy do ia-web) faz proxy_pass pra esta unica porta.
+
+:{$PUBLIC_PORT} {
+    # Backbone API (REST + SSE)
+    handle /api/* {
+        reverse_proxy {$BACKBONE_HOST}:{$BACKBONE_PORT}
+    }
+
+    # Hub (admin UI) — SPA servido pelo Caddy interno do container hub
+    handle /hub {
+        redir * /hub/ 301
+    }
+    handle /hub/* {
+        reverse_proxy {$HUB_HOST}:{$HUB_PORT}
+    }
+
+    # Adminer (database GUI)
+    handle /adminer {
+        redir * /adminer/ 301
+    }
+    handle /adminer/* {
+        reverse_proxy {$ADMINER_HOST}:{$ADMINER_PORT}
+    }
+
+    # Raiz -> /hub/
+    handle / {
+        redir * /hub/ 301
+    }
+
+    # Health check local (responde direto, sem hit no backbone)
+    handle /health {
+        respond "OK" 200
+    }
+}
