@@ -8,7 +8,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ```bash
 # Development (hot-reload via tsx watch)
-npm run dev:all               # backbone + hub + chat concurrently (from root)
+npm run dev               # backbone + hub + chat concurrently (from root)
 npm run dev:backbone          # backbone only (from root)
 npm run dev:hub               # hub only (from root)
 npm run dev:chat              # chat only (from root)
@@ -55,7 +55,7 @@ npm run ngrok:up                       # expose backbone via ngrok
 
 Test credentials come from `.env`: `TEST_USER` / `TEST_PASS`.
 
-**IMPORTANT**: Always use `npm run` commands, never run apps directly (tsx, node, etc). The npm scripts use `dotenv-cli` to properly expand env vars like `${PREFIX}`. Hub proxy to backbone (`/api` → `:BACKBONE_PORT`) is already configured in `vite.config.ts` and only works when started via `npm run dev:all`.
+**IMPORTANT**: Always use `npm run` commands, never run apps directly (tsx, node, etc). The npm scripts use `dotenv-cli` to properly expand env vars like `${PREFIX}`. Hub proxy to backbone (`/api` → `:BACKBONE_PORT`) is already configured in `vite.config.ts` and only works when started via `npm run dev`.
 
 ---
 
@@ -250,6 +250,6 @@ Usuário de teste: `system` (user em `context/users/system/`), senha `12345678`.
 
 ## HotReload
 
-O comando `npm run dev:all`:
+O comando `npm run dev`:
 - **Lança os serviços com hot-reload**
 - **Mantém um log em .tmp\-run.log**
