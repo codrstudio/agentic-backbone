@@ -1,7 +1,7 @@
 import { defineConfig, devices } from "@playwright/test";
 
 export default defineConfig({
-  testDir: "./e2e",
+  testDir: "./tests/e2e",
   fullyParallel: false,
   forbidOnly: !!process.env.CI,
   retries: 0,
@@ -17,6 +17,12 @@ export default defineConfig({
   projects: [
     {
       name: "hub",
+      testDir: "./tests/e2e/hub",
+      use: { ...devices["Desktop Chrome"] },
+    },
+    {
+      name: "backbone",
+      testDir: "./tests/e2e/backbone",
       use: { ...devices["Desktop Chrome"] },
     },
   ],
