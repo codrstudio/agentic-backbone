@@ -6,7 +6,12 @@ import {
   userExists,
   updateUser,
   deleteUser,
+  userHasCredential,
 } from "../users/manager.js";
+
+function withSSOFlag<T extends { slug: string }>(user: T): T & { sso: boolean } {
+  return { ...user, sso: user.slug !== "system" && !userHasCredential(user.slug) };
+}
 import { listAgents } from "../agents/registry.js";
 import { getAuthUser, requireSysuser } from "./auth-helpers.js";
 
@@ -17,7 +22,7 @@ export const userRoutes = new Hono();
 userRoutes.get("/users", (c) => {
   const denied = requireSysuser(c);
   if (denied) return denied;
-  return c.json(listUsers());
+  return c.json(listUsers().map(withSSOFlag));
 });
 
 // --- Get User (sysuser or self) ---
@@ -30,7 +35,7 @@ userRoutes.get("/users/:slug", (c) => {
   }
   const user = getUser(slug);
   if (!user) return c.json({ error: "not found" }, 404);
-  return c.json(user);
+  return c.json(withSSOFlag(user));
 });
 
 // --- Create User (sysuser only) ---
@@ -114,12 +119,12 @@ userRoutes.patch("/users/:slug", async (c) => {
     if (body.address !== undefined) updates.address = body.address;
     const updated = await updateUser(slug, updates);
     if (!updated) return c.json({ error: "not found" }, 404);
-    return c.json(updated);
+    return c.json(withSSOFlag(updated));
   }
 
   const updated = await updateUser(slug, body);
   if (!updated) return c.json({ error: "not found" }, 404);
-  return c.json(updated);
+  return c.json(withSSOFlag(updated));
 });
 
 // --- User Agents (sysuser only) ---

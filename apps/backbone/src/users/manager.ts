@@ -254,6 +254,10 @@ export async function updateUser(
   };
 }
 
+export function userHasCredential(slug: string): boolean {
+  return existsSync(userCredentialPath(slug));
+}
+
 export async function upsertSSOUser(slug: string, displayName: string, email: string): Promise<UserConfig> {
   if (userExists(slug)) {
     const updated = await updateUser(slug, { displayName, email });

@@ -23,6 +23,7 @@ export interface User {
   email: string;
   phoneNumber?: string;
   role?: string;
+  sso?: boolean;
   permissions: UserPermissions;
   address?: UserAddress;
 }
