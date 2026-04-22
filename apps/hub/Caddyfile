@@ -6,7 +6,7 @@
 # - try_files pra SPA routing (tudo cai no index.html se nao for arquivo)
 # - PWA precisa que sw.js e manifest.webmanifest sejam servidos com content-type correto — Caddy detecta pelo file_server.
 
-:80 {
+:{$HUB_PORT} {
     # Gateway envia paths com prefixo /hub (Caddyfile do proxy usa `handle`
     # sem strip). Aqui removemos o prefixo pra casar com a estrutura do dist.
     # Requer que o Vite tenha sido buildado com `base: '/hub/'`.

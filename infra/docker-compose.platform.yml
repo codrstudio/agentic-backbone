@@ -18,10 +18,7 @@ services:
       BACKBONE_HOST: ${PROXY_UPSTREAM:-backbone.internal}
       BACKBONE_PORT: ${BACKBONE_PORT}
       HUB_HOST: ${PROXY_UPSTREAM:-hub.internal}
-      # Hub e' SPA servido pelo Caddy interno do container hub, que ouve em :80.
-      # `HUB_PORT` no .env vale pro dev server Vite (que expoe no host);
-      # aqui no Caddy de infra, apontamos pra porta interna do container.
-      HUB_PORT: ${HUB_PORT_INTERNAL:-80}
+      HUB_PORT: ${HUB_PORT}
       ADMINER_HOST: ${PROXY_UPSTREAM:-adminer.internal}
       ADMINER_PORT: ${ADMINER_PORT_INTERNAL:-8080}
     networks:

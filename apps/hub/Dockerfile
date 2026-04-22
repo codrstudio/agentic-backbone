@@ -45,4 +45,6 @@ FROM caddy:alpine AS runtime
 COPY --from=builder /app/apps/hub/dist /srv/hub
 COPY apps/hub/Caddyfile /etc/caddy/Caddyfile
 
-EXPOSE 80
+# Porta interna definida pelo env HUB_PORT (convencao do projeto: .env manda).
+# Dockerfile so documenta via EXPOSE (nao binda — o Caddy binda via Caddyfile).
+EXPOSE ${HUB_PORT}
