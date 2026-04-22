@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type ComponentType, type SVGProps } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuthStore } from "@/lib/auth";
@@ -49,9 +49,17 @@ const settingsGroups = [
   },
 ] as const;
 
-const settingsTabs = settingsGroups.flatMap((g) => g.items);
+type SettingsTabItem = {
+  value: string;
+  label: string;
+  icon: ComponentType<SVGProps<SVGSVGElement>>;
+};
 
-type SettingsTab = (typeof settingsTabs)[number]["value"];
+const settingsTabs: readonly SettingsTabItem[] = settingsGroups.flatMap(
+  (g) => g.items as readonly SettingsTabItem[],
+);
+
+type SettingsTab = (typeof settingsGroups)[number]["items"][number]["value"];
 
 interface SettingsSearchParams {
   tab?: SettingsTab;
@@ -95,7 +103,7 @@ function SettingsPage() {
     <div className="flex flex-col gap-6 md:flex-row md:items-start md:gap-8">
       {/* Mobile: select */}
       <div className="md:hidden">
-        <Select value={activeTab} onValueChange={handleTabChange}>
+        <Select value={activeTab} onValueChange={(v) => v && handleTabChange(v)}>
           <SelectTrigger>
             <SelectValue />
           </SelectTrigger>

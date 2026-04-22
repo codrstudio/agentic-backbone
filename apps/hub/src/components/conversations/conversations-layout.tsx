@@ -11,7 +11,6 @@ import {
   useHistoryContext,
   type Message,
   type Conversation as ChatConversation,
-  convertSDKMessages,
 } from "@codrstudio/openclaude-chat";
 import {
   Sheet,
@@ -60,7 +59,7 @@ export function ConversationsLayout({ fixedAgentId, basePath }: ConversationsLay
       transport.getMessages(id),
       transport.getConversation(id),
     ]).then(([result, conv]) => {
-      setLoadedMessages(convertSDKMessages(result.messages));
+      setLoadedMessages(result.messages);
       setActiveConv(conv);
       navigate({ to: `${basePath}/${id}` as string });
     });

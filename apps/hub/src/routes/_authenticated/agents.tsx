@@ -103,15 +103,16 @@ function AgentsPage() {
   }, []));
 
   const toggleMutation = useMutation({
-    mutationFn: (id: string) => toggleAgentEnabled(id),
+    mutationFn: ({ id, enabled }: { id: string; enabled: boolean }) =>
+      toggleAgentEnabled(id, enabled),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["agents"] });
     },
   });
 
   const handleToggle = useCallback(
-    (id: string, _enabled: boolean) => {
-      toggleMutation.mutate(id);
+    (id: string, enabled: boolean) => {
+      toggleMutation.mutate({ id, enabled });
     },
     [toggleMutation],
   );

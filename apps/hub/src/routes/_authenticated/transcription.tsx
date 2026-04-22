@@ -151,7 +151,7 @@ function TranscriptionPage() {
       <div className="flex items-end gap-4">
         <div className="space-y-1.5">
           <Label className="text-xs">Idioma</Label>
-          <Select value={language} onValueChange={setLanguage}>
+          <Select value={language} onValueChange={(v) => v && setLanguage(v)}>
             <SelectTrigger className="w-40">
               <SelectValue />
             </SelectTrigger>

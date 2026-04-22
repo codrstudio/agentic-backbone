@@ -116,9 +116,7 @@ export function ConversationChatPage({ id, basePath }: ConversationChatPageProps
           sessionId={id}
           initialMessages={initialMessages ?? []}
           displayRenderers={defaultDisplayRenderers}
-          enableRichContent
           locale="pt-BR"
-          enableLocaleSelect={false}
           className="flex-1 flex flex-col overflow-hidden"
         />
       </div>
