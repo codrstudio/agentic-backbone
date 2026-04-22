@@ -21,6 +21,12 @@ stages:
 variables:
   # Runner sem privileged → DinD não funciona; usa docker.sock do host
   DOCKER_HOST: unix:///var/run/docker.sock
+  # Deploy target (ia-web) — hardcoded aqui porque sao constantes da infra
+  # Processa (nao faz sentido criar vars no GitLab pra isso). Se um dia
+  # mudar o servidor alvo ou padrao de path, troca aqui.
+  VPS_IAWEB_HOST: "172.27.0.50"
+  VPS_IAWEB_USER: "suporte"
+  VPS_IAWEB_DEPLOY_FOLDER: "/projetos"
 
 build:
   stage: build
