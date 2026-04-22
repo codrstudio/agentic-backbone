@@ -17,7 +17,7 @@ interface ChannelMessageFeedProps {
 }
 
 export function ChannelMessageFeed({ channelSlug }: ChannelMessageFeedProps) {
-  const token = useAuthStore((s) => s.token);
+  const user = useAuthStore((s) => s.user);
   const [messages, setMessages] = useState<ChannelMessage[]>([]);
   const [connected, setConnected] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -25,7 +25,7 @@ export function ChannelMessageFeed({ channelSlug }: ChannelMessageFeedProps) {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!token) return;
+    if (!user) return;
 
     let es: EventSource | null = null;
     let disposed = false;
@@ -36,7 +36,8 @@ export function ChannelMessageFeed({ channelSlug }: ChannelMessageFeedProps) {
       if (disposed) return;
 
       es = new EventSource(
-        `/api/v1/ai/channels/${encodeURIComponent(channelSlug)}/events?token=${encodeURIComponent(token!)}`,
+        `/api/v1/ai/channels/${encodeURIComponent(channelSlug)}/events`,
+        { withCredentials: true },
       );
 
       es.addEventListener("connected", () => {
@@ -70,7 +71,7 @@ export function ChannelMessageFeed({ channelSlug }: ChannelMessageFeedProps) {
       es?.close();
       if (retryTimer) clearTimeout(retryTimer);
     };
-  }, [token, channelSlug]);
+  }, [user, channelSlug]);
 
   // Track scroll position on the viewport
   useEffect(() => {

@@ -43,14 +43,15 @@ export function TerminalOutput({
   );
   const [autoScroll, setAutoScroll] = useState(true);
   const containerRef = useRef<HTMLDivElement>(null);
-  const token = useAuthStore((s) => s.token);
+  const user = useAuthStore((s) => s.user);
 
   // SSE streaming for active jobs
   useEffect(() => {
-    if (!streaming || !jobId || !token) return;
+    if (!streaming || !jobId || !user) return;
 
     const es = new EventSource(
-      `/api/v1/ai/jobs/${jobId}/stream?token=${encodeURIComponent(token)}`,
+      `/api/v1/ai/jobs/${jobId}/stream`,
+      { withCredentials: true },
     );
 
     let cancelled = false;
@@ -85,7 +86,7 @@ export function TerminalOutput({
       cancelled = true;
       es.close();
     };
-  }, [streaming, jobId, token]);
+  }, [streaming, jobId, user]);
 
   // Auto-scroll
   useEffect(() => {
