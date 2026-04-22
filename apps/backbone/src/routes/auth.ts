@@ -213,9 +213,9 @@ authPublicRoutes.post("/auth/sso", async (c) => {
 
   const userConfig = await upsertSSOUser(remoteUser, remoteName, remoteEmail);
 
-  // Bootstrap mode: no sysadmin exists yet → every SSO user gets sysuser.
-  // Once any user is marked sysadmin, only sysadmin users get elevated access.
-  const bootstrapMode = !listUsers().some((u) => u.role === "sysadmin");
+  // Bootstrap mode: no non-system sysadmin exists yet → every SSO user gets sysuser.
+  // The built-in "system" user doesn't count — only explicitly promoted users do.
+  const bootstrapMode = !listUsers().some((u) => u.slug !== "system" && u.role === "sysadmin");
   const effectiveRole = bootstrapMode ? "sysadmin" : (userConfig.role ?? "user");
 
   const token = await createAuthToken(remoteUser, effectiveRole);

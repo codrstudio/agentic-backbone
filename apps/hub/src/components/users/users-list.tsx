@@ -179,7 +179,7 @@ export function UsersList() {
   const [editingUser, setEditingUser] = useState<User | undefined>();
   const currentUser = useAuthStore((s) => s.user);
 
-  const bootstrapMode = !!users && !users.some((u) => u.role === "sysadmin");
+  const bootstrapMode = !!users && !users.some((u) => u.slug !== "system" && u.role === "sysadmin");
   const currentIsSysuser = currentUser?.role === "sysuser";
 
   function openCreate() {
