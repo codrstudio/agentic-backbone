@@ -19,18 +19,20 @@ RUN npm ci
 COPY tsconfig.base.json .
 COPY apps/backbone/src apps/backbone/src
 COPY apps/backbone/tsconfig.json apps/backbone/
-# Transpile com --noCheck (TS 5.1+). Separa type-check de emit:
-# - Emit: fica aqui, rapido e barato, usa pouca memoria.
-# - Type-check: roda separado (IDE / CI step opcional via `tsc --noEmit`),
-#   nao bloqueia build.
+# Transpile com --noCheck + declaration off. Separa type-check de emit:
+# - Emit .js: rapido e barato, usa pouca memoria.
+# - Type-check + .d.ts: roda separado (IDE / CI step opcional via
+#   `tsc --noEmit`), nao bloqueia build.
 #
 # Motivo: backbone usa Hono com ~555 rotas encadeadas + ~98 Zod chains.
 # Tsc full checking faz type explosion — consome >8GB e nao termina.
-# Patologia do stack Hono/tRPC-like em escala; fix arquitetural e'
-# anotar os sub-apps Hono explicitamente, trabalho separado.
+# --noCheck sozinho nao basta porque o tsconfig tem `declaration: true`
+# e TS precisa resolver tipos inteiros pra emitir .d.ts. `--declaration=false`
+# corta isso. Flag `--declarationMap=false` idem.
 #
-# Runtime e' identico — mesmo JS emitido que tsc full checking produziria.
-RUN npm run build --workspace=apps/backbone -- --noCheck
+# Runtime .js emitido e' identico; app nao usa .d.ts em producao.
+# NODE_OPTIONS=--max-old-space-size=8192 mantido como seguranca.
+RUN NODE_OPTIONS=--max-old-space-size=8192 npm run build --workspace=apps/backbone -- --noCheck --declaration false --declarationMap false
 
 FROM node:22-slim
 WORKDIR /app
