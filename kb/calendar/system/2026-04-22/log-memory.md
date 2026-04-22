@@ -15,3 +15,13 @@
 2026-04-22 16:20:55 INFO Flushing session f8700eb9-2432-467e-b6c2-bf7ee130b5c2: 14225 chars
 2026-04-22 16:21:33 INFO Result: saved to daily log (3631 chars)
 2026-04-22 16:21:33 INFO Flush complete for session f8700eb9-2432-467e-b6c2-bf7ee130b5c2
+2026-04-22 16:45:53 INFO [hook] SessionEnd fired: session=b4cb5ae3-a5aa-4065-9481-9df206add071 source=unknown
+2026-04-22 16:45:53 INFO [hook] SKIP: transcript missing: C:\Users\gugac\.claude\projects\d--aw-context-workspaces-ab-repo\b4cb5ae3-a5aa-4065-9481-9df206add071.jsonl
+2026-04-22 16:52:04 INFO [hook] SessionEnd fired: session=8a368eb6-3473-45c9-bddb-4b75a46766f1 source=unknown
+2026-04-22 16:52:04 INFO [hook] Spawned flush.js for session 8a368eb6-3473-45c9-bddb-4b75a46766f1 (15 turns, 7427 chars)
+2026-04-22 16:52:04 INFO flush.js started for session 8a368eb6-3473-45c9-bddb-4b75a46766f1, context: D:\aw\context\workspaces\ab\repo\kb\calendar\system\2026-04-22\session-flush-memory-8a368eb6-3473-45c9-bddb-4b75a46766f1-20260422-135204.md
+2026-04-22 16:52:04 INFO Flushing session 8a368eb6-3473-45c9-bddb-4b75a46766f1: 7426 chars
+2026-04-22 16:52:12 INFO Result: FLUSH_OK
+2026-04-22 16:52:12 INFO Flush complete for session 8a368eb6-3473-45c9-bddb-4b75a46766f1
+2026-04-22 17:36:11 INFO [hook] SessionEnd fired: session=4f6772a5-f965-4c65-a4f8-d8a20b91475c source=unknown
+2026-04-22 17:36:11 INFO [hook] SKIP: transcript missing: C:\Users\gugac\.claude\projects\D--aw-context-workspaces-ab-repo\4f6772a5-f965-4c65-a4f8-d8a20b91475c.jsonl
