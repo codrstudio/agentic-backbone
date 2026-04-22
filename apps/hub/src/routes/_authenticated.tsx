@@ -12,9 +12,13 @@ import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated")({
   beforeLoad: async () => {
-    const isAuthenticated = await useAuthStore.getState().checkAuth();
+    const store = useAuthStore.getState();
+    const isAuthenticated = await store.checkAuth();
     if (!isAuthenticated) {
-      throw redirect({ to: "/login" });
+      const ssoOk = await store.loginWithSSO();
+      if (!ssoOk) {
+        throw redirect({ to: "/login" });
+      }
     }
   },
   component: AuthenticatedLayout,

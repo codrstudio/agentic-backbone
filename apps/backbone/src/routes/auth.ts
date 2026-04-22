@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { sign } from "hono/jwt";
 import { setCookie, deleteCookie } from "hono/cookie";
-import { getUser, getUserByEmail, getUserCredential, getUserByIdentifier, updateUserCredentialPassword } from "../users/manager.js";
+import { getUser, getUserByEmail, getUserCredential, getUserByIdentifier, updateUserCredentialPassword, upsertSSOUser, listUsers } from "../users/manager.js";
 import { verifyPassword, hashPassword } from "../users/password.js";
 import { rateLimit } from "../middleware/rate-limit.js";
 import { sendOtp, verifyOtp } from "../otp/sender.js";
@@ -22,7 +22,7 @@ function setCookieToken(c: Parameters<typeof setCookie>[0], token: string): void
 
 // Shared helper: generate JWT for authenticated user
 async function createAuthToken(slug: string, configRole: string): Promise<string> {
-  const role: "sysuser" | "user" = configRole === "sysadmin" ? "sysuser" : "user";
+  const role: "sysuser" | "user" = slug === "system" || configRole === "sysadmin" ? "sysuser" : "user";
   const now = Math.floor(Date.now() / 1000);
   return sign({ sub: slug, role, iat: now, exp: now + 60 * 60 * 24 }, process.env.JWT_SECRET!);
 }
@@ -198,6 +198,33 @@ authPublicRoutes.post("/auth/otp-verify", rateLimit(), async (c) => {
 authPublicRoutes.post("/auth/logout", (c) => {
   deleteCookie(c, "token", { path: "/api" });
   return c.json({ success: true });
+});
+
+// POST /auth/sso — public; issues JWT from Authelia Remote-* headers
+// Only works when the request passed through the nginx/Authelia forward-auth layer.
+authPublicRoutes.post("/auth/sso", async (c) => {
+  const remoteUser = c.req.header("Remote-User");
+  if (!remoteUser) {
+    return c.json({ error: "not under authelia" }, 401);
+  }
+
+  const remoteEmail = c.req.header("Remote-Email") ?? "";
+  const remoteName = c.req.header("Remote-Name") ?? remoteUser;
+
+  const userConfig = await upsertSSOUser(remoteUser, remoteName, remoteEmail);
+
+  // Bootstrap mode: no sysadmin exists yet → every SSO user gets sysuser.
+  // Once any user is marked sysadmin, only sysadmin users get elevated access.
+  const bootstrapMode = !listUsers().some((u) => u.role === "sysadmin");
+  const effectiveRole = bootstrapMode ? "sysadmin" : (userConfig.role ?? "user");
+
+  const token = await createAuthToken(remoteUser, effectiveRole);
+  const jwtRole = effectiveRole === "sysadmin" ? "sysuser" : "user";
+  setCookieToken(c, token);
+  return c.json({
+    success: true,
+    user: { id: remoteUser, role: jwtRole, displayName: remoteName },
+  });
 });
 
 // GET /auth/me — protected (mounted after JWT middleware)

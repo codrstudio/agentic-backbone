@@ -34,6 +34,7 @@ interface AuthState {
   loginWithPassword: (username: string, password: string) => Promise<void>;
   loginWithOtp: (username: string, code: string) => Promise<void>;
   resendOtp: (username: string) => Promise<void>;
+  loginWithSSO: () => Promise<boolean>;
   logout: () => Promise<void>;
   checkAuth: () => Promise<boolean>;
 }
@@ -98,6 +99,17 @@ export const useAuthStore = create<AuthState>()(
           const body = await res.json().catch(() => ({}));
           throw new ApiError(res.status, body.error ?? "Erro desconhecido", body.retryAfter);
         }
+      },
+
+      loginWithSSO: async () => {
+        const res = await fetch("/api/v1/ai/auth/sso", {
+          method: "POST",
+          credentials: "include",
+        });
+        if (!res.ok) return false;
+        const { user } = await res.json();
+        set({ user });
+        return true;
       },
 
       logout: async () => {

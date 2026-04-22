@@ -254,6 +254,28 @@ export async function updateUser(
   };
 }
 
+export async function upsertSSOUser(slug: string, displayName: string, email: string): Promise<UserConfig> {
+  if (userExists(slug)) {
+    const updated = await updateUser(slug, { displayName, email });
+    return updated!;
+  }
+
+  const dir = userDir(slug);
+  mkdirSync(dir, { recursive: true });
+  mkdirSync(join(dir, "channels"), { recursive: true });
+
+  writeMarkdownAs(userMdPath(slug), {
+    slug,
+    displayName,
+    email,
+    canCreateAgents: DEFAULT_PERMISSIONS.canCreateAgents,
+    canCreateChannels: DEFAULT_PERMISSIONS.canCreateChannels,
+    maxAgents: DEFAULT_PERMISSIONS.maxAgents,
+  }, `# ${displayName}\n`, UserMdSchema);
+
+  return { slug, displayName, email, permissions: DEFAULT_PERMISSIONS };
+}
+
 export function deleteUser(slug: string): boolean {
   if (slug === "system") return false;
   const dir = userDir(slug);
