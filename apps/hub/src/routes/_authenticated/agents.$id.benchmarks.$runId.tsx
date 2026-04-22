@@ -392,7 +392,7 @@ function BenchmarkRunPage() {
                         variant="ghost"
                         size="sm"
                         className="h-7 px-2 text-xs"
-                        onClick={() => navigate({ search: { case: c.caseId } })}
+                        onClick={() => navigate({ from: Route.fullPath, search: { case: c.caseId } })}
                       >
                         <Eye className="mr-1 size-3.5" />
                         Ver detalhes
@@ -410,7 +410,7 @@ function BenchmarkRunPage() {
       <CaseDetailModal
         caseData={selectedCase}
         open={!!caseId && !!selectedCase}
-        onOpenChange={(open) => { if (!open) navigate({ search: {} }); }}
+        onOpenChange={(open) => { if (!open) navigate({ from: Route.fullPath, search: {} }); }}
       />
     </div>
   );

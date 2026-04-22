@@ -76,8 +76,8 @@ export function RatingsTable({ items }: RatingsTableProps) {
             </TableCell>
             <TableCell>
               <Link
-                to="/conversations/$id"
-                params={{ id: item.session_id }}
+                to="/agents/$id/conversations/$convId"
+                params={{ id: item.agent_id, convId: item.session_id }}
                 className="text-xs text-primary underline-offset-2 hover:underline"
               >
                 Ver

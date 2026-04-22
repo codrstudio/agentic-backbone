@@ -1,13 +1,12 @@
 import { useState } from "react";
 import { Link, useMatchRoute } from "@tanstack/react-router";
-import { Bot, MessageSquare, Radio, Settings, Menu } from "lucide-react";
+import { Bot, Radio, Settings, Menu } from "lucide-react";
 import { Drawer } from "vaul";
 import { cn } from "@/lib/utils";
 import { NavMenu } from "@/components/layout/nav-menu";
 
 const navItems = [
   { label: "Agentes", icon: Bot, to: "/agents" as const },
-  { label: "Conversas", icon: MessageSquare, to: "/conversations" as const },
   { label: "Canais", icon: Radio, to: "/channels" as const },
   { label: "Config", icon: Settings, to: "/settings" as const },
 ] as const;

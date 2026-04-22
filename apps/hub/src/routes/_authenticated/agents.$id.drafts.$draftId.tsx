@@ -68,7 +68,7 @@ function DraftEditorPage() {
     try {
       await publishDraft(agentId, draftId);
       queryClient.invalidateQueries({ queryKey: ["drafts", agentId] });
-      navigate({ search: (prev: DraftSearch) => ({ file: prev.file }) });
+      navigate({ from: Route.fullPath, search: (prev) => ({ file: prev.file }) });
     } finally {
       setPublishing(false);
     }
@@ -128,7 +128,7 @@ function DraftEditorPage() {
                 <MessageSquare className="size-4 mr-1" />
                 Testar no chat
               </Button>
-              <Button size="sm" variant="outline" onClick={() => navigate({ search: (prev: DraftSearch) => ({ ...prev, action: "publish" }) })}>
+              <Button size="sm" variant="outline" onClick={() => navigate({ from: Route.fullPath, search: (prev) => ({ ...prev, action: "publish" as const }) })}>
                 <Rocket className="size-4 mr-1" />
                 Publicar
               </Button>
@@ -147,7 +147,7 @@ function DraftEditorPage() {
         {fileKeys.length > 0 && (
           <Tabs
             value={currentFile ?? fileKeys[0]}
-            onValueChange={(v) => navigate({ search: (prev: DraftSearch) => ({ ...prev, file: v }) })}
+            onValueChange={(v) => navigate({ from: Route.fullPath, search: (prev) => ({ ...prev, file: v }) })}
             className="flex-1 flex flex-col"
           >
             <TabsList>
@@ -185,7 +185,7 @@ function DraftEditorPage() {
       )}
 
       {/* Publish dialog */}
-      <Dialog open={action === "publish"} onOpenChange={(open) => { if (!open) navigate({ search: (prev: DraftSearch) => ({ file: prev.file }) }); }}>
+      <Dialog open={action === "publish"} onOpenChange={(open) => { if (!open) navigate({ from: Route.fullPath, search: (prev) => ({ file: prev.file }) }); }}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Publicar rascunho</DialogTitle>
@@ -196,7 +196,7 @@ function DraftEditorPage() {
             versao antes de ser substituido.
           </p>
           <DialogFooter>
-            <Button variant="outline" onClick={() => navigate({ search: (prev: DraftSearch) => ({ file: prev.file }) })}>
+            <Button variant="outline" onClick={() => navigate({ from: Route.fullPath, search: (prev) => ({ file: prev.file }) })}>
               Cancelar
             </Button>
             <Button onClick={handlePublish} disabled={publishing}>
