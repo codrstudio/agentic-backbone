@@ -19,12 +19,18 @@ RUN npm ci
 COPY tsconfig.base.json .
 COPY apps/backbone/src apps/backbone/src
 COPY apps/backbone/tsconfig.json apps/backbone/
-# tsc em monorepo grande consome muito heap. Default V8 ~1.5GB, tentativa
-# anterior com 4GB estourou (Ineffective mark-compacts — heap saturado,
-# GC nao libera). 8GB ainda e' um workaround — root cause parece ser
-# type explosion, recomendacao long-term e' usar esbuild/swc no build e
-# rodar tsc --noEmit so pra type check.
-RUN NODE_OPTIONS=--max-old-space-size=8192 npm run build --workspace=apps/backbone
+# Transpile com --noCheck (TS 5.1+). Separa type-check de emit:
+# - Emit: fica aqui, rapido e barato, usa pouca memoria.
+# - Type-check: roda separado (IDE / CI step opcional via `tsc --noEmit`),
+#   nao bloqueia build.
+#
+# Motivo: backbone usa Hono com ~555 rotas encadeadas + ~98 Zod chains.
+# Tsc full checking faz type explosion — consome >8GB e nao termina.
+# Patologia do stack Hono/tRPC-like em escala; fix arquitetural e'
+# anotar os sub-apps Hono explicitamente, trabalho separado.
+#
+# Runtime e' identico — mesmo JS emitido que tsc full checking produziria.
+RUN npm run build --workspace=apps/backbone -- --noCheck
 
 FROM node:22-slim
 WORKDIR /app
