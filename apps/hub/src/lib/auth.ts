@@ -118,9 +118,7 @@ export const useAuthStore = create<AuthState>()(
           credentials: "include",
         }).catch(() => {});
         set({ user: null });
-        if (window.location.pathname !== "/login") {
-          window.location.href = "/login";
-        }
+        window.location.href = "/logout";
       },
 
       checkAuth: async () => {

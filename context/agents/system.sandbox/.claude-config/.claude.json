@@ -14,7 +14,9 @@
     "displayName": "Guga"
   },
   "penguinModeOrgEnabled": false,
-  "clientDataCache": {},
+  "clientDataCache": {
+    "kelp_forest_sonnet": "600000"
+  },
   "additionalModelOptionsCache": [],
   "claudeAiMcpEverConnected": [
     "claude.ai Gmail"
@@ -22,7 +24,7 @@
   "groveConfigCache": {
     "6ef5b597-f227-4e77-abdb-e26c8dcf53b3": {
       "grove_enabled": true,
-      "timestamp": 1776469068627
+      "timestamp": 1776970180024
     }
   },
   "cachedExtraUsageDisabledReason": "org_level_disabled",
@@ -39,7 +41,7 @@
         "currency": "BRL"
       },
       "remaining_passes": 3,
-      "timestamp": 1776469065644
+      "timestamp": 1776970177094
     }
   },
   "additionalModelOptionsCacheScope": "firstParty"

@@ -1,6 +1,7 @@
 import { ConnectorRegistry } from "./registry.js";
 import { mysqlConnector } from "./mysql/index.js";
 import { postgresConnector } from "./postgres/index.js";
+import { sqlserverConnector } from "./sqlserver/index.js";
 import { evolutionConnector } from "./evolution/index.js";
 import { twilioConnector } from "./twilio/index.js";
 import { whatsappCloudConnector } from "./whatsapp-cloud/index.js";
@@ -19,6 +20,7 @@ export const connectorRegistry = new ConnectorRegistry();
 // --- Data connectors (no lifecycle) ---
 connectorRegistry.register(mysqlConnector);
 connectorRegistry.register(postgresConnector);
+connectorRegistry.register(sqlserverConnector);
 connectorRegistry.register(elevenLabsConnector);
 connectorRegistry.register(gitlabConnector);
 connectorRegistry.register(githubConnector);

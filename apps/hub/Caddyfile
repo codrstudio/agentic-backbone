@@ -12,6 +12,11 @@
     # Requer que o Vite tenha sido buildado com `base: '/hub/'`.
     uri strip_prefix /hub
 
+    # SSO logout — redireciona para o provedor configurado (ex: Authelia).
+    # Defina LOGOUT_URL no .env (ex: https://proxy.processa.info/logout).
+    # Se vazio, redireciona para a página de login local.
+    redir /logout {$LOGOUT_URL:/login} 302
+
     root * /srv/hub
 
     # SPA routing: rotas client-side caem no index.html
