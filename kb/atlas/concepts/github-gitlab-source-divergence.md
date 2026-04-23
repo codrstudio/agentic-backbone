@@ -18,7 +18,7 @@ The agentic-backbone project has two remotes: `codrstudio/agentic-backbone` on G
 - **GitHub status**: `codrstudio/agentic-backbone` is a mirror/fork that had been used for GHA builds. GHA stagnated 18 days before 2026-04-21; no automated sync exists.
 - **Production images**: Images running in prod on ia-web were built from GitHub and tagged `:staging` on `ghcr.io/codrstudio/*` — not from the GitLab upstream.
 - **Config loss**: The GitLab upstream (`upstream/ab`) was missing `base: '/hub/'` in `vite.config.ts` — a config that existed on GitHub and that the running production image depended on. This is a concrete example of divergence causing a hidden regression.
-- **Registry**: GHCR (`ghcr.io`) is accepted as a valid alternative to the Processa registry. The `processa-deploy` / `gitlab-ci.yml` skill is registry-agnostic via CI group vars.
+- **Registry migration (2026-04-21)**: Images moved from `ghcr.io/codrstudio/*:staging` (GitHub GHA) → `registry.codrstudio.dev` (intermediate) → `registry.processa.info/agentic-backbone` (final, provisioned by Processa). The skill is registry-agnostic via `DOCKER_REGISTRY_*` CI vars.
 
 ## Details
 
@@ -28,6 +28,8 @@ This divergence caused a subtle config regression: `base: '/hub/'` in `vite.conf
 
 The org has an open decision: establish a proper sync between GitHub and GitLab, or explicitly deprecate one remote and standardize on the other. Continuing to let them drift creates the risk of further silent regressions when the "wrong" remote is used for a build.
 
+As of the 2026-04-21 deploy session, the active build pipeline now originates from GitLab (`nic-lab` id 275) and pushes to `registry.processa.info`. GitHub (`codrstudio/agentic-backbone`) remains as a stale mirror with no active CI. The `branch migrate-infra` was merged to `main` in both remotes, but GitHub remains 18+ days behind on other ongoing work.
+
 ## Related Concepts
 
 - [[concepts/processa-deploy-topology]] - ia-web topology and which remote feeds production images
@@ -35,4 +37,4 @@ The org has an open decision: establish a proper sync between GitHub and GitLab,
 
 ## Sources
 
-- [[calendar/notes/2026-04-21.md]] - Discovered GitHub 18 days behind GitLab; production images from `ghcr.io/codrstudio/:staging` via GitHub GHA; `base: '/hub/'` loss documented; org open question on sync/deprecate decision
+- [[calendar/notes/2026-04-21.md]] - Discovered GitHub 18 days behind GitLab; production images from `ghcr.io/codrstudio/:staging` via GitHub GHA; `base: '/hub/'` loss documented; org open question on sync/deprecate decision; Session (21:00) completed registry migration to `registry.processa.info`; active CI now originates from GitLab nic-lab

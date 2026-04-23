@@ -211,7 +211,6 @@ function AgentsPage() {
           ))}
         </div>
       )}
-      <Outlet />
     </div>
   );
 }

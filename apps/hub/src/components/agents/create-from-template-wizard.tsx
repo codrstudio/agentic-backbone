@@ -130,7 +130,7 @@ export function CreateFromTemplateWizard({
 
   const ownerOptions = [
     { value: "system", label: "system" },
-    ...(users ?? []).map((u) => ({ value: u.slug, label: u.slug })),
+    ...(users ?? []).filter((u) => u.slug !== "system").map((u) => ({ value: u.slug, label: u.slug })),
   ];
 
   function validateStep2(): boolean {

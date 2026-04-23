@@ -8,6 +8,7 @@ created: 2026-04-21
 updated: 2026-04-21
 ---
 
+
 # npm Lockfile Cross-Platform Rollup Bug
 
 When `package-lock.json` is generated on Windows, it does not include the Linux-specific optional dependency `@rollup/rollup-linux-x64-gnu`. Running `npm ci` inside a Linux Docker container then fails because this native binding is absent. This blocks the first CI build for the hub app.
@@ -17,7 +18,8 @@ When `package-lock.json` is generated on Windows, it does not include the Linux-
 - **Root cause**: npm on Windows omits platform-specific optional packages (like `@rollup/rollup-linux-x64-gnu`) from the lockfile because they are not needed on the host platform.
 - **Symptom**: `npm ci` in a Linux container fails with a missing native binding error for rollup.
 - **Fix option 1**: Regenerate `package-lock.json` on a Linux machine (or inside a container) so all platform-specific optional deps are captured.
-- **Fix option 2**: Change the Dockerfile to use `npm install --include=optional` instead of `npm ci`. This forces npm to resolve and install optional packages for the current platform, bypassing the lockfile's missing entries.
+- **Fix option 2**: Use `npm install --include=optional` in the Dockerfile — but this alone is insufficient if the lockfile already exists. The correct sequence is `rm package-lock.json && npm install` inside the container (npm issue #4828). `--include=optional` with the existing lockfile still skips the missing Linux binding.
+- **Fix option 3 (permanent)**: Regenerate `package-lock.json` on a Linux machine or inside a Linux container and commit the result. Allows CI to return to `npm ci` for deterministic installs.
 - **Affected service**: `apps/hub` — new `Dockerfile` uses `node:22-slim + COPY vendor/`. The lockfile was generated on Windows (dev machine).
 
 ## Details
@@ -28,6 +30,8 @@ The `apps/hub/Dockerfile` (added 2026-04-21) uses `node:22-slim` as the base ima
 
 This is a known class of cross-platform npm issue that also affects other packages with native bindings (e.g., `esbuild`, `@swc/core`, `better-sqlite3` on some platforms). The safest general fix for Docker-based builds is to always generate the lockfile in the same OS environment as the build target, or to use `--include=optional` at build time.
 
+During the 2026-04-21 live deploy, this bug was confirmed in the actual CI pipeline. The confirmed fix was `rm package-lock.json && npm install` run inside the container during the build step. The app team's debt item is to commit a Linux-generated lockfile so CI can return to `npm ci` for reproducibility.
+
 ## Related Concepts
 
 - [[concepts/processa-deploy-topology]] - The CI/CD pipeline that will consume this Dockerfile and lockfile
@@ -35,4 +39,4 @@ This is a known class of cross-platform npm issue that also affects other packag
 
 ## Sources
 
-- [[calendar/notes/2026-04-21.md]] - Lesson documented: `package-lock.json` on Windows misses `@rollup/rollup-linux-x64-gnu`; fix options (regenerate on Linux or `--include=optional`); listed as open action item for app team
+- [[calendar/notes/2026-04-21.md]] - Lesson documented: `package-lock.json` on Windows misses `@rollup/rollup-linux-x64-gnu`; fix options (regenerate on Linux or `--include=optional`); listed as open action item for app team; Session (21:00) confirmed the bug live in CI — fix `rm package-lock.json && npm install`; npm issue #4828

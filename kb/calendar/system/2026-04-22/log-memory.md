@@ -33,3 +33,24 @@
 2026-04-22 19:48:15 INFO Flush complete for session 9904842e-dc21-4581-bf1d-2d3e14878491
 2026-04-22 19:48:16 INFO [hook] SessionEnd fired: session=ba5b15ce-e9cb-48d7-838e-7594915b9e98 source=unknown
 2026-04-22 19:48:16 INFO [hook] SKIP: transcript missing: C:\Users\gugac\.claude\projects\D--aw-context-workspaces-ab-repo\ba5b15ce-e9cb-48d7-838e-7594915b9e98.jsonl
+2026-04-22 19:50:26 INFO [hook] SessionEnd fired: session=511e4022-66a2-49d1-80d7-520e5bf1a076 source=unknown
+2026-04-22 19:50:26 INFO [hook] Spawned flush.js for session 511e4022-66a2-49d1-80d7-520e5bf1a076 (9 turns, 3961 chars)
+2026-04-22 19:50:26 INFO flush.js started for session 511e4022-66a2-49d1-80d7-520e5bf1a076, context: D:\aw\context\workspaces\ab\repo\kb\calendar\system\2026-04-22\session-flush-memory-511e4022-66a2-49d1-80d7-520e5bf1a076-20260422-165026.md
+2026-04-22 19:50:26 INFO Flushing session 511e4022-66a2-49d1-80d7-520e5bf1a076: 3960 chars
+2026-04-22 19:50:35 INFO Result: FLUSH_OK
+2026-04-22 19:50:35 INFO Flush complete for session 511e4022-66a2-49d1-80d7-520e5bf1a076
+2026-04-22 20:31:33 INFO [hook] SessionEnd fired: session=a0f3d68c-2d12-4ab9-a8d7-03d9259ca547 source=unknown
+2026-04-22 20:31:33 INFO [hook] SKIP: transcript missing: C:\Users\gugac\.claude\projects\D--aw-context-workspaces-ab-repo\a0f3d68c-2d12-4ab9-a8d7-03d9259ca547.jsonl
+2026-04-22 20:31:56 INFO [hook] SessionEnd fired: session=9d4d1eb7-46f7-477c-a7cb-564a3b02f597 source=unknown
+2026-04-22 20:31:56 INFO [hook] SKIP: transcript missing: C:\Users\gugac\.claude\projects\D--aw-context-workspaces-ab-repo\9d4d1eb7-46f7-477c-a7cb-564a3b02f597.jsonl
+2026-04-22 21:39:55 INFO [hook] SessionEnd fired: session=290925c4-1888-4789-88e8-e78d3f0d9f82 source=unknown
+2026-04-22 21:39:55 INFO [hook] SKIP: transcript missing: C:\Users\gugac\.claude\projects\D--aw-context-workspaces-ab-repo\290925c4-1888-4789-88e8-e78d3f0d9f82.jsonl
+2026-04-22 22:24:44 INFO [pre-compact] PreCompact fired: session=d18c5317-44f5-4735-af88-925a0cdfd314
+2026-04-22 22:24:44 INFO [pre-compact] Spawned flush.js for session d18c5317-44f5-4735-af88-925a0cdfd314 (30 turns, 5016 chars)
+2026-04-22 22:24:44 INFO flush.js started for session d18c5317-44f5-4735-af88-925a0cdfd314, context: D:\aw\context\workspaces\ab\repo\kb\calendar\system\2026-04-22\session-flush-memory-d18c5317-44f5-4735-af88-925a0cdfd314-20260422-192444.md
+2026-04-22 22:24:44 INFO Flushing session d18c5317-44f5-4735-af88-925a0cdfd314: 5015 chars
+2026-04-22 22:24:50 INFO Result: FLUSH_OK
+2026-04-22 22:24:50 INFO End-of-day compilation triggered (after 18:00)
+2026-04-22 22:24:50 INFO Flush complete for session d18c5317-44f5-4735-af88-925a0cdfd314
+2026-04-22 22:58:21 INFO [hook] SessionEnd fired: session=029dd547-300c-4b81-9109-06ef54fb18e0 source=unknown
+2026-04-22 22:58:21 INFO [hook] SKIP: transcript missing: C:\Users\gugac\.claude\projects\D--aw-context-workspaces-ab-repo\029dd547-300c-4b81-9109-06ef54fb18e0.jsonl

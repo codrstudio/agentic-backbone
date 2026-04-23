@@ -13,7 +13,7 @@ interface NewAgentSearch {
   template?: string;
 }
 
-export const Route = createFileRoute("/_authenticated/agents/new")({
+export const Route = createFileRoute("/_authenticated/agents_/new")({
   staticData: { title: "Novo Agente", description: "Escolha um template ou crie do zero" },
   validateSearch: (search: Record<string, unknown>): NewAgentSearch => ({
     template: typeof search.template === "string" ? search.template : undefined,
@@ -29,11 +29,11 @@ function NewAgentPage() {
   const templates = data?.templates ?? [];
 
   const handleSelectTemplate = (slug: string) => {
-    navigate({ to: "/agents/new", search: { template: slug } });
+    navigate({ to: "/agents/new" as any, search: { template: slug } });
   };
 
   const handleScratch = () => {
-    navigate({ to: "/agents/new", search: { template: "scratch" } });
+    navigate({ to: "/agents/new" as any, search: { template: "scratch" } });
   };
 
   if (template && template !== "scratch") {
@@ -68,14 +68,14 @@ function NewAgentPage() {
 
       <div className="flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <p className="text-sm font-medium">Prefere comecar do zero?</p>
+          <p className="text-sm font-medium">Agente em branco</p>
           <p className="text-sm text-muted-foreground">
-            Configure seu agente manualmente sem usar um template.
+            Crie um agente vazio e configure cada detalhe no editor.
           </p>
         </div>
         <Button variant="outline" onClick={handleScratch}>
           <FilePlus2 className="mr-2 size-4" />
-          Criar do zero
+          Criar em branco
         </Button>
       </div>
     </div>

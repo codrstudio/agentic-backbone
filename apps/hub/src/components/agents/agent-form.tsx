@@ -94,7 +94,7 @@ export function AgentForm() {
 
   const ownerOptions = [
     { value: "system", label: "system" },
-    ...(users ?? []).map((u) => ({ value: u.slug, label: u.slug })),
+    ...(users ?? []).filter((u) => u.slug !== "system").map((u) => ({ value: u.slug, label: u.slug })),
   ];
 
   return (

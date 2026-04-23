@@ -39,7 +39,7 @@ import { Route as AuthenticatedSettingsOtelRouteImport } from './routes/_authent
 import { Route as AuthenticatedJobsIdRouteImport } from './routes/_authenticated/jobs.$id'
 import { Route as AuthenticatedChannelsNewRouteImport } from './routes/_authenticated/channels/new'
 import { Route as AuthenticatedChannelsSlugRouteImport } from './routes/_authenticated/channels.$slug'
-import { Route as AuthenticatedAgentsNewRouteImport } from './routes/_authenticated/agents.new'
+import { Route as AuthenticatedAgentsNewRouteImport } from './routes/_authenticated/agents_.new'
 import { Route as AuthenticatedAgentsIdRouteImport } from './routes/_authenticated/agents.$id'
 import { Route as AuthenticatedAdaptersNewRouteImport } from './routes/_authenticated/adapters/new'
 import { Route as AuthenticatedAgentsIdIndexRouteImport } from './routes/_authenticated/agents.$id.index'
@@ -236,9 +236,9 @@ const AuthenticatedChannelsSlugRoute =
     getParentRoute: () => AuthenticatedChannelsRoute,
   } as any)
 const AuthenticatedAgentsNewRoute = AuthenticatedAgentsNewRouteImport.update({
-  id: '/new',
-  path: '/new',
-  getParentRoute: () => AuthenticatedAgentsRoute,
+  id: '/agents_/new',
+  path: '/agents/new',
+  getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedAgentsIdRoute = AuthenticatedAgentsIdRouteImport.update({
   id: '/$id',
@@ -574,7 +574,7 @@ export interface FileRoutesById {
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/_authenticated/adapters/new': typeof AuthenticatedAdaptersNewRoute
   '/_authenticated/agents/$id': typeof AuthenticatedAgentsIdRouteWithChildren
-  '/_authenticated/agents/new': typeof AuthenticatedAgentsNewRoute
+  '/_authenticated/agents_/new': typeof AuthenticatedAgentsNewRoute
   '/_authenticated/channels/$slug': typeof AuthenticatedChannelsSlugRoute
   '/_authenticated/channels/new': typeof AuthenticatedChannelsNewRoute
   '/_authenticated/jobs/$id': typeof AuthenticatedJobsIdRoute
@@ -763,7 +763,7 @@ export interface FileRouteTypes {
     | '/_authenticated/'
     | '/_authenticated/adapters/new'
     | '/_authenticated/agents/$id'
-    | '/_authenticated/agents/new'
+    | '/_authenticated/agents_/new'
     | '/_authenticated/channels/$slug'
     | '/_authenticated/channels/new'
     | '/_authenticated/jobs/$id'
@@ -1027,12 +1027,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedChannelsSlugRouteImport
       parentRoute: typeof AuthenticatedChannelsRoute
     }
-    '/_authenticated/agents/new': {
-      id: '/_authenticated/agents/new'
-      path: '/new'
+    '/_authenticated/agents_/new': {
+      id: '/_authenticated/agents_/new'
+      path: '/agents/new'
       fullPath: '/agents/new'
       preLoaderRoute: typeof AuthenticatedAgentsNewRouteImport
-      parentRoute: typeof AuthenticatedAgentsRoute
+      parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/agents/$id': {
       id: '/_authenticated/agents/$id'
@@ -1388,12 +1388,10 @@ const AuthenticatedAgentsIdRouteWithChildren =
 
 interface AuthenticatedAgentsRouteChildren {
   AuthenticatedAgentsIdRoute: typeof AuthenticatedAgentsIdRouteWithChildren
-  AuthenticatedAgentsNewRoute: typeof AuthenticatedAgentsNewRoute
 }
 
 const AuthenticatedAgentsRouteChildren: AuthenticatedAgentsRouteChildren = {
   AuthenticatedAgentsIdRoute: AuthenticatedAgentsIdRouteWithChildren,
-  AuthenticatedAgentsNewRoute: AuthenticatedAgentsNewRoute,
 }
 
 const AuthenticatedAgentsRouteWithChildren =
@@ -1478,6 +1476,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedTranscriptionRoute: typeof AuthenticatedTranscriptionRoute
   AuthenticatedWorkflowsRoute: typeof AuthenticatedWorkflowsRouteWithChildren
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
+  AuthenticatedAgentsNewRoute: typeof AuthenticatedAgentsNewRoute
   AuthenticatedSettingsOtelRoute: typeof AuthenticatedSettingsOtelRoute
   AuthenticatedApprovalsIndexRoute: typeof AuthenticatedApprovalsIndexRoute
   AuthenticatedComplianceIndexRoute: typeof AuthenticatedComplianceIndexRoute
@@ -1502,6 +1501,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedTranscriptionRoute: AuthenticatedTranscriptionRoute,
   AuthenticatedWorkflowsRoute: AuthenticatedWorkflowsRouteWithChildren,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
+  AuthenticatedAgentsNewRoute: AuthenticatedAgentsNewRoute,
   AuthenticatedSettingsOtelRoute: AuthenticatedSettingsOtelRoute,
   AuthenticatedApprovalsIndexRoute: AuthenticatedApprovalsIndexRoute,
   AuthenticatedComplianceIndexRoute: AuthenticatedComplianceIndexRoute,

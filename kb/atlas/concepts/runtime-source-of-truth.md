@@ -4,8 +4,9 @@ aliases: [runtime-truth, container-config-inspection, legacy-deploy-investigatio
 tags: [deploy, debugging, principle, docker, caddy, infra]
 sources:
   - "calendar/notes/2026-04-21.md"
+  - "calendar/notes/2026-04-22.md"
 created: 2026-04-21
-updated: 2026-04-21
+updated: 2026-04-22
 ---
 
 # Runtime as Source of Truth for Legacy Deploy Investigation
@@ -32,7 +33,9 @@ The corollary for config restoration: if the running production image depends on
 
 - [[concepts/caddy-hub-strip-prefix]] - The Caddy config that was crystallized from the running container
 - [[concepts/processa-deploy-topology]] - The deployment environment where this principle was applied
+- [[concepts/deploy-only-ci-pattern-risks]] - Comparing built HTML asset paths between runtime and repo detects stale image deployments
 
 ## Sources
 
 - [[calendar/notes/2026-04-21.md]] - Principle articulated: `docker exec` to read live Caddyfile; restoration of `base: '/hub/'` as exception to "don't fix app" rule; nginx-default landing page as "implicit config smell"
+- [[calendar/notes/2026-04-22.md]] - Session (13:21): extended to include HTML asset path comparison as a staleness diagnostic — compare built `index.html` asset paths from running container vs what repo build would produce; mismatch confirms stale image
