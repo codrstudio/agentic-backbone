@@ -40,3 +40,8 @@ When answering questions that may draw on past knowledge, consult `kb/HOME.md` f
 - Hooks from any system under `.systems/` are routed through `uv run --directory .systems`, which uses the shared Python environment defined by `.systems/pyproject.toml` and `.systems/uv.lock`.
 - Slash commands under `.claude/commands/` expose interactive operations for each system.
 - Each system is responsible for creating its own subdirectories under `kb/` on first write. System-scoped binary state lives at `kb/x/<slug>/`, and day-scoped artifacts (operational logs, captured contexts) live at `kb/calendar/system/YYYY-MM-DD/` with filenames prefixed by the system slug (e.g. `log-memory.md`, `session-flush-memory-*.md`) so multiple systems can share the same per-day folder.
+
+## More info
+
+About LYT
+- .systems\memory\KNOWLEDGE_BASE.md

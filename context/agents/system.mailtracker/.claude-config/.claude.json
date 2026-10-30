@@ -33,7 +33,7 @@
         "currency": "BRL"
       },
       "remaining_passes": 3,
-      "timestamp": 1776911693007
+      "timestamp": 1777058600485
     }
   },
   "claudeAiMcpEverConnected": [
@@ -42,7 +42,7 @@
   "groveConfigCache": {
     "6ef5b597-f227-4e77-abdb-e26c8dcf53b3": {
       "grove_enabled": true,
-      "timestamp": 1776911696425
+      "timestamp": 1777058602277
     }
   },
   "cachedExtraUsageDisabledReason": "org_level_disabled"

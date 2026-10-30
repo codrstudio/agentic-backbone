@@ -21,6 +21,10 @@ menu:
       conformidade: false
       fleet: false
       opentelemetry: false
+      dashboard: false
+      conversas: false
+      custos: false
+      notificacoes: false
     agent:
       knowledge: true
       versoes: false
@@ -30,9 +34,14 @@ menu:
       avaliacao: false
       qualidade: false
       benchmarks: false
+      webhooks: false
+      handoffs: false
+      routing: false
+      workflows: false
+      sandbox: false
 infrastructure:
   ngrok:
-    authtoken: ENC(MjEJ5S4DxMJbIEsaUnmokNgeAdZUYsrwXz4/enkbpHY5MfH1xxpxUz4OuVqGBpFL24EOMhvGYfb0Zg+DfXsptYkhlZ4OgTkPWDZNR9s=)
+    authtoken: ENC(9HqJ8LYkdn3OXVsC+l4MjuqEm6JY06DiWlw7AbqVm8bP7UAkfFDMUtbOPknxJTVCCIr1w+t6Z0K4e0LMkuCX596VC+/T4qjjjknrO5w=)
     domain: nonporphyritic-microcrystalline-kenya.ngrok-free.dev
     enabled: true
   whisper:
@@ -40,10 +49,10 @@ infrastructure:
     compute-type: int8
 providers:
   openrouter:
-    api_key: ENC(XZQE0AGQn/n1cSThY9u1yCSzLfacDLWyiG+e36qG5Gd3J4NHBn/j/T8FUHFc3jz9Rd+7gifT847otFyU1CKYxXgU73Kc0i6uLMUJ/VBo+/+/qxTIuxDnD8jWxt77c67Y1Z096Rk=)
+    api_key: ENC(9ZbUPwtCRDmWNAKxhmh/Evdj9rTnZ02RE9SEsN2DXuVQ5ghb/tKV5DxgU96SlstyVAhy/oMI17THLI1s9/nH8lGI78fuhs9J0D7jajgqtGQ1fq9KiQo+rzO8UiwIHUZO0RW1SnQ=)
   openai:
-    api_key: ENC(w8DS3xTfzZTAicGFvifqD7pR0Thi7x6IHRxdk4BIMF2q+EHHbqSyCUANai8KldNeBGVmaczbCWcpMNSyvKO31zPrgk7HqXfIjNyttj2Z+PEZDMo+U6ILL/5YvpVAf3FT0PTGF7EFKvHtaaqPjKdLLN5mjDwM1JHYj3nfBiI4S2HRceHSGJnLissG/gPkpsuKnzSkuaoGAk7KRCbv0q2EHotXbP0EZmC+O1fU6Nyu33QjCVsTHqnnC3J2lep9nLaS)
+    api_key: ENC(yvznQxHQYvYF4j7uz8W07nVgvFrZ4/vZc50TYDK7j/dJH8obk9fMSJqgsiqhSqttBp2fG0+ANf3NLbXwz9bMpNAniUdklur0j7RHGbdcRRlZe34V8ziPZNJSmgvL1W8MPwdlqGWhJXh9jxbPjE6ZWbnLMZilOVNQ8U8qHKcXOPCllMS2kS5MzMYa4OOB2gxWI/rsQsgTYxqrhnQ6QrUuZ4EynNs1NfV1kFhrWdR/8xxLHZLAN/VSzhyhsYmfq2p3)
   brave:
-    api_key: ENC(3Q7phj2tQq6IaOkbV2D14IqoEc8RlDo/3ndefOd4m3+UqUcRNsMmk2Bopq/v9suTIsKTfSOMqK+g+wM=)
+    api_key: ENC(ptqM48IdE0VePtjvnbMjUoi5rmrukpccAs1cvM8bntoHwvUFuwRxG5s2OnuQgUJUo+HoVKWnfgRMieY=)
   groq:
-    api_key: ENC(qu4Sy5vOTLBxnRIpzHJWLIQ+LzFP1o387k8qTHAQTKha8d8HvQLBlCLr+k3oETDgDUKkXDCDQYePioyIySyeSH4zr3xFdFXazQnGBe/w0BgOBt9W)
+    api_key: ENC(j10bzMBnsXSCxNvHnb+v5yy4/Qv+8eNoj8Z5h/Yo2c4/LqmulNPS0JDWHCPMf1rWOutCIq25GP9GFPM6NJIYm4O+CvlTWPxk2f/nCYQfSv6PaaJH)
